@@ -6,7 +6,7 @@ DB:
 	+ USER: postgres,
 	+ PASSWORD: uN9pEGKv14yMJB0a,
 	+ HOST: 35.240.239.96,
-	+ PORT: DB_PORT,
+	+ PORT: 5432,
 
 	Default user postgres@uN9pEGKv14yMJB0a
 	
@@ -14,5 +14,4 @@ DB:
       sslcert=client-cert.pem sslkey=client-key.pem \
       hostaddr=35.240.239.96 \
       port=5432 \
-      user=postgres dbname=postgres"
-	  
+      user=postgres dbname=vhcm-db1"

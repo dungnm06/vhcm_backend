@@ -104,7 +104,7 @@ if DATABASE_PROVIDER == 'postgresql':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'vhcm-292513:asia-southeast1:vhcm-instance1',
+            'NAME': 'vhcm-db1',
             'USER': 'postgres',
             'PASSWORD': 'uN9pEGKv14yMJB0a',
             'HOST': '35.240.239.96',
@@ -114,6 +114,7 @@ if DATABASE_PROVIDER == 'postgresql':
                 'sslrootcert': os.path.join(BASE_DIR, 'db_cert/server-ca.pem'),
                 'sslcert': os.path.join(BASE_DIR, 'db_cert/client-cert.pem'),
                 'sslkey': os.path.join(BASE_DIR, 'db_cert/client-key.pem'),
+                'options': '-c search_path=vhcm,public'
             },
         }
     }
