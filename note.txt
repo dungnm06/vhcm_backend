@@ -1,0 +1,18 @@
+Django superuser:
+	+ dungnm@mashiro3108
+
+DB:
+	+ NAME: vhcm-292513:asia-southeast1:vhcm-instance1,
+	+ USER: postgres,
+	+ PASSWORD: uN9pEGKv14yMJB0a,
+	+ HOST: 35.240.239.96,
+	+ PORT: DB_PORT,
+
+	Default user postgres@uN9pEGKv14yMJB0a
+	
+  psql "sslmode=verify-ca sslrootcert=server-ca.pem \
+      sslcert=client-cert.pem sslkey=client-key.pem \
+      hostaddr=35.240.239.96 \
+      port=5432 \
+      user=postgres dbname=postgres"
+	  

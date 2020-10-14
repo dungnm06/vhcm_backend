@@ -99,22 +99,22 @@ WSGI_APPLICATION = 'restapi_core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASE_PROVIDER = 'sqlite'
+DATABASE_PROVIDER = 'postgresql'
 if DATABASE_PROVIDER == 'postgresql':
-    DB_NAME = os.environ.get('DB_NAME', 'zzz')
-    DB_USERNAME = os.environ.get('DB_USERNAME', 'zzz')
-    DB_PASSWORD = os.environ.get('DB_PASSWORD', 'zzz')  # just for dev
-    DB_HOST = os.environ.get('DB_HOST', 'localhost')
-    DB_PORT = os.environ.get('DB_PORT', '')
-
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': DB_NAME,
-            'USER': DB_USERNAME,
-            'PASSWORD': DB_PASSWORD,
-            'HOST': DB_HOST,
-            'PORT': DB_PORT,
+            'NAME': 'vhcm-292513:asia-southeast1:vhcm-instance1',
+            'USER': 'postgres',
+            'PASSWORD': 'uN9pEGKv14yMJB0a',
+            'HOST': '35.240.239.96',
+            'PORT': '5432',
+            'OPTIONS': {
+                'sslmode': 'verify-ca',
+                'sslrootcert': os.path.join(BASE_DIR, 'db_cert/server-ca.pem'),
+                'sslcert': os.path.join(BASE_DIR, 'db_cert/client-cert.pem'),
+                'sslkey': os.path.join(BASE_DIR, 'db_cert/client-key.pem'),
+            },
         }
     }
 elif DATABASE_PROVIDER == 'sqlite' or DATABASE_PROVIDER == 'sqlite3':
