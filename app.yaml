@@ -1,5 +1,7 @@
 # [START django_app]
 runtime: python38
+#env: flex
+instance_class: B2
 
 handlers:
 # This configures Google App Engine to serve the files in the app's static
@@ -13,3 +15,11 @@ handlers:
 - url: /.*
   script: auto
 # [END django_app]
+
+manual_scaling:
+  instances: 1
+
+#resources:
+#  cpu: 1
+#  memory_gb: 1
+#  disk_size_gb: 10
