@@ -1,4 +1,5 @@
 import jwt
+import vhcm.biz.authentication.jwt.jwt_utils as jwt_utils
 from rest_framework.authentication import BaseAuthentication
 from django.middleware.csrf import CsrfViewMiddleware
 from rest_framework import exceptions
@@ -35,7 +36,7 @@ class JWTAuthentication(BaseAuthentication):
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('Access token expired')
 
-        user = User.objects.filter(id=payload['user_id']).first()
+        user = User.objects.filter(id=payload[jwt_utils.USER_ID]).first()
         if user is None:
             raise exceptions.AuthenticationFailed('User not found')
 

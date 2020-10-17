@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 import os
 from pathlib import Path
-from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,21 +32,25 @@ AUTH_USER_MODEL = 'vhcm.User'
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ALLOW_CREDENTIALS = False  # to accept cookies via ajax request
+# to accept cookies via ajax request
+CORS_ALLOW_CREDENTIALS = False
 CORS_ORIGIN_WHITELIST = (
     'http://127.0.0.1:3000',
 )
 
 # JWT
-REFRESH_TOKEN_SECRET = 'bukonkutotodaidai'
+REFRESH_TOKEN_SECRET = 'iweresowrongaboutthis...'
 
+# REST_FRAMEWORK CONFIGS
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',  # make all endpoints private
+        # make all endpoints private
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'vhcm.biz.authentication.jwt_auth.JWTAuthentication',
     ),
+    'EXCEPTION_HANDLER': 'vhcm.biz.exception.exception_handler.raise_exception'
 }
 
 # Application definition
@@ -74,6 +77,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+]
+
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
 ROOT_URLCONF = 'restapi_core.urls'
@@ -116,7 +126,19 @@ if DATABASE_PROVIDER == 'postgresql':
                 'sslkey': os.path.join(BASE_DIR, 'db_cert/client-key.pem'),
                 'options': '-c search_path=vhcm,public'
             },
-        }
+        },
+        # For local uses if cant connect to cloud DB
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        #     'NAME': 'postgres',
+        #     'USER': 'postgres',
+        #     'PASSWORD': '123456',
+        #     'HOST': 'localhost',
+        #     'PORT': '5432',
+        #     'OPTIONS': {
+        #         'options': '-c search_path=vhcm-local,public'
+        #     },
+        # }
     }
 elif DATABASE_PROVIDER == 'sqlite' or DATABASE_PROVIDER == 'sqlite3':
     DATABASES = {

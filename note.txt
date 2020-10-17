@@ -1,12 +1,12 @@
 Django superuser:
-	+ dungnm@mashiro3108
+	+ dungnm: 123
 
 DB:
-	+ NAME: vhcm-292513:asia-southeast1:vhcm-instance1,
-	+ USER: postgres,
-	+ PASSWORD: uN9pEGKv14yMJB0a,
-	+ HOST: 35.240.239.96,
-	+ PORT: 5432,
+	+ NAME: vhcm-292513:asia-southeast1:vhcm-instance1
+	+ USER: postgres
+	+ PASSWORD: uN9pEGKv14yMJB0a
+	+ HOST: 35.240.239.96
+	+ PORT: 5432
 
 	Default user postgres@uN9pEGKv14yMJB0a
 	
