@@ -15,3 +15,11 @@ DB:
       hostaddr=35.240.239.96 \
       port=5432 \
       user=postgres dbname=vhcm-db1"
+
+GCloud App Service 
++ Deploy:
+	python manage.py collectstatic (run only 1)
+	gcloud app deploy
++ Stop:
+	gcloud app versions list
+	gcloud app versions stop <version>

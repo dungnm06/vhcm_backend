@@ -26,7 +26,11 @@ SECRET_KEY = 'g7^5)*q^=^#+fib)i$fpiwfzhfso10iqb4#!u@zv8x$j2x-0xi'
 DEBUG = True
 USE_DEBUG_TOOLBAR = False
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: App Engine's security features ensure that it is safe to
+# have ALLOWED_HOSTS = ['*'] when the app is deployed. If you deploy a Django
+# app not on App Engine, make sure to set an appropriate host here.
+# See https://docs.djangoproject.com/en/2.1/ref/settings/
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'vhcm.User'
 
@@ -111,35 +115,57 @@ WSGI_APPLICATION = 'restapi_core.wsgi.application'
 
 DATABASE_PROVIDER = 'postgresql'
 if DATABASE_PROVIDER == 'postgresql':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'vhcm-db1',
-            'USER': 'postgres',
-            'PASSWORD': 'uN9pEGKv14yMJB0a',
-            'HOST': '35.240.239.96',
-            'PORT': '5432',
-            'OPTIONS': {
-                'sslmode': 'verify-ca',
-                'sslrootcert': os.path.join(BASE_DIR, 'db_cert/server-ca.pem'),
-                'sslcert': os.path.join(BASE_DIR, 'db_cert/client-cert.pem'),
-                'sslkey': os.path.join(BASE_DIR, 'db_cert/client-key.pem'),
-                'options': '-c search_path=vhcm,public'
-            },
-        },
-        # For local uses if cant connect to cloud DB
-        # 'default': {
-        #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        #     'NAME': 'postgres',
-        #     'USER': 'postgres',
-        #     'PASSWORD': '123456',
-        #     'HOST': 'localhost',
-        #     'PORT': '5432',
-        #     'OPTIONS': {
-        #         'options': '-c search_path=vhcm-local,public'
-        #     },
-        # }
-    }
+    if os.getenv('GAE_APPLICATION', None):
+        # Running on production App Engine, so connect to Google Cloud SQL using
+        # the unix socket at /cloudsql/<your-cloudsql-connection string>
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'HOST': '/cloudsql/vhcm-292513:asia-southeast1:vhcm-instance1',
+                'USER': 'postgres',
+                'PASSWORD': 'uN9pEGKv14yMJB0a',
+                'NAME': 'vhcm-db1',
+                'OPTIONS': {
+                    'sslmode': 'verify-ca',
+                    'sslrootcert': os.path.join(BASE_DIR, 'db_cert/server-ca.pem'),
+                    'sslcert': os.path.join(BASE_DIR, 'db_cert/client-cert.pem'),
+                    'sslkey': os.path.join(BASE_DIR, 'db_cert/client-key.pem'),
+                    'options': '-c search_path=vhcm,public'
+                }
+            }
+        }
+    else:
+        # Running locally
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'NAME': 'vhcm-db1',
+                'USER': 'postgres',
+                'PASSWORD': 'uN9pEGKv14yMJB0a',
+                'HOST': '35.240.239.96',
+                'PORT': '5432',
+                'OPTIONS': {
+                    'sslmode': 'verify-ca',
+                    'sslrootcert': os.path.join(BASE_DIR, 'db_cert/server-ca.pem'),
+                    'sslcert': os.path.join(BASE_DIR, 'db_cert/client-cert.pem'),
+                    'sslkey': os.path.join(BASE_DIR, 'db_cert/client-key.pem'),
+                    'options': '-c search_path=vhcm,public'
+                }
+            }
+            # For local uses if cant connect to cloud DB
+            # 'default': {
+            #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            #     'NAME': 'postgres',
+            #     'USER': 'postgres',
+            #     'PASSWORD': '123456',
+            #     'HOST': 'localhost',
+            #     'PORT': '5432',
+            #     'OPTIONS': {
+            #         'options': '-c search_path=vhcm-local,public'
+            #     },
+            # }
+        }
+
 elif DATABASE_PROVIDER == 'sqlite' or DATABASE_PROVIDER == 'sqlite3':
     DATABASES = {
         'default': {
@@ -185,5 +211,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = 'static'
 
 USE_LOCAL_MEDIA = False

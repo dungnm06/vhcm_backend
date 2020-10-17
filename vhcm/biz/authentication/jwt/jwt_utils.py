@@ -11,7 +11,7 @@ ISSUE_TIME = 'iat'
 
 def generate_access_token(user):
     access_token_payload = {
-        USER_ID: user.id,
+        USER_ID: user.user_id,
         EXPIRE_TIME: datetime.datetime.utcnow() + datetime.timedelta(days=0, minutes=10),
         ISSUE_TIME: datetime.datetime.utcnow(),
     }
@@ -22,7 +22,7 @@ def generate_access_token(user):
 
 def generate_refresh_token(user, token_version):
     refresh_token_payload = {
-        USER_ID: user.id,
+        USER_ID: user.user_id,
         EXPIRE_TIME: datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
         ISSUE_TIME: datetime.datetime.utcnow()
     }

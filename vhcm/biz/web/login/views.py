@@ -45,7 +45,7 @@ def login(request):
     }
     result.set_status(True)
     result.set_result_data(data)
-    response.data = result
+    response.data = result.to_json()
     return response
 
 

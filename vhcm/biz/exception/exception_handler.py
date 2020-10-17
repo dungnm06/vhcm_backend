@@ -1,5 +1,6 @@
 from rest_framework.views import exception_handler
 from vhcm.common.response_json import ResponseJSON
+from rest_framework.response import Response
 
 
 def raise_exception(exc, context):
@@ -9,11 +10,18 @@ def raise_exception(exc, context):
     result = ResponseJSON()
     result.set_messages(['An exception has occured'])
 
-    # Now add the HTTP status code to the response.
+    # Now add the HTTP status code to the response. (APIException only)
     if response is not None:
         result.set_result_data({
             'status_code': response.status_code,
             'error_detail': response.data['detail']
+        })
+    # Other Exception types
+    else:
+        response = Response()
+        result.set_result_data({
+            'status_code': 501,
+            'error_detail': str(exc)
         })
 
     response.data = result.to_json()
