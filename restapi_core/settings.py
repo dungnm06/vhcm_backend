@@ -35,12 +35,16 @@ ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = 'vhcm.User'
 
 # CORS
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 # to accept cookies via ajax request
 CORS_ALLOW_CREDENTIALS = False
-CORS_ORIGIN_WHITELIST = (
-    'http://127.0.0.1:3000',
-)
+# CORS_ORIGIN_WHITELIST = (
+#     'http://127.0.0.1:3000',
+#     '117.6.60.188:3000',
+# )
+CSRF_TRUSTED_ORIGINS = [
+    '117.6.60.188'
+]
 
 # JWT
 REFRESH_TOKEN_SECRET = 'iweresowrongaboutthis...'
