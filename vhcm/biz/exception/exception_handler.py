@@ -8,7 +8,7 @@ def raise_exception(exc, context):
     # to get the standard error response.
     response = exception_handler(exc, context)
     result = ResponseJSON()
-    result.set_messages(['An exception has occured'])
+    result.set_messages(['An error has occured'])
 
     # Now add the HTTP status code to the response. (APIException only)
     if response is not None:

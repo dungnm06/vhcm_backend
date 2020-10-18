@@ -128,3 +128,6 @@ class User(AbstractBaseUser):
     def is_active(self):
         """Is the user active?"""
         return self.active
+
+    class Meta:
+        db_table = "user"

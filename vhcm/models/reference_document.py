@@ -13,7 +13,7 @@ CDATE = 'cdate'
 MDATE = 'mdate'
 
 
-class Refercence_Document(models.Model):
+class RefercenceDocument(models.Model):
     reference_document_id = models.AutoField(
         primary_key=True, serialize=True, verbose_name='reference document id'
     )
@@ -31,3 +31,6 @@ class Refercence_Document(models.Model):
     author = models.CharField(max_length=50, blank=False, default='', verbose_name='document author', db_index=True)
     cdate = models.DateTimeField(verbose_name='created date', auto_now_add=True)
     mdate = models.DateTimeField(verbose_name='modified date', auto_now=True)
+
+    class Meta:
+        db_table = "reference_document"

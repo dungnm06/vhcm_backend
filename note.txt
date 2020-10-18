@@ -17,9 +17,11 @@ DB:
       user=postgres dbname=vhcm-db1"
 
 GCloud App Service 
-+ Deploy:
++ Deploy new version:
 	python manage.py collectstatic (run only 1)
 	gcloud app deploy
 + Stop:
 	gcloud app versions list
 	gcloud app versions stop <version>
++ Start:
+	gcloud app versions start <version>

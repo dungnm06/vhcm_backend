@@ -1,0 +1,36 @@
+# Special characters
+HASH = '#'
+PERIOD = '.'
+COLON = ':'
+COMMA = ','
+PLUS = '+'
+MINUS = '-'
+SPACE = ' '
+UNDERSCORE = '_'
+# Encoding
+UTF8 = 'utf-8'
+UTF16 = 'utf-16'
+# Language processing
+VNCORENLP = 'vncorenlp'
+NAMED_ENTITY_TYPES = 'named_entity_types'
+CRITICAL_DATA_NG_PATTERNS = 'critical_data_ng_pattern'
+EXCLUDE_POS_TAG = 'exclude_pos_tag'
+EXCLUDE_WORDS = 'exclude_word'
+# Other
+BERT = 'bert'
+IDX2OBJ = 'idx2obj'
+OBJ2IDX = 'obj2idx'
+# Predict model relative
+CONFIG = 'config'
+CONFIG_PATH = "config.json"
+QUESTION_TYPE_DATA_PATH = 'question_type_data_path'
+QUESTION_TYPE_MODEL_PATH = 'question_type_model_weights'
+QUESTION_TYPE_MAP_FILE_PATH = 'question_type_map_file_path'
+QUESTION_TYPE_MAP_PREDEFINE = 'question_type_map'
+INTENT_DATA_PATH = 'intent_data_path'
+INTENT_MODEL_PATH = 'intent_model_weights'
+INTENT_MAP_FILE_PATH = 'intent_map_file_path'
+SYNONYMS_FILE_PATH = 'synonyms_file_path'
+GLOBAL_SYNONYMS_FILE_PATH = 'global_synonyms_file_path'
+PREDICT_THRESHOLD = 'predict_threshold'
+MAX_SENTENCE_LENGTH = 'max_sentence_length'

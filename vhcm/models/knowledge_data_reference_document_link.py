@@ -1,10 +1,24 @@
 from django.db import models
-from .knowledge_data import Knowledge_Data
-from .reference_document import Refercence_Document
+from .knowledge_data import KnowledgeData
+from .reference_document import RefercenceDocument
 
 
-class Knowledge_Data_Refercence_Document_Link(models.Model):
-    knowledge_data = models.ForeignKey(Knowledge_Data, on_delete=models.CASCADE)
-    reference_document = models.ForeignKey(Refercence_Document, on_delete=models.CASCADE)
-    page = models.SmallIntegerField(verbose_name='document page number')
-    extra_info = models.TextField(verbose_name='extra info on reference document')
+# Fields
+KNOWLEDGE_DATA_ID = 'knowledge_data'
+REFERENCE_DOCUMENT_ID = 'reference_document'
+PAGE = 'page'
+EXTRA_INFO = 'extra_info'
+
+
+class KnowledgeDataRefercenceDocumentLink(models.Model):
+    knowledge_data = models.ForeignKey(KnowledgeData, on_delete=models.CASCADE)
+    reference_document = models.ForeignKey(RefercenceDocument, on_delete=models.CASCADE)
+    page = models.SmallIntegerField(
+        verbose_name='document page number'
+    )
+    extra_info = models.TextField(
+        verbose_name='extra info on reference document'
+    )
+
+    class Meta:
+        db_table = "knowledge_data_reference_document_link"
