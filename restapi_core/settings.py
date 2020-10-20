@@ -35,12 +35,16 @@ ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = 'vhcm.User'
 
 # CORS
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 # to accept cookies via ajax request
 CORS_ALLOW_CREDENTIALS = False
-CORS_ORIGIN_WHITELIST = (
-    'http://127.0.0.1:3000',
-)
+# CORS_ORIGIN_WHITELIST = (
+#     'http://127.0.0.1:3000',
+#     '117.6.60.188:3000',
+# )
+CSRF_TRUSTED_ORIGINS = [
+    '117.6.60.188'
+]
 
 # JWT
 REFRESH_TOKEN_SECRET = 'iweresowrongaboutthis...'
@@ -121,7 +125,7 @@ if DATABASE_PROVIDER == 'postgresql':
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                'HOST': '/cloudsql/vhcm-292513:asia-southeast1:vhcm-instance1',
+                'HOST': '/cloudsql/vhcm-292513:us-central1:vhcm-psql-us1',
                 'USER': 'postgres',
                 'PASSWORD': 'uN9pEGKv14yMJB0a',
                 'NAME': 'vhcm-db1',
@@ -142,7 +146,7 @@ if DATABASE_PROVIDER == 'postgresql':
                 'NAME': 'vhcm-db1',
                 'USER': 'postgres',
                 'PASSWORD': 'uN9pEGKv14yMJB0a',
-                'HOST': '35.240.239.96',
+                'HOST': '35.224.128.36',
                 'PORT': '5432',
                 'OPTIONS': {
                     'sslmode': 'verify-ca',

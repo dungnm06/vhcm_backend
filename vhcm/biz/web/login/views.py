@@ -71,7 +71,7 @@ def request_refresh_token(request):
     except jwt.ExpiredSignatureError:
         raise exceptions.AuthenticationFailed('Expired refresh token')
 
-    user = user_query.objects.filter(id=payload.get(jwt_utils.USER_ID)).first()
+    user = user_query.objects.filter(user_id=payload.get(jwt_utils.USER_ID)).first()
     if user is None:
         raise exceptions.AuthenticationFailed('User not found')
 

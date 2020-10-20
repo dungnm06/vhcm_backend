@@ -1,3 +1,6 @@
+from pathlib import Path
+# Global variables
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 # Special characters
 HASH = '#'
 PERIOD = '.'
@@ -10,12 +13,6 @@ UNDERSCORE = '_'
 # Encoding
 UTF8 = 'utf-8'
 UTF16 = 'utf-16'
-# Language processing
-VNCORENLP = 'vncorenlp'
-NAMED_ENTITY_TYPES = 'named_entity_types'
-CRITICAL_DATA_NG_PATTERNS = 'critical_data_ng_pattern'
-EXCLUDE_POS_TAG = 'exclude_pos_tag'
-EXCLUDE_WORDS = 'exclude_word'
 # Other
 BERT = 'bert'
 IDX2OBJ = 'idx2obj'

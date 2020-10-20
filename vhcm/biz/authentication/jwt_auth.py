@@ -36,7 +36,7 @@ class JWTAuthentication(BaseAuthentication):
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('Access token expired')
 
-        user = User.objects.filter(id=payload[jwt_utils.USER_ID]).first()
+        user = User.objects.filter(user_id=payload[jwt_utils.USER_ID]).first()
         if user is None:
             raise exceptions.AuthenticationFailed('User not found')
 
