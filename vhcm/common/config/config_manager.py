@@ -46,7 +46,7 @@ def add_system_settings(request):
          'Language Processing: VNCoreNLP data path',
          'System path where VNCoreNLP files storing (absolute/relative path OK)',
          '',
-         'data\\nlu\\vncorenlp\\VnCoreNLP-1.1.1.jar'),
+         'data/nlu/vncorenlp/VnCoreNLP-1.1.1.jar'),
         ('exclude_pos_tag',
          'Language Processing: Exclude POS-tag',
          'These POS-tag will be ignored when analyze sentence subjects and verbs in language processing phase (comma separated)',
