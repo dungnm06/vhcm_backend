@@ -45,6 +45,7 @@ CORS_ALLOW_CREDENTIALS = False
 CSRF_TRUSTED_ORIGINS = [
     '117.6.60.188'
 ]
+CSRF_COOKIE_HTTPONLY = True
 
 # JWT
 REFRESH_TOKEN_SECRET = 'iweresowrongaboutthis...'
@@ -70,6 +71,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "sslserver",
     'corsheaders',
     'rest_framework',
     'vhcm',
