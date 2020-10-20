@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view
 from vhcm.common.response_json import ResponseJSON
 from rest_framework.response import Response
+from vhcm.models.synonym import Synonym
 
 
 @api_view(['GET', 'POST'])

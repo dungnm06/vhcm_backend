@@ -7,8 +7,8 @@ from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
-from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.csrf import ensure_csrf_cookie
+# from django.views.decorators.csrf import csrf_protect
+# from django.views.decorators.csrf import ensure_csrf_cookie
 from vhcm.biz.authentication.jwt.jwt_utils import generate_access_token, generate_refresh_token
 from vhcm.serializers.user import UserSerializer
 from vhcm.common.response_json import ResponseJSON
@@ -16,7 +16,7 @@ from vhcm.common.response_json import ResponseJSON
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-@ensure_csrf_cookie
+# @ensure_csrf_cookie
 def login(request):
     response = Response()
     result = ResponseJSON()
@@ -51,7 +51,7 @@ def login(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-@csrf_protect
+# @csrf_protect
 def request_refresh_token(request):
     """
     To obtain a new access_token this view expects 2 important things:
