@@ -12,22 +12,19 @@ class LanguageProcessor(object, metaclass=Singleton):
         # Variables for language understanding tasks
         self.config = config.CONFIG_LOADER
         self.rdrsegmenter = VnCoreNLP(
-            os.path.join(PROJECT_ROOT, to_abs_path(config.get_setting_value(config.VNCORENLP))))
+            os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.VNCORENLP))))
 
-        self.ner_types = config.get_setting_value(config.NAMED_ENTITY_TYPES)
+        self.ner_types = self.config.get_setting_value(config.NAMED_ENTITY_TYPES)
         self.ner_types = string_to_array(self.ner_types, COMMA)
 
-        self.critical_data_ng_patterns = config.get_setting_value(config.CRITICAL_DATA_NG_PATTERNS)
+        self.critical_data_ng_patterns = self.config.get_setting_value(config.CRITICAL_DATA_NG_PATTERNS)
         self.critical_data_ng_patterns = string_to_array(self.critical_data_ng_patterns, COMMA)
 
-        self.exclude_pos_tag = config.get_setting_value(config.EXCLUDE_POS_TAG)
+        self.exclude_pos_tag = self.config.get_setting_value(config.EXCLUDE_POS_TAG)
         self.exclude_pos_tag = string_to_array(self.exclude_pos_tag, COMMA)
 
-        self.exclude_words = config.get_setting_value(config.EXCLUDE_WORDS)
+        self.exclude_words = self.config.get_setting_value(config.EXCLUDE_WORDS)
         self.exclude_words = string_to_array(self.exclude_words, COMMA)
-
-        # test
-        print(self.rdrsegmenter.tokenize('vncorenlp dùng như cc'))
 
     def word_segmentation_no_join(self, text):
         return self.rdrsegmenter.tokenize(text)
@@ -57,41 +54,66 @@ class LanguageProcessor(object, metaclass=Singleton):
             raise Exception("Invaild input type, only str or list of string")
 
     def pos_tagging(self, sentence):
-        # Can only handle simple sentence for now
-        return self.rdrsegmenter.pos_tag(sentence)[0]
+        return self.rdrsegmenter.pos_tag(sentence)
 
     def named_entity_reconize(self, sentence):
-        # Can only handle simple sentence for now
-        ner = self.rdrsegmenter.ner(sentence)[0]
+        ners = self.rdrsegmenter.ner(sentence)
         # Collect named entity words to list
         # Using BIO rule: B: begin, I: inside, O: outside
         named_entities_list = []
         tmp_word = ''
         current_type = ''
-        for o in ner:
-            word, tag = o
-            if tag != 'O':
-                pos, typ = tag.split('-')
-                # Not supporting type
-                if typ not in self.ner_types:
-                    continue
-                # Begin of entity
-                if pos == 'B' and not current_type:
-                    tmp_word += word + SPACE
-                    current_type = typ
-                # Inside of entity
-                elif pos == 'I' and current_type == typ:
-                    tmp_word += word + SPACE
-                # Start new entity
-                elif pos == 'B' and current_type:
-                    named_entities_list.append((current_type, tmp_word.strip()))
-                    tmp_word = word + SPACE
-                    current_type = typ
-            # Outside of entity
-            elif tag == 'O' and current_type:
-                named_entities_list.append((current_type, tmp_word.strip()))
-                tmp_word = ''
-                current_type = ''
+        idx = 0
+        for ner in ners:
+            tmp_list = []
+            for i, o in enumerate(ner):
+                word, tag = o
+                if tag != 'O':
+                    pos, typ = tag.split('-')
+                    # Not supporting type
+                    if typ not in self.ner_types:
+                        continue
+                    # Begin of entity
+                    if pos == 'B' and not current_type:
+                        idx = i
+                        tmp_word += word + ' '
+                        current_type = typ
+                    # Inside of entity
+                    elif pos == 'I' and current_type == typ:
+                        tmp_word += word + ' '
+                    # Start new entity
+                    elif pos == 'B' and current_type:
+                        named_entity = {
+                            'type': current_type,
+                            'word': tmp_word.strip(),
+                            'start_idx': idx,
+                            'end_idx': i - 1
+                        }
+                        tmp_list.append(named_entity)
+                        tmp_word = word + ' '
+                        current_type = typ
+                        idx = i
+                # Outside of entity
+                elif tag == 'O' and current_type:
+                    named_entity = {
+                        'type': current_type,
+                        'word': tmp_word.strip(),
+                        'start_idx': idx,
+                        'end_idx': i - 1
+                    }
+                    tmp_list.append(named_entity)
+                    tmp_word = ''
+                    current_type = ''
+                # End of sentence
+                if i + 1 == len(ner) and current_type:
+                    named_entity = {
+                        'type': current_type,
+                        'word': tmp_word.strip(),
+                        'start_idx': idx,
+                        'end_idx': i
+                    }
+                    tmp_list.append(named_entity)
+            named_entities_list.append(tmp_list)
         return named_entities_list
 
     def generate_similary_sentences(self, sentence_synonym_dict_pair, word_segemented=False, segemented_output=False):
@@ -230,7 +252,8 @@ class LanguageProcessor(object, metaclass=Singleton):
 
     def analyze_critical_parts(self, intent, sentence):
         # Word POS tagging
-        pos_tag = self.pos_tagging(sentence)
+        # Can only handle simple sentence for now
+        pos_tag = self.pos_tagging(sentence)[0]
         # Obtain named entity in the sentence
         ner = self.named_entity_reconize(sentence)
         # Data for the process
@@ -294,7 +317,7 @@ class LanguageProcessor(object, metaclass=Singleton):
 
     def analyze_sentence_components(self, intent, sentence):
         # Word POS tagging
-        pos_tag = self.pos_tagging(sentence)
+        pos_tag = self.pos_tagging(sentence)[0]
         # Obtain named entity in the sentence
         ner = self.named_entity_reconize(sentence)
         # Data for the process
@@ -307,3 +330,6 @@ class LanguageProcessor(object, metaclass=Singleton):
             return flag
         flag = self.analyze_verb_components(intent, sentence)
         return flag
+
+
+language_processor = LanguageProcessor()

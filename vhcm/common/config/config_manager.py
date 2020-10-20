@@ -26,7 +26,7 @@ class ConfigLoader(object, metaclass=Singleton):
 # ALL CONFIGS
 VNCORENLP = 'vncorenlp'
 NAMED_ENTITY_TYPES = 'named_entity_types'
-CRITICAL_DATA_NG_PATTERNS = 'critical_data_ng_pattern'
+CRITICAL_DATA_NG_PATTERNS = 'subject_data_ng_pattern'
 EXCLUDE_POS_TAG = 'exclude_pos_tag'
 EXCLUDE_WORDS = 'exclude_word'
 
