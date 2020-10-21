@@ -36,7 +36,7 @@ AUTH_USER_MODEL = 'vhcm.User'
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
-# to accept cookies via ajax request
+# to accept cookies via request
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
     'http://127.0.0.1:3000',
