@@ -21,4 +21,5 @@ urlpatterns = [
     path('synonym/all', synonym_views.get_all_synonyms, name='get_all_synonyms'),
     # Reference document
     path('reference-document/all', reference_document_views.get_all_document, name='get_all_synonyms'),
+    path('reference-document/add', reference_document_views.AddNewReferenceDocument.as_view(), name='add-new-reference'),
 ]

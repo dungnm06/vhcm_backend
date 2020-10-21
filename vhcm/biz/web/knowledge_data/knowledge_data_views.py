@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from vhcm.biz.nlu.language_processing import language_processor
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 def tokenize_sentences(request):
     response = Response()
     result = ResponseJSON()
@@ -22,7 +22,7 @@ def tokenize_sentences(request):
                 "type": word[1],
                 "value": word[0]
             })
-        pos_tag_tmp.append(words)
+        pos_tag_tmp.extend(words)
 
     data = {
         'ner': ner,
