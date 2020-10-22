@@ -21,15 +21,13 @@ class JWTAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
         User = get_user_model()
-        authorization_header = request.headers.get('Authorization')
+        access_token = request.COOKIES.get('accesstoken')
 
         # Authentication credentials not provided
-        if not authorization_header:
+        if not access_token:
             return None
 
         try:
-            # header = 'xxxxxxxxxxxxxxxxxxxxxxxx'
-            access_token = authorization_header
             payload = jwt.decode(
                 access_token, settings.SECRET_KEY, algorithms=['HS256'])
 

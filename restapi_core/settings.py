@@ -38,12 +38,15 @@ AUTH_USER_MODEL = 'vhcm.User'
 CORS_ORIGIN_ALLOW_ALL = True
 # to accept cookies via request
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = (
-    'http://127.0.0.1:3000',
-    'http://117.6.60.188:3000',
-)
+# CORS_ORIGIN_WHITELIST = (
+#     'https://127.0.0.1',
+#     'https://127.0.0.1:3000',
+#     'https://117.6.60.188:3000',
+# )
 CSRF_TRUSTED_ORIGINS = [
-    '117.6.60.188'
+    # React server
+    '127.0.0.1',
+    '127.0.0.1:3000'
 ]
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
@@ -66,7 +69,6 @@ REST_FRAMEWORK = {
 }
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -84,12 +86,13 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'vhcm.biz.authentication.access_token_updator.AccessTokenUpdatorMiddleware'
 ]
 
 PASSWORD_HASHERS = [

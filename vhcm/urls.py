@@ -12,7 +12,7 @@ urlpatterns = [
     path('hello', root_view.HelloView.as_view(), name='hello'),
     # For authentication
     path('auth', login_views.login, name='auth'),
-    path('refresh-token', login_views.request_refresh_token, name='refresh_token'),
+    # path('refresh-token', login_views.request_refresh_token, name='refresh_token'),
     # System settings
     path('init-settings', add_system_settings, name='add_base_system_settings'),
     # Knowledge data processing
