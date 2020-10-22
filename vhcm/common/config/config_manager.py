@@ -19,16 +19,44 @@ class ConfigLoader(object, metaclass=Singleton):
         else:
             return setting.default
 
+    def get_setting_value_array(self, key, separator):
+        setting = self.settings.filter(setting_id=key).first()
+        if setting is None:
+            raise Exception('Setting not found: ', key)
+        value = None
+        if setting.value:
+            value = setting.value
+        else:
+            value = setting.default
+
+        return [v.strip() for v in value.split(separator)]
+
+    def get_setting_value_int(self, key):
+        setting = self.settings.filter(setting_id=key).first()
+        if setting is None:
+            raise Exception('Setting not found: ', key)
+        value = None
+        if setting.value:
+            value = setting.value
+        else:
+            value = setting.default
+
+        return int(value)
+
     def get_setting(self, key):
         return self.settings.filter(setting_id=key).first()
 
 
 # ALL CONFIGS
+# NLP
 VNCORENLP = 'vncorenlp'
 NAMED_ENTITY_TYPES = 'named_entity_types'
 CRITICAL_DATA_NG_PATTERNS = 'subject_data_ng_pattern'
 EXCLUDE_POS_TAG = 'exclude_pos_tag'
 EXCLUDE_WORDS = 'exclude_word'
+# System
+LOGIN_EXPIRATION_LIMIT = 'login_expiration_limit'
+ACCEPT_IMAGE_FORMAT = 'accept_image_format'
 
 # Instance
 SYSTEM_SETTINGS = SystemSetting.objects.all()
@@ -66,7 +94,17 @@ def add_system_settings(request):
          'Language Processing: Exclude words',
          'These words will be ignored when analyze sentence subjects and verbs in language processing phase (comma separated)',
          'bị,được,giữa,và,là',
-         '')
+         ''),
+        ('login_expiration_limit',
+         'System: Login expiration time',
+         'Specify login expiration time threshold (in minutes)',
+         '5',
+         '30'),
+        ('accept_image_format',
+         'System: Acceptable image file format ',
+         'Specify image file format that can be uploaded to system.\nSee available types at: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html',
+         'JPEG,JPEG 2000,PNG',
+         ''),
     ]
 
     settings = [SystemSetting(setting_id=s[0], setting_name=s[1], description=s[2], value=s[3], default=s[4]) for s in

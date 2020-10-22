@@ -14,17 +14,10 @@ class LanguageProcessor(object, metaclass=Singleton):
         self.rdrsegmenter = VnCoreNLP(
             os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.VNCORENLP))))
 
-        self.ner_types = self.config.get_setting_value(config.NAMED_ENTITY_TYPES)
-        self.ner_types = string_to_array(self.ner_types, COMMA)
-
-        self.critical_data_ng_patterns = self.config.get_setting_value(config.CRITICAL_DATA_NG_PATTERNS)
-        self.critical_data_ng_patterns = string_to_array(self.critical_data_ng_patterns, COMMA)
-
-        self.exclude_pos_tag = self.config.get_setting_value(config.EXCLUDE_POS_TAG)
-        self.exclude_pos_tag = string_to_array(self.exclude_pos_tag, COMMA)
-
-        self.exclude_words = self.config.get_setting_value(config.EXCLUDE_WORDS)
-        self.exclude_words = string_to_array(self.exclude_words, COMMA)
+        self.ner_types = self.config.get_setting_value_array(config.NAMED_ENTITY_TYPES, COMMA)
+        self.critical_data_ng_patterns = self.config.get_setting_value_array(config.CRITICAL_DATA_NG_PATTERNS, COMMA)
+        self.exclude_pos_tag = self.config.get_setting_value_array(config.EXCLUDE_POS_TAG, COMMA)
+        self.exclude_words = self.config.get_setting_value_array(config.EXCLUDE_WORDS, COMMA)
 
     def word_segmentation_no_join(self, text):
         return self.rdrsegmenter.tokenize(text)

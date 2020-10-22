@@ -10,9 +10,10 @@ ISSUE_TIME = 'iat'
 
 
 def generate_access_token(user):
+    from vhcm.common.config.config_manager import CONFIG_LOADER, LOGIN_EXPIRATION_LIMIT
     access_token_payload = {
         USER_ID: user,
-        EXPIRE_TIME: datetime.datetime.utcnow() + datetime.timedelta(days=0, minutes=5),
+        EXPIRE_TIME: datetime.datetime.utcnow() + datetime.timedelta(minutes=CONFIG_LOADER.get_setting_value_int(LOGIN_EXPIRATION_LIMIT)),
         ISSUE_TIME: datetime.datetime.utcnow(),
     }
     access_token = jwt.encode(access_token_payload,

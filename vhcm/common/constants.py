@@ -13,6 +13,8 @@ UNDERSCORE = '_'
 # Encoding
 UTF8 = 'utf-8'
 UTF16 = 'utf-16'
+# System
+ACCESS_TOKEN = 'accesstoken'
 # Other
 BERT = 'bert'
 IDX2OBJ = 'idx2obj'

@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from vhcm.models.user import User
+import vhcm.models.user as user_model
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['user_id', 'username', 'email',
-                  'fullname', 'nationality', 'place_of_birth',
-                  'date_of_birth', 'address', 'phone_number',
-                  'cdate', 'mdate', 'active', 'admin']
+        model = user_model.User
+        fields = [user_model.ID, user_model.USERNAME, user_model.EMAIL,
+                  user_model.FULLNAME, user_model.NATIONALITY, user_model.PLACE_OF_BIRTH,
+                  user_model.DATE_OF_BIRTH, user_model.ADDRESS, user_model.PHONE_NUMBER,
+                  user_model.CDATE, user_model.MDATE, user_model.ACTIVE]

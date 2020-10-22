@@ -12,3 +12,4 @@ from .knowledge_data_reference_document_link import KnowledgeDataRefercenceDocum
 from .report import Report
 from .system_settings import SystemSetting
 from .user import User
+from .blacklisted_token import BlacklistedToken

@@ -5,6 +5,7 @@ from django.middleware.csrf import CsrfViewMiddleware
 from rest_framework import exceptions
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from vhcm.common.constants import ACCESS_TOKEN
 
 
 class CSRFCheck(CsrfViewMiddleware):
@@ -21,7 +22,7 @@ class JWTAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
         User = get_user_model()
-        access_token = request.COOKIES.get('accesstoken')
+        access_token = request.COOKIES.get(ACCESS_TOKEN)
 
         # Authentication credentials not provided
         if not access_token:
@@ -53,7 +54,6 @@ class JWTAuthentication(BaseAuthentication):
         # populates request.META['CSRF_COOKIE'], which is used in process_view()
         check.process_request(request)
         reason = check.process_view(request, None, (), {})
-        print(reason)
         if reason:
             # CSRF failed, bail with explicit error message
             raise exceptions.PermissionDenied('CSRF Failed: %s' % reason)

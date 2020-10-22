@@ -1,20 +1,19 @@
 import vhcm.models.user as user_model
-# import vhcm.biz.authentication.jwt.jwt_utils as jwt_utils
 from django.contrib.auth import get_user_model
-# from django.conf import settings
 from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view, permission_classes
-# from django.views.decorators.csrf import csrf_protect
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from django.views.decorators.csrf import ensure_csrf_cookie
 from vhcm.biz.authentication.jwt.jwt_utils import generate_access_token
 from vhcm.serializers.user import UserSerializer
 from vhcm.common.response_json import ResponseJSON
+from vhcm.common.constants import ACCESS_TOKEN
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@authentication_classes([])
 @ensure_csrf_cookie
 def login(request):
     response = Response()
@@ -37,7 +36,7 @@ def login(request):
     access_token = generate_access_token(user.user_id)
     # refresh_token = generate_refresh_token(user, None)
 
-    response.set_cookie(key='accesstoken', value=access_token, httponly=True, secure=True, samesite='None')
+    response.set_cookie(key=ACCESS_TOKEN, value=access_token, httponly=True, secure=True, samesite='None')
     data = {
         'user': serialized_user,
     }
