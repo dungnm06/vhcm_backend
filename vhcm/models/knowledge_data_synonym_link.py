@@ -12,8 +12,9 @@ class KnowledgeDataSynonymLink(models.Model):
     knowledge_data = models.ForeignKey(KnowledgeData, on_delete=models.CASCADE)
     synonym = models.ForeignKey(Synonym, on_delete=models.CASCADE)
     word = models.TextField(
-        primary_key=True, verbose_name='word thats synonym dict linking with'
+        verbose_name='word thats synonym dict linking with'
     )
 
     class Meta:
         db_table = "knowledge_data_synonym_link"
+        unique_together = ('knowledge_data', 'synonym', 'word',)

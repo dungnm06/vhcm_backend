@@ -38,6 +38,8 @@ def logout(request):
                                         expire=datetime.fromtimestamp(payload.get(jwt_utils.EXPIRE_TIME)))
             bl_token.save()
 
+    request.session['user_id'] = None
+
     result.set_status(True)
     response.data = result.to_json()
     return response

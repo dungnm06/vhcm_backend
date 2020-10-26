@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from vhcm.models.system_settings import SystemSetting
 from vhcm.common.response_json import ResponseJSON
@@ -64,6 +65,8 @@ CONFIG_LOADER = ConfigLoader(SYSTEM_SETTINGS)
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
+@authentication_classes([])
 def add_system_settings(request):
     response = Response()
     result = ResponseJSON()

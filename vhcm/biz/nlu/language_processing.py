@@ -2,7 +2,7 @@ import os
 from vncorenlp import VnCoreNLP
 import vhcm.common.config.config_manager as config
 from vhcm.common.constants import *
-from vhcm.common.utils.CV import to_abs_path, string_to_array
+from vhcm.common.utils.CV import to_abs_path
 from vhcm.common.singleton import Singleton
 from itertools import product
 

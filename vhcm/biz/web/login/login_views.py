@@ -32,6 +32,7 @@ def login(request):
         raise exceptions.AuthenticationFailed('Wrong password')
 
     serialized_user = UserSerializer(user).data
+    request.session['user_id'] = user.user_id
 
     access_token = generate_access_token(user.user_id)
     # refresh_token = generate_refresh_token(user, None)

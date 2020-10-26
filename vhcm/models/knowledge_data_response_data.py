@@ -7,15 +7,16 @@ ID = 'response_data_id'
 KNOWLEDGE_DATA_ID = 'knowledge_data'
 TYPE = 'type'
 ANSWER = 'answer'
+
 # Constants
 RESPONSE_TYPES = {
-    1: 'what',
-    2: 'when',
-    3: 'where',
-    4: 'who',
-    5: 'why',
-    6: 'how',
-    7: 'yesno'
+    'WHAT':     1,
+    'WHEN':     2,
+    'WHERE':    3,
+    'WHO':      4,
+    'WHY':      5,
+    'HOW':      6,
+    'YESNO':    7
 }
 
 

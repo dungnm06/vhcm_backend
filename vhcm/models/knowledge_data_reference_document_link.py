@@ -14,9 +14,11 @@ class KnowledgeDataRefercenceDocumentLink(models.Model):
     knowledge_data = models.ForeignKey(KnowledgeData, on_delete=models.CASCADE)
     reference_document = models.ForeignKey(RefercenceDocument, on_delete=models.CASCADE)
     page = models.SmallIntegerField(
+        null=True,
         verbose_name='document page number'
     )
     extra_info = models.TextField(
+        null=True,
         verbose_name='extra info on reference document'
     )
 

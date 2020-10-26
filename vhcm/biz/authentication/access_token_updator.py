@@ -22,8 +22,13 @@ class AccessTokenUpdatorMiddleware:
 
         access_token = request.COOKIES.get('accesstoken')
         if not access_token \
-                or (not response.data['status'] and response.data['result_data']['error_detail'] == 'Access token expired')\
-                or (not response.data['status'] and response.data['result_data']['status_code'] == 403)\
+                or (
+                    'An error has occured' in response.data['messages'] and
+                    (
+                            (not response.data['status'] and response.data['result_data']['error_detail'] == 'Access token expired')
+                            or (not response.data['status'] and response.data['result_data']['status_code'] == 403)
+                    )
+                )\
                 or ('auth' in request.path):
             return response
 

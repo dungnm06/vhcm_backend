@@ -1,19 +1,14 @@
 import io
-import jwt
-import vhcm.biz.authentication.jwt.jwt_utils as jwt_utils
-import rest_framework.status as status
 import vhcm.models.reference_document as document_model
-import vhcm.models.user as user_model
 import vhcm.common.config.config_manager as config
-from django.conf import settings
-from rest_framework import exceptions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.parsers import FileUploadParser
 from rest_framework.views import APIView
 from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.reference_document import ReferenceDocumentSerializer
-from vhcm.common.constants import ACCESS_TOKEN, COMMA
+from vhcm.common.constants import COMMA
+from vhcm.biz.authentication.user_session import get_current_user
 from PIL import Image
 
 
@@ -93,13 +88,7 @@ class AddNewReferenceDocument(APIView):
             document.link = request.data[document_model.LINK]
 
         # User
-        access_token = request.COOKIES.get(ACCESS_TOKEN)
-        try:
-            payload = jwt.decode(
-                access_token, settings.SECRET_KEY, algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise exceptions.AuthenticationFailed('Something wrong with access-token')
-        user = user_model.User.objects.filter(user_id=int(payload.get(jwt_utils.USER_ID))).first()
+        user = get_current_user(request)
         document.create_user = user
         document.last_edit_user = user
         document.save()
@@ -147,14 +136,8 @@ class EditReferenceDocument(APIView):
             document.link = request.data[document_model.LINK]
 
         # Edit user
-        access_token = request.COOKIES.get(ACCESS_TOKEN)
-        try:
-            payload = jwt.decode(
-                access_token, settings.SECRET_KEY, algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise exceptions.AuthenticationFailed('Something wrong with access-token')
-
-        document.last_edit_user = user_model.User.objects.filter(user_id=int(payload.get(jwt_utils.USER_ID))).first()
+        user = get_current_user(request)
+        document.last_edit_user = user
         document.save()
 
         result.set_status(True)

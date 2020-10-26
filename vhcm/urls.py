@@ -18,9 +18,15 @@ urlpatterns = [
     # System settings
     path('init-settings', add_system_settings, name='add_base_system_settings'),
     # Knowledge data processing
-    path('knowledge-data/extract-sentence', knowledge_data_views.tokenize_sentences, name='add_base_system_settings'),
+    path('knowledge-data/extract-sentence', knowledge_data_views.tokenize_sentences, name='tokenize sentence'),
+    path('knowledge-data/add', knowledge_data_views.add, name='add new knowledge data'),
     # Synonym
     path('synonym/all', synonym_views.get_all_synonyms, name='get_all_synonyms'),
+    path('synonym/get', synonym_views.get, name='get_one_synonym'),
+    path('synonym/add', synonym_views.add, name='add_synonym'),
+    path('synonym/edit', synonym_views.edit, name='edit_synonym'),
+    path('synonym/validate-delete', synonym_views.validate_delete, name='validate_synonym_before_delete'),
+    path('synonym/delete', synonym_views.delete, name='delete_synonym'),
     # Reference document
     path('reference-document/all', reference_document_views.get_all_document, name='get_all_references'),
     path('reference-document/get', reference_document_views.get_document, name='get_reference'),
