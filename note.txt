@@ -29,9 +29,11 @@ GCloud App Service
 Install environment:
 + JDK8
 + postgresql 12
++ conda create -n django python=3.6.9
 + pip install -r requirements.txt
 	
 Deploy local:
++ conda activate django
 + Port 8000 default: python manage.py runsslserver
 + Custom port: python manage.py runsslserver 127.0.0.1:<port>
 
