@@ -79,7 +79,7 @@ class User(AbstractBaseUser):
     )
     phone_number = models.CharField(
         verbose_name='phone number',
-        max_length=20, null=True
+        max_length=20, null=True, blank=True
     )
     cdate = models.DateTimeField(
         verbose_name='account create time',
@@ -91,8 +91,9 @@ class User(AbstractBaseUser):
     )
     email = models.EmailField(
         verbose_name='email address',
-        max_length=60, null=True, db_index=True
+        max_length=60, null=True, db_index=True, blank=True
     )
+    avatar = models.BinaryField()
     active = models.BooleanField(default=True, db_index=True)
     admin = models.BooleanField(default=False)  # a superuser
     # notice the absence of a "Password field", that is built in.
@@ -118,16 +119,6 @@ class User(AbstractBaseUser):
         """Does the user have permissions to view the app `app_label`?"""
         # Simplest possible answer: Yes, always
         return True
-
-    @property
-    def is_admin(self):
-        """Is the user a admin member?"""
-        return self.admin
-
-    @property
-    def is_active(self):
-        """Is the user active?"""
-        return self.active
 
     class Meta:
         db_table = "user"

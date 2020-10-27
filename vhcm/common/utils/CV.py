@@ -1,9 +1,6 @@
 import os
-import io
+import json
 from pathlib import Path
-import PIL.Image as Image
-
-from array import array
 
 
 def readimage(path):
@@ -11,10 +8,6 @@ def readimage(path):
     with open(path, "rb") as f:
         return bytearray(f.read())
 
-
-# bytes = readimage(path+extension)
-# image = Image.open(io.BytesIO(bytes))
-# image.save(savepath)
 
 def to_abs_path(path):
     if os.path.isabs(path):
@@ -26,3 +19,12 @@ def to_abs_path(path):
 
 def string_to_array(input_str, separator=' '):
     return [s.strip() for s in input_str.split(separator)]
+
+
+def extract_validation_messages(form):
+    messages = []
+    errors = json.loads(form.errors.as_json())
+    for field in errors:
+        messages.extend([field_error['message'] for field_error in errors[field]])
+
+    return messages

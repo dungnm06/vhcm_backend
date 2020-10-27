@@ -16,10 +16,10 @@ CDATE = 'cdate'
 MDATE = 'mdate'
 # Constant
 PROCESS_STATUS = [
-    0,  # Available
-    1,  # Processing
-    2,  # Done
-    3   # Disable
+    (0, 'Available'),
+    (1, 'Processing'),
+    (2, 'Done'),
+    (3, 'Disable')
 ]
 
 
@@ -34,7 +34,7 @@ class KnowledgeData(models.Model):
     intent = models.CharField(max_length=50, verbose_name='intent', db_index=True)
     intent_fullname = models.CharField(max_length=255, verbose_name='intent full name', db_index=True)
     base_response = models.TextField(verbose_name='base response')
-    status = models.SmallIntegerField(verbose_name='status', default=1)
+    status = models.SmallIntegerField(verbose_name='status', choices=PROCESS_STATUS, default=1)
     raw_data = models.TextField(verbose_name='raw text data')
     cdate = models.DateTimeField(verbose_name='created date', auto_now_add=True)
     mdate = models.DateTimeField(verbose_name='modified date', auto_now=True)

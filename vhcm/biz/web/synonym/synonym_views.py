@@ -32,7 +32,7 @@ def get(request):
     result = ResponseJSON()
 
     try:
-        synonym_id = int(request.data.get('id'))
+        synonym_id = int(request.data.get('id')) if request.method == 'POST' else int(request.GET.get('id'))
         synonym = synonym_model.Synonym.objects.filter(synonym_id=synonym_id).first()
         if synonym is None:
             raise ValueError('')
@@ -111,7 +111,7 @@ def validate_delete(request):
     result = ResponseJSON()
 
     try:
-        synonym_id = int(request.data.get('id'))
+        synonym_id = int(request.data.get('id')) if request.method == 'POST' else int(request.GET.get('id'))
         synonym = synonym_model.Synonym.objects.filter(synonym_id=synonym_id).first()
         if synonym is None:
             raise ValueError('')
@@ -151,7 +151,7 @@ def delete(request):
     result = ResponseJSON()
 
     try:
-        synonym_id = int(request.data.get('id'))
+        synonym_id = int(request.data.get('id')) if request.method == 'POST' else int(request.GET.get('id'))
         synonym = synonym_model.Synonym.objects.filter(synonym_id=synonym_id).first()
         if synonym is None:
             raise ValueError('')

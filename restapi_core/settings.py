@@ -96,7 +96,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'vhcm.biz.authentication.access_token_updator.AccessTokenUpdatorMiddleware'
+    'vhcm.biz.middleware.VhcmMiddleware'
 ]
 
 PASSWORD_HASHERS = [
