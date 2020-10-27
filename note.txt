@@ -5,14 +5,14 @@ DB:
 	+ NAME: vhcm-292513:asia-southeast1:vhcm-instance1
 	+ USER: postgres
 	+ PASSWORD: uN9pEGKv14yMJB0a
-	+ HOST: 35.240.239.96
+	+ HOST: 35.224.128.36 (On gcloud internal network: 10.41.144.3)
 	+ PORT: 5432
 
-	Default user postgres@uN9pEGKv14yMJB0a
+	Default user "postgres": uN9pEGKv14yMJB0a
 	
   psql "sslmode=verify-ca sslrootcert=server-ca.pem \
       sslcert=client-cert.pem sslkey=client-key.pem \
-      hostaddr=35.240.239.96 \
+      hostaddr=35.224.128.36 \
       port=5432 \
       user=postgres dbname=vhcm-db1"
 
@@ -25,3 +25,17 @@ GCloud App Service
 	gcloud app versions stop <version>
 + Start:
 	gcloud app versions start <version>
+	
+Install environment:
++ JDK8
++ postgresql 12
++ pip install -r requirements.txt
+	
+Deploy local:
++ Port 8000 default: python manage.py runsslserver
++ Custom port: python manage.py runsslserver 127.0.0.1:<port>
+
+* MacOS and Linux need to fix db certificates before deploy: add "postgres" user to default group -> change 3 cert keys permission to 0600
++ Linux: https://askubuntu.com/questions/487527/give-specific-user-permission-to-write-to-a-folder-using-w-notation
++ MacOS: https://superuser.com/questions/214004/how-to-add-user-to-a-group-from-mac-os-x-command-line
+-> Do this only once
