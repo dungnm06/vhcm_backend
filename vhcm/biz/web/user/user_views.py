@@ -88,7 +88,16 @@ def edit(request):
 
     form = UserForm(request.data)
     if form.is_valid():
-        form.save()
+        datas = form.instance
+        user.fullname = datas.fullname
+        user.nationality = datas.nationality
+        user.place_of_birth = datas.place_of_birth
+        user.date_of_birth = datas.date_of_birth
+        user.address = datas.address
+        user.email = datas.email
+        user.phone_number = datas.phone_number
+
+        user.save()
     else:
         result.set_status(False)
         result.set_messages(extract_validation_messages(form))

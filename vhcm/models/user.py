@@ -8,13 +8,14 @@ ID = 'user_id'
 USERNAME = 'username'
 PASSWORD = 'password'
 FULLNAME = 'fullname'
-NATIONALITY = 'fullname'
+NATIONALITY = 'nationality'
 PLACE_OF_BIRTH = 'place_of_birth'
 DATE_OF_BIRTH = 'date_of_birth'
 ADDRESS = 'address'
 PHONE_NUMBER = 'phone_number'
 EMAIL = 'email'
 ADMIN = 'admin'
+AVATAR = 'avatar'
 ACTIVE = 'active'
 CDATE = 'cdate'
 MDATE = 'mdate'
@@ -93,7 +94,7 @@ class User(AbstractBaseUser):
         verbose_name='email address',
         max_length=60, null=True, db_index=True, blank=True
     )
-    avatar = models.BinaryField()
+    avatar = models.BinaryField(null=True, verbose_name='user display avatar')
     active = models.BooleanField(default=True, db_index=True)
     admin = models.BooleanField(default=False)  # a superuser
     # notice the absence of a "Password field", that is built in.
