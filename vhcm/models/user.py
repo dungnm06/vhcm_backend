@@ -17,6 +17,7 @@ EMAIL = 'email'
 ADMIN = 'admin'
 AVATAR = 'avatar'
 ACTIVE = 'active'
+FIRST_LOGIN = 'first_login'
 CDATE = 'cdate'
 MDATE = 'mdate'
 
@@ -73,7 +74,8 @@ class User(AbstractBaseUser):
         default=''
     )
     date_of_birth = models.DateField(
-        verbose_name='date of birth', default=now
+        verbose_name='date of birth',
+        default=now
     )
     address = models.TextField(
         verbose_name='address', default=''
@@ -94,11 +96,14 @@ class User(AbstractBaseUser):
         verbose_name='email address',
         max_length=60, null=True, db_index=True, blank=True
     )
-    avatar = models.BinaryField(null=True, verbose_name='user display avatar')
+    avatar = models.BinaryField(
+        verbose_name='user display avatar',
+        null=True, blank=True)
     active = models.BooleanField(default=True, db_index=True)
     admin = models.BooleanField(default=False)  # a superuser
-    # notice the absence of a "Password field", that is built in.
+    first_login = models.BooleanField(default=False)
 
+    # notice the absence of a "Password field", that is built in.
     USERNAME_FIELD = USERNAME
     REQUIRED_FIELDS = []  # Username & Password are required by default.
 

@@ -58,6 +58,7 @@ EXCLUDE_WORDS = 'exclude_word'
 # System
 LOGIN_EXPIRATION_LIMIT = 'login_expiration_limit'
 ACCEPT_IMAGE_FORMAT = 'accept_image_format'
+DEFAULT_PASSWORD = 'default_password'
 
 # Instance
 SYSTEM_SETTINGS = SystemSetting.objects.all()
@@ -108,6 +109,11 @@ def add_system_settings(request):
          'Specify image file format that can be uploaded to system.\nSee available types at: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html',
          'JPEG,JPEG 2000,PNG',
          ''),
+        ('default_password',
+         'System: New user default password',
+         'Default password for newly created user',
+         'vhcm-user',
+         '123'),
     ]
 
     settings = [SystemSetting(setting_id=s[0], setting_name=s[1], description=s[2], value=s[3], default=s[4]) for s in

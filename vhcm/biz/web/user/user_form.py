@@ -4,7 +4,7 @@ import vhcm.models.user as user_model
 
 
 # define the class of a form
-class UserForm(ModelForm):
+class UserEditForm(ModelForm):
     class Meta:
         # write the name of models for which the form is made
         model = user_model.User
@@ -35,3 +35,14 @@ class UserForm(ModelForm):
 
         # return any errors if found
         return self.cleaned_data
+
+
+# define the class of a form
+class UserAddForm(ModelForm):
+    class Meta:
+        # write the name of models for which the form is made
+        model = user_model.User
+        # Custom fields
+        fields = [user_model.USERNAME, user_model.FULLNAME, user_model.NATIONALITY,
+                  user_model.PLACE_OF_BIRTH, user_model.DATE_OF_BIRTH, user_model.ADDRESS,
+                  user_model.PHONE_NUMBER, user_model.EMAIL]

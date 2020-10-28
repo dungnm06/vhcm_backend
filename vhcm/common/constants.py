@@ -1,4 +1,5 @@
 from pathlib import Path
+
 # Global variables
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 # Special characters
@@ -33,3 +34,14 @@ SYNONYMS_FILE_PATH = 'synonyms_file_path'
 GLOBAL_SYNONYMS_FILE_PATH = 'global_synonyms_file_path'
 PREDICT_THRESHOLD = 'predict_threshold'
 MAX_SENTENCE_LENGTH = 'max_sentence_length'
+
+
+# Date format
+class DateFormat(object):
+    def __init__(self, format, regex):
+        self.format = format
+        self.regex = regex
+
+
+DATETIME_DDMMYYYY = DateFormat('DD/MM/YYYY', '%d/%m/%Y')
+DATETIME_DJANGO_DEFUALT = DateFormat('YYYY-MM-DD', '%Y-%m-%d')
