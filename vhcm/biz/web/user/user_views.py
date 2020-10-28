@@ -1,16 +1,21 @@
 import datetime
 import random
 import string
+import io
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view
+from rest_framework import exceptions
+from rest_framework.response import Response
 import vhcm.models.user as user_model
 import vhcm.models.knowledge_data as knowledge_data_model
+import vhcm.common.config.config_manager as config
 from vhcm.common.response_json import ResponseJSON
-from rest_framework.response import Response
 from vhcm.serializers.user import UserSerializer
 from .user_form import UserForm
-from rest_framework.decorators import api_view
 from vhcm.biz.authentication.user_session import get_current_user
-from rest_framework import exceptions
-from vhcm.common.utils.CV import extract_validation_messages
+from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
+from vhcm.common.constants import COMMA
+from PIL import Image
 
 
 @api_view(['GET', 'POST'])
@@ -64,49 +69,67 @@ def get(request):
     return response
 
 
-@api_view(['POST'])
-def edit(request):
-    response = Response()
-    result = ResponseJSON()
-    current_user = get_current_user(request)
+class EditUser(APIView):
+    parser_class = (ImageUploadParser,)
 
-    try:
-        user_id = int(request.data.get('id'))
-        user = user_model.User.objects.filter(user_id=user_id).first()
-        if user is None:
-            raise ValueError('')
-    except ValueError:
-        raise Exception('Invalid user id: {}'.format(request.data.get('id')))
-    except KeyError:
-        raise Exception('Missing user id')
+    def edit_user(self, request):
+        response = Response()
+        result = ResponseJSON()
+        current_user = get_current_user(request)
 
-    if not current_user.admin and user.admin:
-        raise exceptions.PermissionDenied('Only superuser can edit this user infomations')
+        try:
+            user_id = int(request.data.get('id'))
+            user = user_model.User.objects.filter(user_id=user_id).first()
+            if user is None:
+                raise ValueError('')
+        except ValueError:
+            raise Exception('Invalid user id: {}'.format(request.data.get('id')))
+        except KeyError:
+            raise Exception('Missing user id')
 
-    if current_user.user_id != user.user_id and not current_user.admin:
-        raise exceptions.PermissionDenied('You dont have right to edit this user infomations')
+        if not current_user.admin and user.admin:
+            raise exceptions.PermissionDenied('Only superuser can edit this user infomations')
 
-    form = UserForm(request.data)
-    if form.is_valid():
-        datas = form.instance
-        user.fullname = datas.fullname
-        user.nationality = datas.nationality
-        user.place_of_birth = datas.place_of_birth
-        user.date_of_birth = datas.date_of_birth
-        user.address = datas.address
-        user.email = datas.email
-        user.phone_number = datas.phone_number
+        if current_user.user_id != user.user_id and not current_user.admin:
+            raise exceptions.PermissionDenied('You dont have right to edit this user infomations')
 
-        user.save()
-    else:
-        result.set_status(False)
-        result.set_messages(extract_validation_messages(form))
+        form = UserForm(request.data)
+        if form.is_valid():
+            datas = form.instance
+            user.fullname = datas.fullname
+            user.nationality = datas.nationality
+            user.place_of_birth = datas.place_of_birth
+            user.date_of_birth = datas.date_of_birth
+            user.address = datas.address
+            user.email = datas.email
+            user.phone_number = datas.phone_number
+
+            if user_model.AVATAR in request.data and request.data[user_model.AVATAR]:
+                f = request.data[user_model.AVATAR].read()
+                image = Image.open(io.BytesIO(f))
+                if image.format not in config.CONFIG_LOADER.get_setting_value_array(config.ACCEPT_IMAGE_FORMAT, COMMA):
+                    result.set_status(False)
+                    result.set_messages('Only accept jpg, png image file format')
+                    response.data = result.to_json()
+                    return response
+                user.avatar = f
+
+            user.save()
+        else:
+            result.set_status(False)
+            result.set_messages(extract_validation_messages(form))
+            response.data = result.to_json()
+            return response
+
+        result.set_status(True)
         response.data = result.to_json()
         return response
 
-    result.set_status(True)
-    response.data = result.to_json()
-    return response
+    def post(self, request, format=None):
+        return self.edit_user(request)
+
+    def put(self, request, format=None):
+        return self.edit_user(request)
 
 
 @api_view(['GET', 'POST'])
@@ -131,11 +154,12 @@ def change_status(request):
     user.active = not user.active
 
     # Change user's knowledge data status
-    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(edit_user=user).update(status=0)
+    if not user.active:
+        knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(edit_user=user).update(status=0)
+        knowledge_data.save()
 
     # Save to DB
     user.save()
-    knowledge_data.save()
 
     result.set_status(True)
     response.data = result.to_json()

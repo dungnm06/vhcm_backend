@@ -13,12 +13,12 @@ def access_token_updator(request, response):
             or (
             'An error has occured' in response.data['messages'] and
             (
-                    (not response.data['status'] and response.data['result_data'][
-                        'error_detail'] == 'Access token expired')
+                    (not response.data['status'] and response.data['result_data']['error_detail'] == 'Access token expired')
                     or (not response.data['status'] and is_error_code(response.data['result_data']['status_code']))
             )
             ) \
-            or ('auth' in request.path):
+            or ('auth' in request.path)\
+            or ('logout' in request.path):
         return response
 
     # Decode the token

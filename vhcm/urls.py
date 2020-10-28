@@ -24,7 +24,7 @@ urlpatterns = [
     # User
     path('user/all', user_views.all, name='get_all_users'),
     path('user/get', user_views.get, name='get_user'),
-    path('user/edit', user_views.edit, name='edit_user'),
+    path('user/edit', user_views.EditUser.as_view(), name='edit_user'),
     # Synonym
     path('synonym/all', synonym_views.get_all_synonyms, name='get_all_synonyms'),
     path('synonym/get', synonym_views.get, name='get_one_synonym'),
@@ -38,7 +38,3 @@ urlpatterns = [
     path('reference-document/add', reference_document_views.AddNewReferenceDocument.as_view(), name='add-new-reference'),
     path('reference-document/edit', reference_document_views.EditReferenceDocument.as_view(), name='edit-reference'),
 ]
-
-from django.conf.urls import handler404
-from vhcm.views import error404
-handler404 = error404

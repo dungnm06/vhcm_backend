@@ -1,6 +1,7 @@
 import os
 import json
 from pathlib import Path
+from rest_framework.parsers import FileUploadParser
 
 
 def readimage(path):
@@ -28,3 +29,7 @@ def extract_validation_messages(form):
         messages.extend([field_error['message'] for field_error in errors[field]])
 
     return messages
+
+
+class ImageUploadParser(FileUploadParser):
+    media_type = 'image/*'

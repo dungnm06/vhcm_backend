@@ -3,11 +3,11 @@ import vhcm.models.reference_document as document_model
 import vhcm.common.config.config_manager as config
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.parsers import FileUploadParser
 from rest_framework.views import APIView
 from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.reference_document import ReferenceDocumentSerializer
 from vhcm.common.constants import COMMA
+from vhcm.common.utils.CV import ImageUploadParser
 from vhcm.biz.authentication.user_session import get_current_user
 from PIL import Image
 
@@ -52,10 +52,6 @@ def get_document(request):
     result.set_result_data(data)
     response.data = result.to_json()
     return response
-
-
-class ImageUploadParser(FileUploadParser):
-    media_type = 'image/*'
 
 
 class AddNewReferenceDocument(APIView):
