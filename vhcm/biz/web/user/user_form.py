@@ -11,7 +11,7 @@ class UserEditForm(ModelForm):
         # Custom fields
         fields = [user_model.ID, user_model.FULLNAME, user_model.NATIONALITY,
                   user_model.PLACE_OF_BIRTH, user_model.DATE_OF_BIRTH, user_model.ADDRESS,
-                  user_model.PHONE_NUMBER, user_model.EMAIL]
+                  user_model.PHONE_NUMBER, user_model.ID_NUMBER, user_model.EMAIL]
 
         # this function will be used for the validation
 
@@ -45,4 +45,4 @@ class UserAddForm(ModelForm):
         # Custom fields
         fields = [user_model.USERNAME, user_model.FULLNAME, user_model.NATIONALITY,
                   user_model.PLACE_OF_BIRTH, user_model.DATE_OF_BIRTH, user_model.ADDRESS,
-                  user_model.PHONE_NUMBER, user_model.EMAIL]
+                  user_model.PHONE_NUMBER, user_model.ID_NUMBER, user_model.EMAIL]

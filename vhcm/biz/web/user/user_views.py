@@ -11,8 +11,8 @@ from vhcm.serializers.user import UserSerializer
 from .user_form import UserEditForm, UserAddForm
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
-from vhcm.biz.validation.image_validator import image_validate
-from vhcm.biz.validation.date_validator import date_validate
+from vhcm.biz.validation.image import image_validate
+from vhcm.biz.validation.date import date_validate
 from vhcm.common.constants import DATETIME_DDMMYYYY
 from vhcm.common.config.config_manager import CONFIG_LOADER, DEFAULT_PASSWORD
 
@@ -88,9 +88,9 @@ class AddUser(APIView):
             user.set_password(CONFIG_LOADER.get_setting_value(DEFAULT_PASSWORD))
             user.nationality = datas.nationality
             user.place_of_birth = datas.place_of_birth
-            user.date_of_birth = datas.date_of_birth
             user.address = datas.address
             user.email = datas.email
+            user.id_number = datas.id_number
             user.phone_number = datas.phone_number
 
             dob = request.data.get(user_model.DATE_OF_BIRTH)
@@ -99,7 +99,7 @@ class AddUser(APIView):
                 result.set_status(False)
                 result.set_messages(dob)
             else:
-                user.date_of_birth = dob
+                user.date_of_birth = dob.date()
 
             if user_model.AVATAR in request.data and request.data.get(user_model.AVATAR):
                 f = request.data[user_model.AVATAR].read()
@@ -115,6 +115,8 @@ class AddUser(APIView):
                 return response
 
             user.save()
+            serialized_user = UserSerializer(user)
+            result.set_result_data(serialized_user.data)
         else:
             result.set_status(False)
             result.set_messages(extract_validation_messages(form))
@@ -162,9 +164,9 @@ class EditUser(APIView):
             user.fullname = datas.fullname
             user.nationality = datas.nationality
             user.place_of_birth = datas.place_of_birth
-            user.date_of_birth = datas.date_of_birth
             user.address = datas.address
             user.email = datas.email
+            user.id_number = datas.id_number
             user.phone_number = datas.phone_number
 
             dob = request.data.get(user_model.DATE_OF_BIRTH)
@@ -173,7 +175,7 @@ class EditUser(APIView):
                 result.set_status(False)
                 result.set_messages(dob)
             else:
-                user.date_of_birth = dob
+                user.date_of_birth = dob.date()
 
             if user_model.AVATAR in request.data and request.data.get(user_model.AVATAR):
                 f = request.data[user_model.AVATAR].read()
@@ -189,6 +191,8 @@ class EditUser(APIView):
                 return response
 
             user.save()
+            serialized_user = UserSerializer(user)
+            result.set_result_data(serialized_user.data)
         else:
             result.set_status(False)
             result.set_messages(extract_validation_messages(form))

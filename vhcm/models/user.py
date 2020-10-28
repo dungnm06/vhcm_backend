@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
-from django.utils.timezone import now
+import datetime
+from vhcm.biz.validation.string import only_digit
 
 
 # Fields
@@ -14,6 +15,7 @@ DATE_OF_BIRTH = 'date_of_birth'
 ADDRESS = 'address'
 PHONE_NUMBER = 'phone_number'
 EMAIL = 'email'
+ID_NUMBER = 'id_number'
 ADMIN = 'admin'
 AVATAR = 'avatar'
 ACTIVE = 'active'
@@ -75,10 +77,14 @@ class User(AbstractBaseUser):
     )
     date_of_birth = models.DateField(
         verbose_name='date of birth',
-        default=now
+        default=datetime.date.today
     )
     address = models.TextField(
         verbose_name='address', default=''
+    )
+    id_number = models.CharField(
+        verbose_name='id_number',
+        default='', max_length=12, validators=[only_digit], unique=True
     )
     phone_number = models.CharField(
         verbose_name='phone number',
