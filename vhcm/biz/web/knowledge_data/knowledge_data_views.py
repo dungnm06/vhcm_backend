@@ -33,7 +33,7 @@ def tokenize_sentences(request):
                 "type": word[1],
                 "value": word[0]
             })
-        pos_tag_tmp.extend(words)
+        pos_tag_tmp.append(words)
 
     data = {
         'ner': ner,

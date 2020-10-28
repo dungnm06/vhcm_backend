@@ -12,3 +12,5 @@ vncorenlp==1.0.3
 pyOpenSSL==19.1.0
 django-sslserver==0.22
 timeloop==1.0.2
+pickle-mixin==1.0.2
+pandas==1.1.3
