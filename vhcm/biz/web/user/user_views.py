@@ -84,6 +84,7 @@ class AddUser(APIView):
         if form.is_valid():
             user = user_model.User()
             datas = form.instance
+            user.username = datas.username
             user.fullname = datas.fullname
             user.set_password(CONFIG_LOADER.get_setting_value(DEFAULT_PASSWORD))
             user.nationality = datas.nationality
