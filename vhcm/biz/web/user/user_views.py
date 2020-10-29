@@ -194,8 +194,9 @@ def change_status(request):
 
     # Change user's knowledge data status
     if not user.active:
-        knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(edit_user=user).update(status=0)
-        if knowledge_data is not None:
+        knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(edit_user=user)
+        if knowledge_data:
+            knowledge_data.update(status=0)
             knowledge_data.save()
 
     # Save to DB

@@ -1,7 +1,6 @@
 from rest_framework.decorators import api_view
 from vhcm.common.response_json import ResponseJSON
 from rest_framework.response import Response
-from vhcm.biz.nlu.language_processing import language_processor
 import vhcm.models.knowledge_data as knowledge_data_model
 import vhcm.models.knowledge_data_response_data as response_data_model
 import vhcm.models.knowledge_data_subject as subject_model
@@ -13,36 +12,6 @@ import vhcm.models.knowledge_data_question as question_model
 import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.common.constants import *
-
-
-@api_view(['GET', 'POST'])
-def tokenize_sentences(request):
-    response = Response()
-    result = ResponseJSON()
-
-    sentence = request.data['paragraph']
-    # Named entity extract
-    ner = language_processor.named_entity_reconize(sentence)
-    # POS tagging
-    pos_tag = language_processor.pos_tagging(sentence)
-    pos_tag_tmp = []
-    for pos in pos_tag:
-        words = []
-        for word in pos:
-            words.append({
-                "type": word[1],
-                "value": word[0]
-            })
-        pos_tag_tmp.append(words)
-
-    data = {
-        'ner': ner,
-        'pos': pos_tag_tmp
-    }
-    result.set_status(True)
-    result.set_result_data(data)
-    response.data = result.to_json()
-    return response
 
 
 SUBMIT_TYPES = ['add', 'edit']
@@ -63,11 +32,6 @@ def add(request):
     submit_type = request.data.get('submit_type')
     # Add new Knowledge data
     knowledge_data = knowledge_data_model.KnowledgeData()
-    # Edit existing Knowledge data
-    # elif submit_type == SUBMIT_TYPES[1]:
-    #     data_id = int(request.data.get('id'))
-    #     knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=data_id).first()
-    #     response_data = response_data_model.ResponseData.objects.filter(knowledge_data=knowledge_data)
 
     # Intent
     knowledge_data.intent = request.data.get('intent').strip()
