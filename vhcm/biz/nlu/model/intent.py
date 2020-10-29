@@ -74,7 +74,7 @@ class Intent:
         self.synonym_sets = synonym_sets
 
 
-def load_from_db_models(models):
+def load_from_db(models):
     intent_maps = {}
     for knowledge_data in models:
         intent = Intent()

@@ -69,7 +69,10 @@ def add(request):
     synonym.words = COMMA.join([w.strip() for w in request.data.get('words')])
     synonym.save()
 
+    serilized_synonym = SynonymSerializer(synonym).data
+
     result.set_status(True)
+    result.set_result_data(serilized_synonym)
     response.data = result.to_json()
     return response
 
@@ -100,7 +103,10 @@ def edit(request):
     synonym.words = COMMA.join([w.strip() for w in request.data.get('words')])
     synonym.save()
 
+    serilized_synonym = SynonymSerializer(synonym).data
+
     result.set_status(True)
+    result.set_result_data(serilized_synonym)
     response.data = result.to_json()
     return response
 

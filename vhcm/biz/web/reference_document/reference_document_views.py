@@ -1,15 +1,14 @@
-import io
+from rest_framework.exceptions import APIException
 import vhcm.models.reference_document as document_model
-import vhcm.common.config.config_manager as config
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.reference_document import ReferenceDocumentSerializer
-from vhcm.common.constants import COMMA
-from vhcm.common.utils.CV import ImageUploadParser
+from vhcm.common.utils.CV import ImageUploadParser, extract_validation_messages
 from vhcm.biz.authentication.user_session import get_current_user
-from PIL import Image
+from .reference_document_forms import DocumentAddForm, DocumentEditForm
+from vhcm.biz.validation.image import image_validate
 
 
 @api_view(['GET', 'POST'])
@@ -60,34 +59,37 @@ class AddNewReferenceDocument(APIView):
     def add_new(self, request):
         response = Response()
         result = ResponseJSON()
-
-        document = document_model.RefercenceDocument()
-
-        if document_model.COVER in request.data and request.data[document_model.COVER]:
-            f = request.data[document_model.COVER].read()
-            image = Image.open(io.BytesIO(f))
-            if image.format not in config.CONFIG_LOADER.get_setting_value_array(config.ACCEPT_IMAGE_FORMAT, COMMA):
-                raise Exception('Only accept jpg, png image file format')
-            document.cover = f
-
-        if document_model.AUTHOR in request.data and request.data[document_model.AUTHOR]:
-            document.author = request.data[document_model.AUTHOR]
-        else:
-            raise Exception('Missing reference document author')
-
-        if document_model.NAME in request.data and request.data[document_model.NAME]:
-            document.reference_name = request.data[document_model.NAME]
-        else:
-            raise Exception('Missing reference document name')
-
-        if document_model.LINK in request.data and request.data[document_model.LINK]:
-            document.link = request.data[document_model.LINK]
-
-        # User
         user = get_current_user(request)
-        document.create_user = user
-        document.last_edit_user = user
-        document.save()
+
+        form = DocumentAddForm(request.data)
+        if form.is_valid():
+            document = document_model.RefercenceDocument()
+            datas = form.instance
+            document.reference_name = datas.reference_name
+            document.link = datas.link
+            document.author = datas.author
+
+            if document_model.COVER in request.data and request.data.get(document_model.COVER):
+                f = request.data.get(document_model.COVER).read()
+                image_error = image_validate(f)
+                if image_error:
+                    result.set_status(False)
+                    result.set_messages(image_error)
+                    response.data = result.to_json()
+                    return response
+                document.cover = f
+
+            document.create_user = user
+            document.last_edit_user = user
+
+            document.save()
+            serialized_document = ReferenceDocumentSerializer(document)
+            result.set_result_data(serialized_document.data)
+        else:
+            result.set_status(False)
+            result.set_messages(extract_validation_messages(form, document_model.FIELDS))
+            response.data = result.to_json()
+            return response
 
         result.set_status(True)
         response.data = result.to_json()
@@ -109,34 +111,42 @@ class EditReferenceDocument(APIView):
         try:
             document_id = int(request.data[document_model.ID])
         except Exception:
-            raise Exception('Document id is invalid')
+            raise APIException('Document id is invalid')
 
         document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
         if not document:
             raise Exception('References document not found')
 
-        if document_model.COVER in request.data and request.data[document_model.COVER]:
-            f = request.data[document_model.COVER].read()
-            image = Image.open(io.BytesIO(f))
-            if image.format not in config.CONFIG_LOADER.get_setting_value_array(config.ACCEPT_IMAGE_FORMAT, COMMA):
-                raise Exception('Only accept jpg, png image file format')
-            document.cover = f
-
-        if document_model.AUTHOR in request.data and request.data[document_model.AUTHOR]:
-            document.author = request.data[document_model.AUTHOR]
-
-        if document_model.NAME in request.data and request.data[document_model.NAME]:
-            document.reference_name = request.data[document_model.NAME]
-
-        if document_model.LINK in request.data and request.data[document_model.LINK]:
-            document.link = request.data[document_model.LINK]
-
-        # Edit user
-        user = get_current_user(request)
-        document.last_edit_user = user
-        document.save()
-
         result.set_status(True)
+        form = DocumentEditForm(request.data, instance=document)
+        if form.is_valid():
+            datas = form.instance
+            document.reference_name = datas.reference_name
+            document.link = datas.link
+            document.author = datas.author
+
+            if document_model.COVER in request.data and request.data.get(document_model.COVER):
+                f = request.data.get(document_model.COVER).read()
+                image_error = image_validate(f)
+                if image_error:
+                    result.set_status(False)
+                    result.set_messages(image_error)
+                    response.data = result.to_json()
+                    return response
+                document.cover = f
+
+            user = get_current_user(request)
+            document.last_edit_user = user
+
+            document.save()
+            serialized_document = ReferenceDocumentSerializer(document)
+            result.set_result_data(serialized_document.data)
+        else:
+            result.set_status(False)
+            result.set_messages(extract_validation_messages(form, document_model.FIELDS))
+            response.data = result.to_json()
+            return response
+
         response.data = result.to_json()
         return response
 

@@ -12,6 +12,7 @@ from .user_form import UserEditForm, UserAddForm
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
 from vhcm.common.config.config_manager import CONFIG_LOADER, DEFAULT_PASSWORD
+from vhcm.biz.validation.image import image_validate
 
 
 @api_view(['GET', 'POST'])
@@ -76,7 +77,6 @@ class AddUser(APIView):
         if not current_user.admin:
             raise exceptions.PermissionDenied('Only superuser uses this API')
 
-        result.set_status(True)
         form = UserAddForm(request.data)
         if form.is_valid():
             user = user_model.User()
@@ -92,7 +92,16 @@ class AddUser(APIView):
             user.email = datas.email
             user.id_number = datas.id_number
             user.phone_number = datas.phone_number
-            user.avatar = datas.avatar
+
+            if user_model.AVATAR in request.data and request.data.get(user_model.AVATAR):
+                f = request.data.get(user_model.AVATAR).read()
+                image_error = image_validate(f)
+                if image_error:
+                    result.set_status(False)
+                    result.set_messages(image_error)
+                    response.data = result.to_json()
+                    return response
+                user.avatar = f
 
             user.save()
             serialized_user = UserSerializer(user)
@@ -103,6 +112,7 @@ class AddUser(APIView):
             response.data = result.to_json()
             return response
 
+        result.set_status(True)
         response.data = result.to_json()
         return response
 
@@ -137,7 +147,6 @@ class EditUser(APIView):
         if current_user.user_id != user.user_id and not current_user.admin:
             raise exceptions.PermissionDenied('You dont have right to edit this user infomations')
 
-        result.set_status(True)
         form = UserEditForm(request.data, instance=user)
         if form.is_valid():
             datas = form.instance
@@ -150,7 +159,17 @@ class EditUser(APIView):
             user.email = datas.email
             user.id_number = datas.id_number
             user.phone_number = datas.phone_number
-            user.avatar = datas.avatar
+
+            # BinaryField is non-editable so it cant be added to validation form
+            if user_model.AVATAR in request.data and request.data.get(user_model.AVATAR):
+                f = request.data.get(user_model.AVATAR).read()
+                image_error = image_validate(f)
+                if image_error:
+                    result.set_status(False)
+                    result.set_messages(image_error)
+                    response.data = result.to_json()
+                    return response
+                user.avatar = f
 
             user.save()
             serialized_user = UserSerializer(user)
@@ -161,6 +180,7 @@ class EditUser(APIView):
             response.data = result.to_json()
             return response
 
+        result.set_status(True)
         response.data = result.to_json()
         return response
 

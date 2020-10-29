@@ -5,6 +5,7 @@ from django.middleware.csrf import CsrfViewMiddleware
 from rest_framework import exceptions
 from django.conf import settings
 from django.contrib.auth import get_user_model
+import vhcm.models.blacklisted_token as bl_token_model
 from vhcm.common.constants import ACCESS_TOKEN
 
 
@@ -33,6 +34,10 @@ class JWTAuthentication(BaseAuthentication):
                 access_token, settings.SECRET_KEY, algorithms=['HS256'])
 
         except jwt.ExpiredSignatureError:
+            raise exceptions.AuthenticationFailed('Access token expired')
+
+        blacklisted = bl_token_model.BlacklistedToken.objects.filter(token=access_token).first()
+        if blacklisted is not None:
             raise exceptions.AuthenticationFailed('Access token expired')
 
         user = User.objects.filter(user_id=payload[jwt_utils.USER_ID]).first()

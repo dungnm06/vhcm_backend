@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from vhcm.biz.nlu.language_processing import language_processor
 import vhcm.models.synonym as synonym_model
 from vhcm.biz.nlu.model.synonym import SynonymSet
-from vhcm.common.constants import COMMA
+from vhcm.common.constants import COMMA, SPACE
 
 
 @api_view(['POST'])
@@ -38,6 +38,27 @@ def tokenize_sentences(request):
     }
     result.set_status(True)
     result.set_result_data(data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['POST'])
+def untokenize_sentences(request):
+    response = Response()
+    result = ResponseJSON()
+    result_data = {
+        'sentences': []
+    }
+
+    if not ('sentences' in request.data and request.data.get('sentences')):
+        sentence = []
+    else:
+        sentence = request.data['sentences']
+
+    result_data['sentences'].extend(language_processor.words_unsegmentation(sentence))
+
+    result.set_status(True)
+    result.set_result_data(result_data)
     response.data = result.to_json()
     return response
 
@@ -76,12 +97,14 @@ def generate_similaries(request):
             synonym_ids = data['synonyms']
             sentence_synonyms = synonyms.filter(synonym_id__in=synonym_ids)
             synonym_set_dicts = {}
+
             for synonym in sentence_synonyms:
                 s = sentence_synonyms.filter(synonym_id=synonym.synonym_id).first()
                 synonym_set_dicts[s.synonym_id] = SynonymSet(s)
+
             result_data['similaries'].append(
                 language_processor.generate_similary_sentences(
-                                    (sentence, synonym_set_dicts),
+                                    (sentence.split(SPACE), synonym_set_dicts),
                                     word_segemented=True
                 ))
 

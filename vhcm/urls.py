@@ -21,6 +21,7 @@ urlpatterns = [
     path('init-settings', add_system_settings, name='add_base_system_settings'),
     # NLP
     path('nlp/tokenize', nlp_views.tokenize_sentences, name='tokenize_sentence'),
+    path('nlp/untokenize', nlp_views.untokenize_sentences, name='tokenize_sentence'),
     path('nlp/generate-similaries', nlp_views.generate_similaries, name='generate_similary_sentences'),
     # Knowledge data processing
     path('knowledge-data/add', knowledge_data_views.add, name='add_new_knowledge_data'),

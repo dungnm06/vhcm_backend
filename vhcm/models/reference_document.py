@@ -12,6 +12,19 @@ AUTHOR = 'author'
 CDATE = 'cdate'
 MDATE = 'mdate'
 
+# Fields key:name map
+FIELDS = {
+    ID: 'User ID',
+    CREATE_USER: 'Reference Document Created User',
+    LAST_EDIT_USER: 'Reference Document Last Edited User',
+    NAME: 'Reference Document Name',
+    LINK: 'Resource Link',
+    COVER: 'Cover',
+    AUTHOR: 'Author',
+    CDATE: 'CDATE',
+    MDATE: 'MDATE',
+}
+
 
 class RefercenceDocument(models.Model):
     reference_document_id = models.AutoField(
@@ -26,8 +39,8 @@ class RefercenceDocument(models.Model):
     reference_name = models.CharField(
         max_length=100, blank=False, default='', verbose_name='reference name', db_index=True
     )
-    link = models.TextField(null=True, verbose_name='reference urls')
-    cover = models.BinaryField(null=True, verbose_name='document cover')
+    link = models.TextField(null=True, blank=True, verbose_name='reference urls')
+    cover = models.BinaryField(null=True, blank=True, verbose_name='document cover')
     author = models.TextField(blank=False, default='', verbose_name='document author', db_index=True)
     cdate = models.DateTimeField(verbose_name='created date', auto_now_add=True)
     mdate = models.DateTimeField(verbose_name='modified date', auto_now=True)
