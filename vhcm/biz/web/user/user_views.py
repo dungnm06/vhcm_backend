@@ -11,9 +11,6 @@ from vhcm.serializers.user import UserSerializer
 from .user_form import UserEditForm, UserAddForm
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
-from vhcm.biz.validation.image import image_validate
-from vhcm.biz.validation.date import date_validate
-from vhcm.common.constants import DATETIME_DDMMYYYY
 from vhcm.common.config.config_manager import CONFIG_LOADER, DEFAULT_PASSWORD
 
 
@@ -86,41 +83,23 @@ class AddUser(APIView):
             datas = form.instance
             user.username = datas.username
             user.fullname = datas.fullname
+            user.gender = datas.gender
             user.set_password(CONFIG_LOADER.get_setting_value(DEFAULT_PASSWORD))
             user.nationality = datas.nationality
             user.place_of_birth = datas.place_of_birth
+            user.date_of_birth = datas.date_of_birth
             user.address = datas.address
             user.email = datas.email
             user.id_number = datas.id_number
             user.phone_number = datas.phone_number
-
-            dob = request.data.get(user_model.DATE_OF_BIRTH)
-            dob = date_validate(dob, DATETIME_DDMMYYYY, 'User date of birth is invalid.')
-            if isinstance(dob, str):
-                result.set_status(False)
-                result.set_messages(dob)
-            else:
-                user.date_of_birth = dob.date()
-
-            if user_model.AVATAR in request.data and request.data.get(user_model.AVATAR):
-                f = request.data[user_model.AVATAR].read()
-                image_error = image_validate(f)
-                if image_error:
-                    result.set_status(False)
-                    result.set_messages(image_error)
-                else:
-                    user.avatar = f
-
-            if not result.status:
-                response.data = result.to_json()
-                return response
+            user.avatar = datas.avatar
 
             user.save()
             serialized_user = UserSerializer(user)
             result.set_result_data(serialized_user.data)
         else:
             result.set_status(False)
-            result.set_messages(extract_validation_messages(form))
+            result.set_messages(extract_validation_messages(form, user_model.FIELDS))
             response.data = result.to_json()
             return response
 
@@ -159,44 +138,26 @@ class EditUser(APIView):
             raise exceptions.PermissionDenied('You dont have right to edit this user infomations')
 
         result.set_status(True)
-        form = UserEditForm(request.data)
+        form = UserEditForm(request.data, instance=user)
         if form.is_valid():
             datas = form.instance
             user.fullname = datas.fullname
+            user.gender = datas.gender
             user.nationality = datas.nationality
             user.place_of_birth = datas.place_of_birth
+            user.date_of_birth = datas.date_of_birth
             user.address = datas.address
             user.email = datas.email
             user.id_number = datas.id_number
             user.phone_number = datas.phone_number
-
-            dob = request.data.get(user_model.DATE_OF_BIRTH)
-            dob = date_validate(dob, DATETIME_DDMMYYYY, 'User date of birth is invalid.')
-            if isinstance(dob, str):
-                result.set_status(False)
-                result.set_messages(dob)
-            else:
-                user.date_of_birth = dob.date()
-
-            if user_model.AVATAR in request.data and request.data.get(user_model.AVATAR):
-                f = request.data[user_model.AVATAR].read()
-                image_error = image_validate(f)
-                if image_error:
-                    result.set_status(False)
-                    result.set_messages(image_error)
-                else:
-                    user.avatar = f
-
-            if not result.status:
-                response.data = result.to_json()
-                return response
+            user.avatar = datas.avatar
 
             user.save()
             serialized_user = UserSerializer(user)
             result.set_result_data(serialized_user.data)
         else:
             result.set_status(False)
-            result.set_messages(extract_validation_messages(form))
+            result.set_messages(extract_validation_messages(form, user_model.FIELDS))
             response.data = result.to_json()
             return response
 
@@ -234,7 +195,8 @@ def change_status(request):
     # Change user's knowledge data status
     if not user.active:
         knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(edit_user=user).update(status=0)
-        knowledge_data.save()
+        if knowledge_data is not None:
+            knowledge_data.save()
 
     # Save to DB
     user.save()

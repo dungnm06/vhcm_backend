@@ -34,7 +34,7 @@ def get_document(request):
     response = Response()
     result = ResponseJSON()
     try:
-        document_id = int(request.data[document_model.ID])
+        document_id = int(request.data.get(document_model.ID)) if request.method == 'POST' else int(request.GET.get(document_model.ID))
     except Exception:
         raise Exception('Document id is invalid')
 

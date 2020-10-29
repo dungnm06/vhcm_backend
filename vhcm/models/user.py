@@ -9,6 +9,7 @@ ID = 'user_id'
 USERNAME = 'username'
 PASSWORD = 'password'
 FULLNAME = 'fullname'
+GENDER = 'gender'
 NATIONALITY = 'nationality'
 PLACE_OF_BIRTH = 'place_of_birth'
 DATE_OF_BIRTH = 'date_of_birth'
@@ -22,6 +23,35 @@ ACTIVE = 'active'
 FIRST_LOGIN = 'first_login'
 CDATE = 'cdate'
 MDATE = 'mdate'
+
+# Fields key:name map
+FIELDS = {
+    ID: 'User ID',
+    USERNAME: 'Username',
+    PASSWORD: 'Password',
+    FULLNAME: 'Fullname',
+    GENDER: 'Gender',
+    NATIONALITY: 'Nationality',
+    PLACE_OF_BIRTH: 'Place of Birth',
+    DATE_OF_BIRTH: 'Date of Birth',
+    ADDRESS: 'Address',
+    PHONE_NUMBER: 'Phone Number',
+    EMAIL: 'Email',
+    ID_NUMBER: 'ID Number',
+    ADMIN: 'Admin',
+    AVATAR: 'Avatar',
+    ACTIVE: 'Active',
+    FIRST_LOGIN: 'First Login Status',
+    CDATE: 'CDATE',
+    MDATE: 'MDATE',
+}
+
+# Constant
+ALL_GENDER = [
+    (0, 'Men'),
+    (1, 'Women'),
+    (2, 'Unknown')
+]
 
 
 class UserManager(BaseUserManager):
@@ -64,6 +94,9 @@ class User(AbstractBaseUser):
     fullname = models.CharField(
         verbose_name='fullname', max_length=60,
         db_index=True, default=''
+    )
+    gender = models.SmallIntegerField(
+        verbose_name='gender', choices=ALL_GENDER, default=2
     )
     nationality = models.CharField(
         verbose_name='nationality',
