@@ -325,5 +325,4 @@ class LanguageProcessor(object, metaclass=Singleton):
         return flag
 
 
-# language_processor = LanguageProcessor()
-language_processor = None
+language_processor = LanguageProcessor()
