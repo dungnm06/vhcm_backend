@@ -1,35 +1,36 @@
+from collections import Counter
 from rest_framework.decorators import api_view
-from vhcm.common.response_json import ResponseJSON
+from rest_framework.exceptions import APIException
 from rest_framework.response import Response
+from django.db import transaction
+from vhcm.common.dao.model_query import get_latest_id
+from vhcm.common.response_json import ResponseJSON
 import vhcm.models.knowledge_data as knowledge_data_model
 import vhcm.models.knowledge_data_response_data as response_data_model
 import vhcm.models.knowledge_data_subject as subject_model
 import vhcm.models.reference_document as document_model
 import vhcm.models.synonym as synonym_model
 import vhcm.models.knowledge_data_reference_document_link as kd_document_model
-import vhcm.models.knowledge_data_verbs as verb_model
 import vhcm.models.knowledge_data_question as question_model
 import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
+import vhcm.models.knowledge_data_generated_question as gq_model
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.common.constants import *
 
 
-SUBMIT_TYPES = ['add', 'edit']
-
-
 @api_view(['POST'])
+@transaction.atomic
 def add(request):
     response = Response()
     result = ResponseJSON()
 
-    errors = validate(request)
+    errors = validate(request, 'add')
     if errors:
         result.set_status(False)
         result.set_messages(errors)
         response.data = result.to_json()
         return response
 
-    submit_type = request.data.get('submit_type')
     # Add new Knowledge data
     knowledge_data = knowledge_data_model.KnowledgeData()
 
@@ -46,12 +47,13 @@ def add(request):
     knowledge_data.create_user = user
     knowledge_data.edit_user = user
 
-    # Save the model first before create relation models
     knowledge_data.save()
 
     # Reference document
     references = []
-    for reference in request.data.get('documentReference'):
+    next_reference_id = get_latest_id(kd_document_model.KnowledgeDataRefercenceDocumentLink, kd_document_model.ID)
+
+    for i, reference in enumerate(request.data.get('documentReference')):
         try:
             document_id = int(reference['id'])
             document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
@@ -60,71 +62,94 @@ def add(request):
             page = int(reference['page']) if reference['page'].strip() else None
             extra_info = reference['extra_info'].strip()
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
+                id=(next_reference_id+i),
                 knowledge_data=knowledge_data,
                 reference_document=document,
                 page=page,
                 extra_info=extra_info
             ))
         except ValueError:
-            errors.append('Reference document id is invalid ({})'.format(reference['id']))
+            raise APIException('Reference document id is invalid ({})'.format(reference['id']))
     kd_document_model.KnowledgeDataRefercenceDocumentLink.objects.bulk_create(references)
 
     # Response data
     response_datas = []
-    for rd in request.data.get('coresponse'):
+    next_response_data_id = get_latest_id(response_data_model.ResponseData, response_data_model.ID)
+
+    for i, rd in enumerate(request.data.get('coresponse')):
         response_datas.append(response_data_model.ResponseData(
+            response_data_id=(next_response_data_id+i),
             knowledge_data=knowledge_data,
-            type=response_data_model.RESPONSE_TYPES[rd['type']],
+            type=response_data_model.RESPONSE_TYPES[rd['type'].lower()],
             answer=rd['answer']
         ))
     response_data_model.ResponseData.objects.bulk_create(response_datas)
 
     # Subjects
-    verbs = []
-    for sj in request.data.get('criticalData'):
-        # Subject
+    subjects = []
+    next_subject_id = get_latest_id(subject_model.Subject, subject_model.ID)
+
+    for i, sj in enumerate(request.data.get('criticalData')):
         type = sj['type']
         subject_data = []
         for word in sj['word']:
             subject_data.append((word['type'], word['word']))
         if type == 'MISC':
             # Eg: MISC:N:Thư+V:chúc_mừng+N:năm+R:mới
-            subject_data = PLUS.join([(s1[0] + COMMA + s1[1]) for s1 in subject_data])
+            subject_data = PLUS.join([(s1[0] + COLON + s1[1]) for s1 in subject_data])
         else:
             # Eg: LOC:làng Kim_Liên
             subject_data = SPACE.join([s1[1] for s1 in subject_data])
-        subject = subject_model.Subject.objects.create(
-            knowledge_data=knowledge_data,
-            type=type,
-            subject_data=subject_data
-        )
+
         # Verbs
         if not sj['verb']:
-            verbs.append(verb_model.Verb(
-                subject=subject,
-                verb_data='empty'
-            ))
+            verb = ''
         else:
-            verbs.append(verb_model.Verb(
-                subject=subject,
-                verb_data=PLUS.join([(v['type'] + COLON + v['word']) for v in sj['verb']])
-            ))
-    verb_model.Verb.objects.bulk_create(verbs)
+            verb = PLUS.join([(v['type'] + COLON + v['word']) for v in sj['verb']])
+
+        subjects.append(subject_model.Subject(
+            subject_id=(next_subject_id+i),
+            knowledge_data=knowledge_data,
+            type=type,
+            subject_data=subject_data,
+            verb=verb
+        ))
+    subject_model.Subject.objects.bulk_create(subjects)
 
     # Questions
     questions = []
-    for q in request.data.get('questions'):
+    generated_questions = []
+    next_question_id = get_latest_id(question_model.Question, question_model.ID)
+    next_g_question_id = get_latest_id(gq_model.GeneratedQuestion, gq_model.ID)
+
+    for i, q in enumerate(request.data.get('questions')):
         questions.append(question_model.Question(
+            question_id=(next_question_id+i),
             knowledge_data=knowledge_data,
-            question=q.strip()
+            question=q['question']
         ))
+        try:
+            for i2, gqs in enumerate(q['generated_questions']):
+                generated_question = gq_model.GeneratedQuestion(
+                    generated_question_id=(next_g_question_id+i2),
+                    generated_question=gqs['question'],
+                    accept_status=gq_model.ACCEPT_STATUS[gqs['accept']],
+                    question_id=(next_question_id+i)
+                )
+                generated_questions.append(generated_question)
+            next_g_question_id += len(q['generated_questions'])
+        except KeyError:
+            raise APIException('Generated questions data is malformed')
+
     question_model.Question.objects.bulk_create(questions)
+    gq_model.GeneratedQuestion.objects.bulk_create(generated_questions)
 
     # Synonyms
     kd_synonym_links = []
-    for i, synonym_word_pair in enumerate(request.data.get('synonyms')):
+    next_synonym_link_id = get_latest_id(kd_synonym_model.KnowledgeDataSynonymLink, kd_synonym_model.ID)
+    for synonym_word_pair in request.data.get('synonyms'):
         word = synonym_word_pair['word']
-        for s_id in synonym_word_pair['synonyms']:
+        for i, s_id in enumerate(synonym_word_pair['synonyms']):
             synonym = synonym_model.Synonym.objects.filter(synonym_id=s_id).first()
             if synonym is None:
                 raise Exception('Invalid synonym group ids: {}'.format(s_id))
@@ -136,10 +161,12 @@ def add(request):
                 synonym.save()
             # Relation model regist
             kd_synonym_links.append(kd_synonym_model.KnowledgeDataSynonymLink(
+                id=(next_synonym_link_id+i),
                 knowledge_data=knowledge_data,
                 synonym=synonym,
                 word=word
             ))
+        next_synonym_link_id += len(synonym_word_pair['synonyms'])
     kd_synonym_model.KnowledgeDataSynonymLink.objects.bulk_create(kd_synonym_links)
 
     result.set_status(True)
@@ -147,19 +174,183 @@ def add(request):
     return response
 
 
-def validate(request):
+@api_view(['POST'])
+@transaction.atomic
+def edit(request):
+    response = Response()
+    result = ResponseJSON()
+
+    errors = validate(request, 'edit')
+    if errors:
+        result.set_status(False)
+        result.set_messages(errors)
+        response.data = result.to_json()
+        return response
+
+    # Get existing Knowledge data
+    intent = request.data.get('intent').strip()
+    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(intent__iexact=intent).first()
+    if knowledge_data is None:
+        raise APIException('Invalid intent: {}'.format(intent))
+
+    # Intent
+    knowledge_data.intent = intent
+    # Intent fullname
+    knowledge_data.intent_fullname = request.data.get('intentFullName').strip()
+    # Base response
+    knowledge_data.base_response = request.data.get('baseResponse').strip()
+    # Raw data
+    knowledge_data.raw_data = request.data.get('rawData').strip()
+    # User
+    user = get_current_user(request)
+    knowledge_data.edit_user = user
+
+    knowledge_data.save()
+
+    # Reference document
+    kd_document_model.KnowledgeDataRefercenceDocumentLink.objects.filter(knowledge_data=knowledge_data).delete()
+    references = []
+    next_reference_id = get_latest_id(kd_document_model.KnowledgeDataRefercenceDocumentLink, kd_document_model.ID)
+
+    for i, reference in enumerate(request.data.get('documentReference')):
+        try:
+            document_id = int(reference['id'])
+            document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
+            if document is None:
+                raise ValueError('')
+            page = int(reference['page']) if reference['page'].strip() else None
+            extra_info = reference['extra_info'].strip()
+            references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
+                id=(next_reference_id+i),
+                knowledge_data=knowledge_data,
+                reference_document=document,
+                page=page,
+                extra_info=extra_info
+            ))
+        except ValueError:
+            raise APIException('Reference document id is invalid ({})'.format(reference['id']))
+    kd_document_model.KnowledgeDataRefercenceDocumentLink.objects.bulk_create(references)
+
+    # Response data
+    response_data_model.ResponseData.objects.filter(knowledge_data=knowledge_data).delete()
+    response_datas = []
+    next_response_data_id = get_latest_id(response_data_model.ResponseData, response_data_model.ID)
+
+    for i, rd in enumerate(request.data.get('coresponse')):
+        response_datas.append(response_data_model.ResponseData(
+            response_data_id=(next_response_data_id+i),
+            knowledge_data=knowledge_data,
+            type=response_data_model.RESPONSE_TYPES[rd['type'].lower()],
+            answer=rd['answer']
+        ))
+    response_data_model.ResponseData.objects.bulk_create(response_datas)
+
+    # Subjects
+    subject_model.Subject.objects.filter(knowledge_data=knowledge_data).delete()
+    subjects = []
+    next_subject_id = get_latest_id(subject_model.Subject, subject_model.ID)
+
+    for i, sj in enumerate(request.data.get('criticalData')):
+        type = sj['type']
+        subject_data = []
+        for word in sj['word']:
+            subject_data.append((word['type'], word['word']))
+        if type == 'MISC':
+            # Eg: MISC:N:Thư+V:chúc_mừng+N:năm+R:mới
+            subject_data = PLUS.join([(s1[0] + COLON + s1[1]) for s1 in subject_data])
+        else:
+            # Eg: LOC:làng Kim_Liên
+            subject_data = SPACE.join([s1[1] for s1 in subject_data])
+
+        # Verbs
+        if not sj['verb']:
+            verbs = ''
+        else:
+            verbs = PLUS.join([(v['type'] + COLON + v['word']) for v in sj['verb']])
+
+        subjects.append(subject_model.Subject(
+            subject_id=(next_subject_id+i),
+            knowledge_data=knowledge_data,
+            type=type,
+            subject_data=subject_data,
+            verbs=verbs
+        ))
+    subject_model.Subject.objects.bulk_create(subjects)
+
+    # Questions
+    question_model.Question.objects.filter(knowledge_data=knowledge_data).delete()
+    questions = []
+    generated_questions = []
+    next_question_id = get_latest_id(question_model.Question, question_model.ID)
+    next_g_question_id = get_latest_id(gq_model.GeneratedQuestion, gq_model.ID)
+
+    for i, q in enumerate(request.data.get('questions')):
+        questions.append(question_model.Question(
+            question_id=(next_question_id+i),
+            knowledge_data=knowledge_data,
+            question=q['question']
+        ))
+        try:
+            for i2, gqs in enumerate(q['generated_questions']):
+                generated_question = gq_model.GeneratedQuestion(
+                    generated_question_id=(next_g_question_id + i2),
+                    generated_question=gqs['question'],
+                    accept_status=gq_model.ACCEPT_STATUS[gqs['accept']],
+                    question_id=(next_question_id + i)
+                )
+                generated_questions.append(generated_question)
+            next_g_question_id += len(q['generated_questions'])
+        except KeyError:
+            raise APIException('Generated questions data is malformed')
+
+    question_model.Question.objects.bulk_create(questions)
+    gq_model.GeneratedQuestion.objects.bulk_create(generated_questions)
+
+    # Synonyms
+    kd_synonym_model.KnowledgeDataSynonymLink.objects.filter(knowledge_data=knowledge_data).delete()
+    kd_synonym_links = []
+    next_synonym_link_id = get_latest_id(kd_synonym_model.KnowledgeDataSynonymLink, kd_synonym_model.ID)
+    for synonym_word_pair in request.data.get('synonyms'):
+        word = synonym_word_pair['word']
+        for i, s_id in enumerate(synonym_word_pair['synonyms']):
+            synonym = synonym_model.Synonym.objects.filter(synonym_id=s_id).first()
+            if synonym is None:
+                raise Exception('Invalid synonym group ids: {}'.format(s_id))
+            # If word metion in data not in synonyms dictionary so add it
+            syn_words = [s.lower() for s in synonym.words.split()]
+            if word.lower() not in syn_words:
+                syn_words.append(word)
+                synonym.words = COMMA.join(syn_words)
+                synonym.save()
+            # Relation model regist
+            kd_synonym_links.append(kd_synonym_model.KnowledgeDataSynonymLink(
+                id=(next_synonym_link_id+i),
+                knowledge_data=knowledge_data,
+                synonym=synonym,
+                word=word
+            ))
+        next_synonym_link_id += len(synonym_word_pair['synonyms'])
+    kd_synonym_model.KnowledgeDataSynonymLink.objects.bulk_create(kd_synonym_links)
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
+
+
+def validate(request, mode):
     errors = []
-    # submit_type = request.data.get('submit_type')
-    # if not submit_type:
-    #     errors.append('Missing submit type')
-    # elif submit_type not in SUBMIT_TYPES:
-    #     errors.append('Submit type invalid')
-    #
-    # if submit_type == SUBMIT_TYPES[1]:
-    #     try:
-    #         data_id = int(request.data.get('id'))
-    #     except (ValueError, KeyError):
-    #         errors.append('Data id invalid')
+
+    # Intent
+    if not ('intent' in request.data and request.data.get('intent').strip()):
+        errors.append('Missing intent id')
+    else:
+        knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(intent__iexact=request.data.get('intent')).first()
+        if knowledge_data is not None and mode == 'add':
+            errors.append('Duplicated intent id')
+
+    # Intent full name
+    if not ('intentFullName' in request.data and request.data.get('intentFullName').strip()):
+        errors.append('Missing intent name')
 
     # Base response
     if not ('baseResponse' in request.data and request.data.get('baseResponse')):
@@ -170,13 +361,20 @@ def validate(request):
         errors.append('Missing response data, response data must be at least one')
     else:
         err_rd_types = []
+        type_check = []
         for i, rd in enumerate(request.data.get('coresponse')):
-            if rd['type'] not in response_data_model.RESPONSE_TYPES:
+            type = rd['type'].lower()
+            if type not in response_data_model.RESPONSE_TYPES:
                 err_rd_types.append(rd['type'])
             if not rd['answer'].strip():
                 errors.append('Response data #{} is empty'.format(i + 1))
+            type_check.append(type)
         if err_rd_types:
             errors.append('Invalid response data type: {}'.format(', '.join(err_rd_types)))
+        type_check = Counter(type_check)
+        type_check = [k for k in type_check if type_check[k] > 1]
+        if type_check:
+            errors.append('Response data type duplicated: {}'.format(', '.join(type_check)))
 
     # Subjects
     if not ('criticalData' in request.data and request.data.get('criticalData')):
@@ -192,14 +390,6 @@ def validate(request):
     # Reference document
     if not ('documentReference' in request.data and request.data.get('documentReference')):
         errors.append('Knowledge data must belong to atleast one reference document')
-
-    # Intent
-    if not ('intent' in request.data and request.data.get('intent').strip()):
-        errors.append('Missing intent id')
-
-    # Intent full name
-    if not ('intentFullName' in request.data and request.data.get('intentFullName').strip()):
-        errors.append('Missing intent name')
 
     # Questions
     if not ('questions' in request.data and request.data.get('questions')):

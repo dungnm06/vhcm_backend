@@ -3,13 +3,13 @@ from .knowledge_data import KnowledgeData
 
 
 # Fields
-ID = 'response_data_id'
+ID = 'question_id'
 KNOWLEDGE_DATA_ID = 'knowledge_data'
 QUESTION = 'question'
 
 
 class Question(models.Model):
-    question_id = models.AutoField(
+    question_id = models.BigIntegerField(
         primary_key=True, verbose_name='question id', serialize=True
     )
     knowledge_data = models.ForeignKey(KnowledgeData, on_delete=models.CASCADE)

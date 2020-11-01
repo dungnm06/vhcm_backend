@@ -10,18 +10,18 @@ ANSWER = 'answer'
 
 # Constants
 RESPONSE_TYPES = {
-    'WHAT':     1,
-    'WHEN':     2,
-    'WHERE':    3,
-    'WHO':      4,
-    'WHY':      5,
-    'HOW':      6,
-    'YESNO':    7
+    'what':     1,
+    'when':     2,
+    'where':    3,
+    'who':      4,
+    'why':      5,
+    'how':      6,
+    'yesno':    7
 }
 
 
 class ResponseData(models.Model):
-    response_data_id = models.AutoField(
+    response_data_id = models.BigIntegerField(
         primary_key=True, verbose_name='response data id', serialize=True
     )
     knowledge_data = models.ForeignKey(KnowledgeData, on_delete=models.CASCADE)
@@ -34,3 +34,4 @@ class ResponseData(models.Model):
 
     class Meta:
         db_table = "knowledge_data_response_data"
+        unique_together = ('knowledge_data', 'type',)

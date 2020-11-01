@@ -28,6 +28,7 @@ urlpatterns = [
     path('nlp/generate-similaries', nlp_views.generate_similaries, name='generate_similary_sentences'),
     # Knowledge data processing
     path('knowledge-data/add', knowledge_data_views.add, name='add_new_knowledge_data'),
+    path('knowledge-data/edit', knowledge_data_views.edit, name='edit_knowledge_data'),
     # User
     path('user/all', user_views.all, name='get_all_users'),
     path('user/get', user_views.get, name='get_user'),

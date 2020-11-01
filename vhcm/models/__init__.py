@@ -6,7 +6,7 @@ from .knowledge_data_response_data import ResponseData
 from .knowledge_data_subject import Subject
 from .synonym import Synonym
 from .knowledge_data_synonym_link import KnowledgeDataSynonymLink
-from .knowledge_data_verbs import Verb
+# from .knowledge_data_verbs import Verb
 from .reference_document import RefercenceDocument
 from .knowledge_data_reference_document_link import KnowledgeDataRefercenceDocumentLink
 from .report import Report

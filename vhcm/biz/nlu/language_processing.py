@@ -326,3 +326,4 @@ class LanguageProcessor(object, metaclass=Singleton):
 
 
 language_processor = LanguageProcessor()
+# language_processor = None

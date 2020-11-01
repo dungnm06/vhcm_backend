@@ -9,7 +9,7 @@ DATA = 'verb_data'
 
 
 class Verb(models.Model):
-    verb_id = models.AutoField(
+    verb_id = models.BigIntegerField(
         primary_key=True, verbose_name='verb id', serialize=True
     )
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)

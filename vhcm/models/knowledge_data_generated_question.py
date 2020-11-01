@@ -8,9 +8,14 @@ QUESTION_ID = 'question'
 DATA = 'generated_question'
 STATUS = 'accept_status'
 
+ACCEPT_STATUS = {
+    1: True,
+    0: False
+}
+
 
 class GeneratedQuestion(models.Model):
-    generated_question_id = models.AutoField(
+    generated_question_id = models.BigIntegerField(
         primary_key=True, verbose_name='generated question id', serialize=True
     )
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
