@@ -48,4 +48,6 @@ urlpatterns = [
     path('reference-document/get', reference_document_views.get_document, name='get_reference'),
     path('reference-document/add', reference_document_views.AddNewReferenceDocument.as_view(), name='add-new-reference'),
     path('reference-document/edit', reference_document_views.EditReferenceDocument.as_view(), name='edit-reference'),
+    path('reference-document/validate-delete', reference_document_views.validate_delete, name='validate_document_before_delete'),
+    path('reference-document/delete', reference_document_views.delete, name='delete_document'),
 ]

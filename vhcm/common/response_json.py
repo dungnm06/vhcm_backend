@@ -17,7 +17,10 @@ class ResponseJSON(object):
         self.status = status
 
     def set_messages(self, messages):
-        self.messages.extend(messages)
+        if isinstance(messages, list):
+            self.messages.extend(messages)
+        elif isinstance(messages, str):
+            self.messages.append(messages)
 
     def set_result_data(self, data):
         self.result_data = data

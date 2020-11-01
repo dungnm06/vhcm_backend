@@ -1,5 +1,6 @@
 from rest_framework.exceptions import APIException
 import vhcm.models.reference_document as document_model
+import vhcm.models.knowledge_data as knowledge_data_model
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,6 +10,7 @@ from vhcm.common.utils.CV import ImageUploadParser, extract_validation_messages
 from vhcm.biz.authentication.user_session import get_current_user
 from .reference_document_forms import DocumentAddForm, DocumentEditForm
 from vhcm.biz.validation.image import image_validate
+from vhcm.common.constants import COMMA, SPACE
 
 
 @api_view(['GET', 'POST'])
@@ -33,7 +35,7 @@ def get_document(request):
     response = Response()
     result = ResponseJSON()
     try:
-        document_id = int(request.data.get(document_model.ID)) if request.method == 'POST' else int(request.GET.get(document_model.ID))
+        document_id = int(request.data[document_model.ID]) if request.method == 'POST' else int(request.GET[document_model.ID])
     except Exception:
         raise Exception('Document id is invalid')
 
@@ -155,3 +157,71 @@ class EditReferenceDocument(APIView):
 
     def put(self, request, format=None):
         return self.edit(request)
+
+
+@api_view(['GET', 'POST'])
+def validate_delete(request):
+    response = Response()
+    result = ResponseJSON()
+
+    try:
+        id = int(request.data[document_model.ID]) if request.method == 'POST' else int(request.GET[document_model.ID])
+        document = document_model.RefercenceDocument.objects.filter(reference_document_id=id).first()
+        if document is None:
+            raise ValueError('')
+    except ValueError:
+        raise Exception('Invalid reference document id: {}'.format(request.data.get('id')))
+    except KeyError:
+        raise Exception('Missing reference document id')
+
+    knowledge_datas = knowledge_data_model.KnowledgeData.objects.filter(references__reference_document_id=id)
+    kd_nums = len(knowledge_datas)
+    if kd_nums > 0:
+        result.set_status(False)
+        kds = knowledge_datas[:] if len(knowledge_datas) <= 3 else knowledge_datas[:3]
+        kd_names = (COMMA+SPACE).join([k.intent for k in kds])
+        if kd_nums > 3:
+            kd_names += '...'
+        result.set_messages('Reference document "{}" is being linked with {} Knowledge Data: {}.\nNeed to edit knowledge data first!'.format(
+            document.reference_name,
+            kd_nums,
+            kd_names
+        ))
+        response.data = result.to_json()
+        return response
+
+    request.session['document_delete_'+str(id)] = 'ok'
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['GET', 'POST'])
+def delete(request):
+    response = Response()
+    result = ResponseJSON()
+
+    try:
+        id = int(request.data[document_model.ID]) if request.method == 'POST' else int(request.GET[document_model.ID])
+        document = document_model.RefercenceDocument.objects.filter(reference_document_id=id).first()
+        if document is None:
+            raise ValueError('')
+    except ValueError:
+        raise Exception('Invalid reference document id: {}'.format(request.data.get('id')))
+    except KeyError:
+        raise Exception('Missing reference document id')
+
+    try:
+        tmp = request.session['document_delete_'+str(id)]
+    except KeyError:
+        result.set_status(False)
+        result.set_messages('Unable to delete requested reference document, need validation.')
+        response.data = result.to_json()
+        return response
+
+    document.delete()
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response

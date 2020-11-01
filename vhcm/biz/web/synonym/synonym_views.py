@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from vhcm.common.response_json import ResponseJSON
 from rest_framework.response import Response
 from vhcm.serializers.synonym import SynonymSerializer
-from vhcm.common.constants import COMMA
+from vhcm.common.constants import COMMA, SPACE
 
 
 @api_view(['GET', 'POST'])
@@ -32,14 +32,14 @@ def get(request):
     result = ResponseJSON()
 
     try:
-        synonym_id = int(request.data.get('id')) if request.method == 'POST' else int(request.GET.get('id'))
+        synonym_id = int(request.data['id']) if request.method == 'POST' else int(request.GET['id'])
         synonym = synonym_model.Synonym.objects.filter(synonym_id=synonym_id).first()
         if synonym is None:
             raise ValueError('')
     except ValueError:
-        raise Exception('Invalid synonym group ids: {}'.format(request.data.get('id')))
+        raise Exception('Invalid synonym set ids: {}'.format(request.data.get('id')))
     except KeyError:
-        raise Exception('Missing synonym group id')
+        raise Exception('Missing synonym set id')
 
     serialized_synonyms = SynonymSerializer(synonym).data
     words = serialized_synonyms['words']
@@ -90,14 +90,14 @@ def edit(request):
         return response
 
     try:
-        synonym_id = int(request.data.get('id'))
+        synonym_id = int(request.data['id'])
         synonym = synonym_model.Synonym.objects.filter(synonym_id=synonym_id).first()
         if synonym is None:
             raise ValueError('')
     except ValueError:
-        raise Exception('Invalid synonym group ids: {}'.format(request.data.get('id')))
+        raise Exception('Invalid synonym set ids: {}'.format(request.data['id']))
     except KeyError:
-        raise Exception('Missing synonym group id')
+        raise Exception('Missing synonym set id')
 
     synonym.meaning = request.data.get('meaning').strip()
     synonym.words = COMMA.join([w.strip() for w in request.data.get('words')])
@@ -117,24 +117,24 @@ def validate_delete(request):
     result = ResponseJSON()
 
     try:
-        synonym_id = int(request.data.get('id')) if request.method == 'POST' else int(request.GET.get('id'))
+        synonym_id = int(request.data['id']) if request.method == 'POST' else int(request.GET['id'])
         synonym = synonym_model.Synonym.objects.filter(synonym_id=synonym_id).first()
         if synonym is None:
             raise ValueError('')
     except ValueError:
-        raise Exception('Invalid synonym group ids: {}'.format(request.data.get('id')))
+        raise Exception('Invalid synonym set ids: {}'.format(request.data.get('id')))
     except KeyError:
-        raise Exception('Missing synonym group id')
+        raise Exception('Missing synonym set id')
 
     knowledge_datas = knowledge_data_model.KnowledgeData.objects.filter(synonym=synonym)
     kd_nums = len(knowledge_datas)
     if kd_nums > 0:
         result.set_status(False)
         kds = knowledge_datas[:] if len(knowledge_datas) <= 3 else knowledge_datas[:3]
-        kd_names = COMMA.join([k.intent for k in kds])
+        kd_names = (COMMA+SPACE).join([k.intent for k in kds])
         if kd_nums > 3:
             kd_names += '...'
-        result.set_messages('Synonym group "{}" is being used in {} Knowledge Data: {}.\nNeed to edit knowledge data first!'.format(
+        result.set_messages('Synonym set "{}" is being used in {} Knowledge Data: {}.\nNeed to edit knowledge data first!'.format(
             synonym.meaning,
             kd_nums,
             kd_names
@@ -142,9 +142,7 @@ def validate_delete(request):
         response.data = result.to_json()
         return response
 
-    if 'synonym_delete' not in request.session:
-        request.session['synonym_delete'] = {}
-    request.session['synonym_delete'][str('synonym_id')] = True
+    request.session[('synonym_delete_'+str('synonym_id'))] = 'ok'
 
     result.set_status(True)
     response.data = result.to_json()
@@ -157,21 +155,20 @@ def delete(request):
     result = ResponseJSON()
 
     try:
-        synonym_id = int(request.data.get('id')) if request.method == 'POST' else int(request.GET.get('id'))
+        synonym_id = int(request.data['id']) if request.method == 'POST' else int(request.GET['id'])
         synonym = synonym_model.Synonym.objects.filter(synonym_id=synonym_id).first()
         if synonym is None:
             raise ValueError('')
     except ValueError:
-        raise Exception('Invalid synonym group ids: {}'.format(request.data.get('id')))
+        raise Exception('Invalid synonym set ids: {}'.format(request.data.get('id')))
     except KeyError:
-        raise Exception('Missing synonym group id')
+        raise Exception('Missing synonym set id')
 
     try:
-        if not request.session['synonym_delete'][str('synonym_id')]:
-            raise KeyError()
+        tmp = request.session[('synonym_delete_'+str('synonym_id'))]
     except KeyError:
         result.set_status(False)
-        result.set_messages('Need validation before delete')
+        result.set_messages('Unable to delete requested synonym set, need validation')
         response.data = result.to_json()
         return response
 
@@ -190,6 +187,6 @@ def validate(request):
 
     # Words
     if not ('words' in request.data and request.data.get('words')):
-        errors.append('Synonym group must contains atleast 1 word')
+        errors.append('Synonym set must contains atleast 1 word')
 
     return errors
