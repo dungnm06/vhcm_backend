@@ -37,7 +37,7 @@ urlpatterns = [
     path('user/add', user_views.AddUser.as_view(), name='add_user'),
     path('user/edit', user_views.EditUser.as_view(), name='edit_user'),
     path('user/change-status', user_views.change_status, name='change_user_status'),
-    path('user/update-password', user_views.update_password_first_login, name='first_time_login_update_password'),
+    path('user/update-password-first-login', user_views.update_password_first_login, name='first_time_login_update_password'),
     # Synonym
     path('synonym/all', synonym_views.get_all_synonyms, name='get_all_synonyms'),
     path('synonym/get', synonym_views.get, name='get_one_synonym'),
