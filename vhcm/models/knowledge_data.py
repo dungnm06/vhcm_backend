@@ -21,6 +21,12 @@ PROCESS_STATUS = [
     (2, 'Done'),
     (3, 'Disable')
 ]
+PROCESS_STATUS_DICT = {
+    0: 'Available',
+    1: 'Processing',
+    2: 'Done',
+    3: 'Disable'
+}
 
 
 class KnowledgeData(models.Model):

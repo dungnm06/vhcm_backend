@@ -9,7 +9,16 @@ TYPE = 'type'
 ANSWER = 'answer'
 
 # Constants
-RESPONSE_TYPES = {
+RESPONSE_TYPES = [
+    (1, 'what'),
+    (2, 'when'),
+    (3, 'where'),
+    (4, 'who'),
+    (5, 'why'),
+    (6, 'how'),
+    (7, 'yesno')
+]
+RESPONSE_TYPES_T2IDX = {
     'what':     1,
     'when':     2,
     'where':    3,
@@ -18,6 +27,7 @@ RESPONSE_TYPES = {
     'how':      6,
     'yesno':    7
 }
+RESPONSE_TYPES_IDX2T = {v: k for k, v in RESPONSE_TYPES_T2IDX.items()}
 
 
 class ResponseData(models.Model):
@@ -26,7 +36,7 @@ class ResponseData(models.Model):
     )
     knowledge_data = models.ForeignKey(KnowledgeData, on_delete=models.CASCADE)
     type = models.SmallIntegerField(
-        verbose_name='type of question'
+        verbose_name='type of question', choices=RESPONSE_TYPES
     )
     answer = models.TextField(
         verbose_name='answer string'

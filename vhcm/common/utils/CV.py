@@ -35,3 +35,7 @@ def extract_validation_messages(form, fields_map):
 
 class ImageUploadParser(FileUploadParser):
     media_type = 'image/*'
+
+
+def datetime_to_str(time, format):
+    return time.strftime(format)

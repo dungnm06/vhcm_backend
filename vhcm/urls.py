@@ -27,6 +27,8 @@ urlpatterns = [
     path('nlp/untokenize', nlp_views.untokenize_sentences, name='tokenize_sentence'),
     path('nlp/generate-similaries', nlp_views.generate_similaries, name='generate_similary_sentences'),
     # Knowledge data processing
+    path('knowledge-data/all', knowledge_data_views.all, name='get_list_knowledge_data'),
+    path('knowledge-data/get', knowledge_data_views.get, name='get_knowledge_data'),
     path('knowledge-data/add', knowledge_data_views.add, name='add_new_knowledge_data'),
     path('knowledge-data/edit', knowledge_data_views.edit, name='edit_knowledge_data'),
     # User
@@ -41,13 +43,11 @@ urlpatterns = [
     path('synonym/get', synonym_views.get, name='get_one_synonym'),
     path('synonym/add', synonym_views.add, name='add_synonym'),
     path('synonym/edit', synonym_views.edit, name='edit_synonym'),
-    path('synonym/validate-delete', synonym_views.validate_delete, name='validate_synonym_before_delete'),
     path('synonym/delete', synonym_views.delete, name='delete_synonym'),
     # Reference document
     path('reference-document/all', reference_document_views.get_all_document, name='get_all_references'),
     path('reference-document/get', reference_document_views.get_document, name='get_reference'),
     path('reference-document/add', reference_document_views.AddNewReferenceDocument.as_view(), name='add-new-reference'),
     path('reference-document/edit', reference_document_views.EditReferenceDocument.as_view(), name='edit-reference'),
-    path('reference-document/validate-delete', reference_document_views.validate_delete, name='validate_document_before_delete'),
     path('reference-document/delete', reference_document_views.delete, name='delete_document'),
 ]

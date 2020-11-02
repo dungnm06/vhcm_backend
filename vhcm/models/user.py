@@ -152,8 +152,8 @@ class User(AbstractBaseUser):
         # The user is identified by their email address
         return self.fullname
 
-    def __str__(self):  # __unicode__ on Python 2
-        return self.username
+    # def __str__(self):  # __unicode__ on Python 2
+    #     return self.username
 
     def has_perm(self, perm, obj=None):
         """Does the user have a specific permission?"""

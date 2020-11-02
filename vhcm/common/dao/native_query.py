@@ -18,7 +18,9 @@ def namedtuplefetchall(cursor):
     return [nt_result(*row) for row in cursor.fetchall()]
 
 
-def execute_native_query(sql, params, return_type='named_tuple'):
+def execute_native_query(sql, params=None, return_type='named_tuple'):
+    if params is None:
+        params = []
     with connection.cursor() as cursor:
         cursor.execute(sql, params)
         if return_type == 'named_tuple':

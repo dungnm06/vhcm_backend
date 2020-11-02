@@ -112,7 +112,7 @@ def edit(request):
 
 
 @api_view(['GET', 'POST'])
-def validate_delete(request):
+def delete(request):
     response = Response()
     result = ResponseJSON()
 
@@ -139,36 +139,6 @@ def validate_delete(request):
             kd_nums,
             kd_names
         ))
-        response.data = result.to_json()
-        return response
-
-    request.session[('synonym_delete_'+str('synonym_id'))] = 'ok'
-
-    result.set_status(True)
-    response.data = result.to_json()
-    return response
-
-
-@api_view(['GET', 'POST'])
-def delete(request):
-    response = Response()
-    result = ResponseJSON()
-
-    try:
-        synonym_id = int(request.data['id']) if request.method == 'POST' else int(request.GET['id'])
-        synonym = synonym_model.Synonym.objects.filter(synonym_id=synonym_id).first()
-        if synonym is None:
-            raise ValueError('')
-    except ValueError:
-        raise Exception('Invalid synonym set ids: {}'.format(request.data.get('id')))
-    except KeyError:
-        raise Exception('Missing synonym set id')
-
-    try:
-        tmp = request.session[('synonym_delete_'+str('synonym_id'))]
-    except KeyError:
-        result.set_status(False)
-        result.set_messages('Unable to delete requested synonym set, need validation')
         response.data = result.to_json()
         return response
 

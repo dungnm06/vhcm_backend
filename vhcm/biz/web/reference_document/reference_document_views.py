@@ -160,7 +160,7 @@ class EditReferenceDocument(APIView):
 
 
 @api_view(['GET', 'POST'])
-def validate_delete(request):
+def delete(request):
     response = Response()
     result = ResponseJSON()
 
@@ -187,36 +187,6 @@ def validate_delete(request):
             kd_nums,
             kd_names
         ))
-        response.data = result.to_json()
-        return response
-
-    request.session['document_delete_'+str(id)] = 'ok'
-
-    result.set_status(True)
-    response.data = result.to_json()
-    return response
-
-
-@api_view(['GET', 'POST'])
-def delete(request):
-    response = Response()
-    result = ResponseJSON()
-
-    try:
-        id = int(request.data[document_model.ID]) if request.method == 'POST' else int(request.GET[document_model.ID])
-        document = document_model.RefercenceDocument.objects.filter(reference_document_id=id).first()
-        if document is None:
-            raise ValueError('')
-    except ValueError:
-        raise Exception('Invalid reference document id: {}'.format(request.data.get('id')))
-    except KeyError:
-        raise Exception('Missing reference document id')
-
-    try:
-        tmp = request.session['document_delete_'+str(id)]
-    except KeyError:
-        result.set_status(False)
-        result.set_messages('Unable to delete requested reference document, need validation.')
         response.data = result.to_json()
         return response
 

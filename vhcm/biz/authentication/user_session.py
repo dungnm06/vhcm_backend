@@ -23,9 +23,10 @@ def get_current_user(request):
             request.session['user_id'] = user_id
         except (jwt.ExpiredSignatureError, ValueError):
             pass
-    # User data not exists anywhere, raise error
+
     user = user_model.User.objects.filter(user_id=user_id).first()
     if user is None:
+        # User data not exists anywhere, raise error
         raise exceptions.AuthenticationFailed('Access token expired')
 
     return user

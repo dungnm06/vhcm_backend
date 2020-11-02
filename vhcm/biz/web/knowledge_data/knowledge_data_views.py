@@ -16,6 +16,155 @@ import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
 import vhcm.models.knowledge_data_generated_question as gq_model
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.common.constants import *
+from .sql import GET_ALL_KNOWLEDGE_DATA
+from vhcm.common.dao.native_query import execute_native_query
+
+
+@api_view(['GET', 'POST'])
+def all(request):
+    response = Response()
+    result = ResponseJSON()
+
+    query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA)
+    result_data = {
+        'knowledges': []
+    }
+    for data in query_data:
+        knowledge_data = {
+            'intent': data.intent,
+            'intent_fullname': data.intent_fullname,
+            'status': knowledge_data_model.PROCESS_STATUS_DICT[data.status],
+            'create_user': data.create_user,
+            'create_user_id': data.create_user_id,
+            'edit_user': data.edit_user,
+            'edit_user_id': data.edit_user_id,
+            'cdate': data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'mdate': data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+        }
+        result_data['knowledges'].append(knowledge_data)
+
+    result.set_status(True)
+    result.set_result_data(result_data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['GET', 'POST'])
+def get(request):
+    response = Response()
+    result = ResponseJSON()
+
+    try:
+        intent = request.data[knowledge_data_model.INTENT] if request.method == 'POST' else request.GET[knowledge_data_model.INTENT]
+    except KeyError:
+        raise APIException('Can\'t get knowledge data infomations, missing intent id')
+
+    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(intent=intent).first()
+    if not knowledge_data:
+        raise APIException('Invalid intent id, couldnt find knowledge data')
+
+    # Response data
+    response_datas = response_data_model.ResponseData.objects.filter(knowledge_data=knowledge_data)
+    response_data_display = []
+    for response_data in response_datas:
+        response_data_display.append({
+            'type': response_data_model.RESPONSE_TYPES_IDX2T[response_data.type],
+            'answer': response_data.answer
+        })
+
+    # Subject
+    subjects = subject_model.Subject.objects.filter(knowledge_data=knowledge_data)
+    subjects_display = []
+    for subject in subjects:
+        # Words in subjects
+        words = []
+        for pair in subject.subject_data.split(PLUS):
+            type_word_pair = pair.split(COLON)
+            words.append({
+                'type': type_word_pair[0],
+                'word': type_word_pair[1]
+            })
+        # Verbs
+        verb = []
+        if subject.verbs:
+            for pair in subject.verbs.split(PLUS):
+                type_word_pair = pair.split(COLON)
+                verb.append({
+                    'type': type_word_pair[0],
+                    'word': type_word_pair[1]
+                })
+        subjects_display.append({
+            'type': subject.type,
+            'words': words,
+            'verb': verb
+        })
+
+    # Questions
+    questions = question_model.Question.objects.filter(knowledge_data=knowledge_data)
+    questions_display = []
+    for question in questions:
+        # Generated questions
+        generated_questions = []
+        generated_question_models = gq_model.GeneratedQuestion.objects.filter(question=question)
+        for generated_question in generated_question_models:
+            generated_questions.append({
+                'question': generated_question.generated_question,
+                'accept': 1 if generated_question.accept_status else 0
+            })
+        questions_display.append({
+            'question': question.question,
+            'generated_questions': generated_questions
+        })
+
+    # Synonyms
+    synonym_links = kd_synonym_model.KnowledgeDataSynonymLink.objects.filter(knowledge_data=knowledge_data)
+    synonyms_display = []
+    tmp_dict = {}
+    for synonym in synonym_links:
+        if synonym.word not in tmp_dict:
+            tmp_dict[synonym.word] = []
+        tmp_dict[synonym.word].append(synonym.synonym.synonym_id)
+    for word in tmp_dict:
+        synonyms_display.append({
+            'word': word,
+            'synonyms': tmp_dict[word]
+        })
+
+    # Reference Document
+    document_links = kd_document_model.KnowledgeDataRefercenceDocumentLink.objects.filter(knowledge_data=knowledge_data)
+    documents_display = []
+    for document in document_links:
+        documents_display.append({
+            'id': document.reference_document.reference_document_id,
+            'page': document.page,
+            'extra_info': document.extra_info
+        })
+
+    result_data = {
+        'knowledge_data': {
+            'intent': knowledge_data.intent,
+            'intentFullName': knowledge_data.intent_fullname,
+            'baseResponse': knowledge_data.base_response,
+            'coresponse': response_data_display,
+            'criticalData': subjects_display,
+            'documentReference': documents_display,
+            'questions': questions_display,
+            'rawData': knowledge_data.raw_data,
+            'synonyms': synonyms_display,
+            'status': knowledge_data_model.PROCESS_STATUS_DICT[knowledge_data.status],
+            'create_user': knowledge_data.create_user.username,
+            'create_user_id': knowledge_data.create_user.user_id,
+            'edit_user': knowledge_data.edit_user.username,
+            'edit_user_id': knowledge_data.edit_user.user_id,
+            'cdate': knowledge_data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'mdate': knowledge_data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+        }
+    }
+
+    result.set_status(True)
+    result.set_result_data(result_data)
+    response.data = result.to_json()
+    return response
 
 
 @api_view(['POST'])
@@ -80,7 +229,7 @@ def add(request):
         response_datas.append(response_data_model.ResponseData(
             response_data_id=(next_response_data_id+i),
             knowledge_data=knowledge_data,
-            type=response_data_model.RESPONSE_TYPES[rd['type'].lower()],
+            type=response_data_model.RESPONSE_TYPES_T2IDX[rd['type'].lower()],
             answer=rd['answer']
         ))
     response_data_model.ResponseData.objects.bulk_create(response_datas)
@@ -94,16 +243,13 @@ def add(request):
         subject_data = []
         for word in sj['word']:
             subject_data.append((word['type'], word['word']))
-        if type == 'MISC':
-            # Eg: MISC:N:Thư+V:chúc_mừng+N:năm+R:mới
-            subject_data = PLUS.join([(s1[0] + COLON + s1[1]) for s1 in subject_data])
-        else:
-            # Eg: LOC:làng Kim_Liên
-            subject_data = SPACE.join([s1[1] for s1 in subject_data])
+        # Eg: MISC:N:Thư+V:chúc_mừng+N:năm+R:mới
+        # Eg2: LOC:N:làng+Np:Kim_Liên
+        subject_data = PLUS.join([(s1[0] + COLON + s1[1]) for s1 in subject_data])
 
         # Verbs
         if not sj['verb']:
-            verb = ''
+            verb = None
         else:
             verb = PLUS.join([(v['type'] + COLON + v['word']) for v in sj['verb']])
 
@@ -240,7 +386,7 @@ def edit(request):
         response_datas.append(response_data_model.ResponseData(
             response_data_id=(next_response_data_id+i),
             knowledge_data=knowledge_data,
-            type=response_data_model.RESPONSE_TYPES[rd['type'].lower()],
+            type=response_data_model.RESPONSE_TYPES_T2IDX[rd['type'].lower()],
             answer=rd['answer']
         ))
     response_data_model.ResponseData.objects.bulk_create(response_datas)
@@ -264,7 +410,7 @@ def edit(request):
 
         # Verbs
         if not sj['verb']:
-            verbs = ''
+            verbs = None
         else:
             verbs = PLUS.join([(v['type'] + COLON + v['word']) for v in sj['verb']])
 
@@ -364,7 +510,7 @@ def validate(request, mode):
         type_check = []
         for i, rd in enumerate(request.data.get('coresponse')):
             type = rd['type'].lower()
-            if type not in response_data_model.RESPONSE_TYPES:
+            if type not in response_data_model.RESPONSE_TYPES_T2IDX:
                 err_rd_types.append(rd['type'])
             if not rd['answer'].strip():
                 errors.append('Response data #{} is empty'.format(i + 1))

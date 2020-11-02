@@ -44,4 +44,5 @@ class DateFormat(object):
 
 
 DATETIME_DDMMYYYY = DateFormat('DD/MM/YYYY', '%d/%m/%Y')
+DATETIME_DDMMYYYY_HHMMSS = DateFormat('DD/MM/YYYY HH:MM:SS', '%d/%m/%Y %H:%M:%S')
 DATETIME_DJANGO_DEFUALT = DateFormat('YYYY-MM-DD', '%Y-%m-%d')
