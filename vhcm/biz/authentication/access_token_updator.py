@@ -5,6 +5,7 @@ from django.conf import settings
 from vhcm.common.utils.CH import is_error_code
 from vhcm.biz.authentication.jwt import jwt_utils
 from vhcm.models.blacklisted_token import BlacklistedToken
+from vhcm.common.constants import ACCESS_TOKEN
 
 
 def access_token_updator(request, response):
@@ -32,6 +33,6 @@ def access_token_updator(request, response):
     bl_token.save()
     # Create new access token with new expire time
     new_access_token = jwt_utils.generate_access_token(payload.get(jwt_utils.USER_ID))
-    response.set_cookie(key='accesstoken', value=new_access_token, httponly=True, secure=True, samesite='None')
+    response.set_cookie(key=ACCESS_TOKEN, value=new_access_token, httponly=True, secure=True, samesite='None')
 
     return response

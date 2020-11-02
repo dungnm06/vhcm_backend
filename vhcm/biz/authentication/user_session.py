@@ -28,5 +28,5 @@ def get_current_user(request):
     if user is None:
         # User data not exists anywhere, raise error
         raise exceptions.AuthenticationFailed('Access token expired')
-
+    user.check_password()
     return user

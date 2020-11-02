@@ -240,6 +240,31 @@ def update_password_first_login(request):
         raise exceptions.APIException('Missing password data')
 
     current_user.set_password(request.data.get('password'))
+    current_user.first_login = False
+    current_user.save()
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['POST'])
+def change_password(request):
+    response = Response()
+    result = ResponseJSON()
+    current_user = get_current_user(request)
+
+    if not ('current_password' in request.data and request.data.get('current_password')):
+        raise exceptions.APIException('Missing current password, couldn\'t authenticate')
+    if not ('new_password' in request.data and request.data.get('new_password')):
+        raise exceptions.APIException('Missing password data')
+    if not current_user.check_password(request.data.get('current_password')):
+        result.set_status(False)
+        result.set_messages('Wrong password')
+        response.data = result.to_json()
+        return response
+
+    current_user.set_password(request.data.get('new_password'))
     current_user.save()
 
     result.set_status(True)
