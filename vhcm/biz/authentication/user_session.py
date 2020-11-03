@@ -4,7 +4,6 @@ import vhcm.models.user as user_model
 from django.conf import settings
 from rest_framework import exceptions
 from vhcm.common.constants import ACCESS_TOKEN
-from vhcm.serializers.user import UserSerializer
 
 
 def get_current_user(request):

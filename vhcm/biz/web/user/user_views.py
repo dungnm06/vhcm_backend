@@ -240,7 +240,7 @@ def update_password_first_login(request):
         raise exceptions.APIException('Missing password data')
 
     current_user.set_password(request.data.get('password'))
-    current_user.first_login = False
+    current_user.first_login = True
     current_user.save()
 
     result.set_status(True)
