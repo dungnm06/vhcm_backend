@@ -1,8 +1,7 @@
 import os
 import json
-from pathlib import Path
 from rest_framework.parsers import FileUploadParser
-from vhcm.common.constants import COMMA, COLON, SPACE
+from vhcm.common.constants import COMMA, COLON, SPACE, PROJECT_ROOT
 
 
 def readimage(path):
@@ -15,8 +14,7 @@ def to_abs_path(path):
     if os.path.isabs(path):
         return path
     else:
-        project_root = Path(__file__).resolve().parent.parent.parent.parent
-        return os.path.join(project_root, path)
+        return os.path.join(PROJECT_ROOT, path)
 
 
 def string_to_array(input_str, separator=' '):

@@ -82,8 +82,10 @@ INSTALLED_APPS = [
     "sslserver",
     'corsheaders',
     'rest_framework',
+    'channels',
     'vhcm',
 ]
+
 
 # Middleware
 MIDDLEWARE = [
@@ -98,6 +100,19 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'vhcm.biz.middleware.VhcmMiddleware'
 ]
+
+
+# Websocket
+ASGI_APPLICATION = 'websocket.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',

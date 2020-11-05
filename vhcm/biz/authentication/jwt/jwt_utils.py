@@ -9,6 +9,7 @@ EXPIRE_TIME = 'exp'
 ISSUE_TIME = 'iat'
 
 
+
 def generate_access_token(user):
     from vhcm.common.config.config_manager import CONFIG_LOADER, LOGIN_EXPIRATION_LIMIT
     access_token_payload = {

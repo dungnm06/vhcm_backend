@@ -16,13 +16,21 @@ UTF8 = 'utf-8'
 UTF16 = 'utf-16'
 # System
 ACCESS_TOKEN = 'accesstoken'
+# Websocket
+WEBSOCKET_ROOM = 'ws'
+INTENT_CLASSIFIER_ROOM_GROUP = '_intent_classifier'
+QUESTION_CLASSIFIER_ROOM_GROUP = '_question_classifier'
 # Other
-BERT = 'bert'
 IDX2OBJ = 'idx2obj'
 OBJ2IDX = 'obj2idx'
-# Predict model relative
-CONFIG = 'config'
-CONFIG_PATH = "config.json"
+# NLP
+BERT = 'bert'
+INTENT = 'intent'
+QUESTION = 'question'
+CLASSIFIER_TYPES = {
+    INTENT: 1,
+    QUESTION: 2
+}
 QUESTION_TYPE_DATA_PATH = 'question_type_data_path'
 QUESTION_TYPE_MODEL_PATH = 'question_type_model_weights'
 QUESTION_TYPE_MAP_FILE_PATH = 'question_type_map_file_path'

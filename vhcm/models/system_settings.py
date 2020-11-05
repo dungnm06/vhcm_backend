@@ -10,6 +10,12 @@ DEFAULT = 'default'
 CDATE = 'cdate'
 MDATE = 'mdate'
 
+# Setting types
+SETTING_TYPES = [
+    (1, 'System'),
+    (2, 'NLP')
+]
+
 
 class SystemSetting(models.Model):
     setting_id = models.CharField(
@@ -20,6 +26,9 @@ class SystemSetting(models.Model):
     )
     description = models.TextField(
         verbose_name='setting description', null=True, blank=True
+    )
+    type = models.IntegerField(
+        choices=SETTING_TYPES, verbose_name='setting type'
     )
     value = models.TextField(
         verbose_name='value', null=True, blank=True

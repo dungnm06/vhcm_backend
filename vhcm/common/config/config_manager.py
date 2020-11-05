@@ -51,6 +51,7 @@ class ConfigLoader(object, metaclass=Singleton):
 # ALL CONFIGS
 # NLP
 VNCORENLP = 'vncorenlp'
+CLASSIFIER_TRAINER_SCRIPT = 'classifier_train_script'
 NAMED_ENTITY_TYPES = 'named_entity_types'
 CRITICAL_DATA_NG_PATTERNS = 'subject_data_ng_pattern'
 EXCLUDE_POS_TAG = 'exclude_pos_tag'
@@ -77,46 +78,60 @@ def add_system_settings(request):
         ('vncorenlp',
          'Language Processing: VNCoreNLP data path',
          'System path where VNCoreNLP files storing (absolute/relative path OK)',
+         2,
          '',
-         'data/nlu/vncorenlp/VnCoreNLP-1.1.1.jar'),
+         'extras/nlp/data/vncorenlp/VnCoreNLP-1.1.1.jar'),
+        ('classifier_train_script',
+         'Language Processing: Classifiers trainer script path',
+         'System path where intent classifier trainer script file storing (absolute/relative path OK)',
+         2,
+         '',
+         'extras/nlp/vhcm_trainer.py'),
         ('exclude_pos_tag',
          'Language Processing: Exclude POS-tag',
          'These POS-tag will be ignored when analyze sentence subjects and verbs in language processing phase (comma separated)',
+         2,
          'E,A,L,CH,X',
          ''),
         ('named_entity_types',
          'Language Processing: Names entity types',
          'Accepted NER types for extracting main subjects in sentence',
+         2,
          'LOC,PER,ORG,MISC',
          ''),
         ('subject_data_ng_pattern',
          'Language Processing: Bad subject structure patterns',
          'Using this to analyze main subjects in sentences is matching.\nInput pattern examples:\nX-main\nmain-X\nX-main-X\nIn that (main) is main subject, (X) is word types adjacent to main subject',
+         2,
          'N-E-main,N-main',
          ''),
         ('exclude_word',
          'Language Processing: Exclude words',
          'These words will be ignored when analyze sentence subjects and verbs in language processing phase (comma separated)',
+         2,
          'bị,được,giữa,và,là',
          ''),
         ('login_expiration_limit',
          'System: Login expiration time',
          'Specify login expiration time threshold (in minutes)',
+         1,
          '5',
          '30'),
         ('accept_image_format',
          'System: Acceptable image file format ',
          'Specify image file format that can be uploaded to system.\nSee available types at: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html',
+         1,
          'JPEG,JPEG 2000,PNG',
          ''),
         ('default_password',
          'System: New user default password',
          'Default password for newly created user',
+         1,
          'vhcm-user',
          '123'),
     ]
 
-    settings = [SystemSetting(setting_id=s[0], setting_name=s[1], description=s[2], value=s[3], default=s[4]) for s in
+    settings = [SystemSetting(setting_id=s[0], setting_name=s[1], description=s[2], type=s[3], value=s[4], default=s[5]) for s in
                 settings]
     SystemSetting.objects.all().delete()
     SystemSetting.objects.bulk_create(settings)
