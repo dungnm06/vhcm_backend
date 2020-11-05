@@ -103,7 +103,7 @@ MIDDLEWARE = [
 
 
 # Websocket
-ASGI_APPLICATION = 'websocket.asgi.application'
+ASGI_APPLICATION = 'restapi_core.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
