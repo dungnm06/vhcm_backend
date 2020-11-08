@@ -37,7 +37,6 @@ class ClassifierTrainer(object):
             args=(self.communicate_queue,),
             daemon=True)
         self.listening_process.start()
-        self.process.terminate()
 
     def stop(self):
         status = False

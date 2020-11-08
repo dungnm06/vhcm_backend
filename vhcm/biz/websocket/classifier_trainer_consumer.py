@@ -28,7 +28,7 @@ class ClassifierConsumer(WebsocketConsumer):
             self.channel_name
         )
         print("DISCONNECTED CODE: ", close_code)
-        if self.is_process_running():
+        if self.is_process_running() and close_code != 1000:
             self.trainer.stop()
 
     def close(self, code=None):
@@ -50,7 +50,12 @@ class ClassifierConsumer(WebsocketConsumer):
 
             self.trainer.start(train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation)
         elif command == 'stop':
-            self.trainer.stop()
+            status = self.trainer.stop()
+            # Send status to WebSocket
+            self.send(text_data=json.dumps({
+                'type': 'stop_status',
+                'data': status
+            }))
 
         elif command == 'check_status':
             status = self.is_process_running()
