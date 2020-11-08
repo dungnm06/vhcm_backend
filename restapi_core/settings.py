@@ -82,10 +82,9 @@ INSTALLED_APPS = [
     "sslserver",
     'corsheaders',
     'rest_framework',
-    'channels',
     'vhcm',
+    'channels'
 ]
-
 
 # Middleware
 MIDDLEWARE = [
@@ -101,7 +100,6 @@ MIDDLEWARE = [
     'vhcm.biz.middleware.VhcmMiddleware'
 ]
 
-
 # Websocket
 ASGI_APPLICATION = 'restapi_core.asgi.application'
 CHANNEL_LAYERS = {
@@ -112,7 +110,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
-
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',

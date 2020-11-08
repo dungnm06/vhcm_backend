@@ -1,5 +1,3 @@
-from rest_framework.response import Response
-from rest_framework import status
 from vhcm.biz.exception.exception_handler import exception_cleaner
 from vhcm.biz.authentication.access_token_updator import access_token_updator
 
@@ -22,6 +20,3 @@ class VhcmMiddleware(object):
         response = access_token_updator(request, response)
 
         return response
-
-    # def process_exception(self, request, exception):
-    #     return Response({'error': True, 'content': exception}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

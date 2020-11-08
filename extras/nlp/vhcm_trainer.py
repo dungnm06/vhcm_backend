@@ -1,5 +1,6 @@
 import argparse
 from classifiers.intent_classifier import train_intent_classifier
+from classifiers.question_classifier import train_question_classifier
 
 if __name__ == '__main__':
     # Load parameters
@@ -32,4 +33,4 @@ if __name__ == '__main__':
     if args.type == 2:
         if activation is None:
             activation = 'sigmoid'
-        train_intent_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation)
+        train_question_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation)

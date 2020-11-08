@@ -24,19 +24,6 @@ def pickle_file(datas, filename):
 
 def train_intent_classifier(data, output, sentencelength, batch, epoch, learning_rate, epsilon, activation):
     ###################################
-    # --------- Setup BERT ---------- #
-    BERT_MODEL = 'vinai/phobert-base'
-    # Max length of tokens
-    SENTENCE_MAX_LENGTH = sentencelength
-    # # Load transformers config and set output_hidden_states to False
-    # config = AutoConfig.from_pretrained(BERT_MODEL)
-    # config.output_hidden_states = True
-    # Load BERT tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(BERT_MODEL)
-    # Load the Transformers BERT model
-    transformer_model = TFAutoModel.from_pretrained(BERT_MODEL)
-
-    ###################################
     # --------- Import data --------- #
     # Import datas
     TRAIN_DATA = data
@@ -56,6 +43,22 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
     x = list(x)
     y = list(y)
     y = tf.constant(y)
+
+    #####################################
+    # ------- Setup BERT model -------- #
+    BERT_MODEL = 'vinai/phobert-base'
+    # Max length of tokens
+    SENTENCE_MAX_LENGTH = sentencelength
+    # # Load transformers config and set output_hidden_states to False
+    # config = AutoConfig.from_pretrained(BERT_MODEL)
+    # config.output_hidden_states = True
+    # Load BERT tokenizer, build the model
+    model, tokenizer = build_PhoBERT_classifier_model(sequence_length=SENTENCE_MAX_LENGTH,
+                                                      output_layer_size=len(intents_count),
+                                                      activation=activation, name='Intent_Classifier_BERT_MultiClass')
+
+    ###################################
+    # ------- Train the model ------- #
     # Tokenize the input
     x = tokenizer(
         text=x,
@@ -67,16 +70,6 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
         return_token_type_ids=False,
         truncation=True
     )
-
-    ###################################
-    # ------- Build the model ------- #
-
-    model = build_PhoBERT_classifier_model(sequence_length=SENTENCE_MAX_LENGTH, output_layer_size=len(intents_count),
-                    activation=activation, name='Intent_Classifier_BERT_MultiClass')
-    # model.load_weights('/content/drive/My Drive/training-data/intent_reconizer')
-
-    ###################################
-    # ------- Train the model ------- #
     # Hyperparameters
     BATCH_SIZE = batch
     EPOCHES = epoch

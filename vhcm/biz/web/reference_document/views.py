@@ -8,7 +8,7 @@ from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.reference_document import ReferenceDocumentSerializer
 from vhcm.common.utils.CV import ImageUploadParser, extract_validation_messages
 from vhcm.biz.authentication.user_session import get_current_user
-from .reference_document_forms import DocumentAddForm, DocumentEditForm
+from .forms import DocumentAddForm, DocumentEditForm
 from vhcm.biz.validation.image import image_validate
 from vhcm.common.constants import COMMA, SPACE
 

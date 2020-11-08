@@ -8,7 +8,7 @@ import vhcm.models.user as user_model
 import vhcm.models.knowledge_data as knowledge_data_model
 from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.user import UserSerializer
-from .user_form import UserEditForm, UserAddForm
+from .forms import UserEditForm, UserAddForm
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
 from vhcm.common.config.config_manager import CONFIG_LOADER, DEFAULT_PASSWORD

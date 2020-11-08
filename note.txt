@@ -34,8 +34,9 @@ Install environment:
 	
 Deploy local:
 + conda activate django
-+ Port 8000 default: python manage.py runsslserver
-+ Custom port: python manage.py runsslserver 127.0.0.1:<port>
++ Deploy command: daphne -e ssl:<port>:privateKey=server_cert/key.pem:certKey=server_cert/cert.pem restapi_core.asgi:application
+Default port 8000
+
 
 * MacOS and Linux need to fix db certificates before deploy: add "postgres" user to default group -> change 3 cert keys permission to 0600
 + Linux: https://askubuntu.com/questions/487527/give-specific-user-permission-to-write-to-a-folder-using-w-notation

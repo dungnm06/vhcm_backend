@@ -38,4 +38,4 @@ def build_PhoBERT_classifier_model(sequence_length, output_layer_size, activatio
     # Take a look at the model
     model.summary()
 
-    return model
+    return model, tokenizer

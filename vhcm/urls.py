@@ -1,14 +1,15 @@
 from django.urls import path
-from vhcm import views as root_view
-from vhcm.biz.web.login import login_views
-from vhcm.biz.web.logout import logout_views
+import vhcm.views as root_view
+import vhcm.biz.web.login.views as login_views
+import vhcm.biz.web.logout.views as logout_views
 from vhcm.common.config.config_manager import add_system_settings
-from vhcm.biz.web.setting import setting_views
-from vhcm.biz.web.nlp import nlp_views
-from vhcm.biz.web.knowledge_data import knowledge_data_views
-from vhcm.biz.web.synonym import synonym_views
-from vhcm.biz.web.reference_document import reference_document_views
-from vhcm.biz.web.user import user_views
+import vhcm.biz.web.setting.views as setting_views
+import vhcm.biz.web.nlp.views as nlp_views
+import vhcm.biz.web.knowledge_data.views as knowledge_data_views
+import vhcm.biz.web.synonym.views as synonym_views
+import vhcm.biz.web.reference_document.views as reference_document_views
+import vhcm.biz.web.user.views as user_views
+import vhcm.biz.web.train_classifier.views as trainer_views
 
 
 urlpatterns = [
@@ -50,4 +51,6 @@ urlpatterns = [
     path('reference-document/add', reference_document_views.AddNewReferenceDocument.as_view(), name='add-new-reference'),
     path('reference-document/edit', reference_document_views.EditReferenceDocument.as_view(), name='edit-reference'),
     path('reference-document/delete', reference_document_views.delete, name='delete_document'),
+    # Classifier training service
+    # path('trainer/is-running', trainer_views.is_process_running, name='check_trainning_process'),
 ]
