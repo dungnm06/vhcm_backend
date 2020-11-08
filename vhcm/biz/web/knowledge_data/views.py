@@ -258,7 +258,7 @@ def add(request):
             knowledge_data=knowledge_data,
             type=type,
             subject_data=subject_data,
-            verb=verb
+            verbs=verb
         ))
     subject_model.Subject.objects.bulk_create(subjects)
 
