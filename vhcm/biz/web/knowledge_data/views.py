@@ -95,7 +95,7 @@ def get(request):
                 })
         subjects_display.append({
             'type': subject.type,
-            'words': words,
+            'word': words,
             'verb': verb
         })
 
@@ -136,6 +136,7 @@ def get(request):
     for document in document_links:
         documents_display.append({
             'id': document.reference_document.reference_document_id,
+            'name': document.reference_document.reference_name,
             'page': document.page,
             'extra_info': document.extra_info
         })
