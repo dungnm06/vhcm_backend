@@ -162,7 +162,9 @@ def validate(request):
         errors.append('Missing synonym meaning')
 
     # Words
-    if not ('words' in request.data and request.data.get('words')):
+    if not ('words' in request.data and not isinstance(request.data.get('words'), list)):
+        errors.append('Form data is malformed')
+    elif len(request.data.get('words')) < 1:
         errors.append('Synonym set must contains atleast 1 word')
 
     return errors

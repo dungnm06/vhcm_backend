@@ -1,6 +1,9 @@
 import pickle
 
 
+PICKLE_EXTENSION = '.pickle'
+
+
 def unpickle_file(filename):
     """Returns the result of unpickling the file content."""
     with open(filename, 'rb') as f:

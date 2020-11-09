@@ -31,6 +31,7 @@ def all(request):
     }
     for data in query_data:
         knowledge_data = {
+            'id': data.id,
             'intent': data.intent,
             'intent_fullname': data.intent_fullname,
             'status': knowledge_data_model.PROCESS_STATUS_DICT[data.status],
@@ -55,7 +56,8 @@ def get(request):
     result = ResponseJSON()
 
     try:
-        intent = request.data[knowledge_data_model.INTENT] if request.method == 'POST' else request.GET[knowledge_data_model.INTENT]
+        intent = request.data[knowledge_data_model.INTENT] if request.method == 'POST' else request.GET[
+            knowledge_data_model.INTENT]
     except KeyError:
         raise APIException('Can\'t get knowledge data infomations, missing intent id')
 
@@ -113,7 +115,8 @@ def get(request):
             })
         questions_display.append({
             'question': question.question,
-            'generated_questions': generated_questions
+            'generated_questions': generated_questions,
+            'type': question.type.split(COMMA)
         })
 
     # Synonyms
@@ -143,6 +146,7 @@ def get(request):
 
     result_data = {
         'knowledge_data': {
+            'id': knowledge_data.knowledge_data_id,
             'intent': knowledge_data.intent,
             'intentFullName': knowledge_data.intent_fullname,
             'baseResponse': knowledge_data.base_response,
@@ -212,7 +216,7 @@ def add(request):
             page = int(reference['page']) if reference['page'].strip() else None
             extra_info = reference['extra_info'].strip()
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
-                id=(next_reference_id+i),
+                id=(next_reference_id + i),
                 knowledge_data=knowledge_data,
                 reference_document=document,
                 page=page,
@@ -228,7 +232,7 @@ def add(request):
 
     for i, rd in enumerate(request.data.get('coresponse')):
         response_datas.append(response_data_model.ResponseData(
-            response_data_id=(next_response_data_id+i),
+            response_data_id=(next_response_data_id + i),
             knowledge_data=knowledge_data,
             type=response_data_model.RESPONSE_TYPES_T2IDX[rd['type'].lower()],
             answer=rd['answer']
@@ -255,7 +259,7 @@ def add(request):
             verb = PLUS.join([(v['type'] + COLON + v['word']) for v in sj['verb']])
 
         subjects.append(subject_model.Subject(
-            subject_id=(next_subject_id+i),
+            subject_id=(next_subject_id + i),
             knowledge_data=knowledge_data,
             type=type,
             subject_data=subject_data,
@@ -271,17 +275,18 @@ def add(request):
 
     for i, q in enumerate(request.data.get('questions')):
         questions.append(question_model.Question(
-            question_id=(next_question_id+i),
+            question_id=(next_question_id + i),
             knowledge_data=knowledge_data,
-            question=q['question']
+            question=q['question'],
+            type=COMMA.join([str(t) for t in q['type']])
         ))
         try:
             for i2, gqs in enumerate(q['generated_questions']):
                 generated_question = gq_model.GeneratedQuestion(
-                    generated_question_id=(next_g_question_id+i2),
+                    generated_question_id=(next_g_question_id + i2),
                     generated_question=gqs['question'],
                     accept_status=gq_model.ACCEPT_STATUS[gqs['accept']],
-                    question_id=(next_question_id+i)
+                    question_id=(next_question_id + i)
                 )
                 generated_questions.append(generated_question)
             next_g_question_id += len(q['generated_questions'])
@@ -308,7 +313,7 @@ def add(request):
                 synonym.save()
             # Relation model regist
             kd_synonym_links.append(kd_synonym_model.KnowledgeDataSynonymLink(
-                id=(next_synonym_link_id+i),
+                id=(next_synonym_link_id + i),
                 knowledge_data=knowledge_data,
                 synonym=synonym,
                 word=word
@@ -368,7 +373,7 @@ def edit(request):
             page = int(reference['page']) if reference['page'].strip() else None
             extra_info = reference['extra_info'].strip()
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
-                id=(next_reference_id+i),
+                id=(next_reference_id + i),
                 knowledge_data=knowledge_data,
                 reference_document=document,
                 page=page,
@@ -385,7 +390,7 @@ def edit(request):
 
     for i, rd in enumerate(request.data.get('coresponse')):
         response_datas.append(response_data_model.ResponseData(
-            response_data_id=(next_response_data_id+i),
+            response_data_id=(next_response_data_id + i),
             knowledge_data=knowledge_data,
             type=response_data_model.RESPONSE_TYPES_T2IDX[rd['type'].lower()],
             answer=rd['answer']
@@ -416,7 +421,7 @@ def edit(request):
             verbs = PLUS.join([(v['type'] + COLON + v['word']) for v in sj['verb']])
 
         subjects.append(subject_model.Subject(
-            subject_id=(next_subject_id+i),
+            subject_id=(next_subject_id + i),
             knowledge_data=knowledge_data,
             type=type,
             subject_data=subject_data,
@@ -433,9 +438,10 @@ def edit(request):
 
     for i, q in enumerate(request.data.get('questions')):
         questions.append(question_model.Question(
-            question_id=(next_question_id+i),
+            question_id=(next_question_id + i),
             knowledge_data=knowledge_data,
-            question=q['question']
+            question=q['question'],
+            type=COMMA.join([str(t) for t in q['type']])
         ))
         try:
             for i2, gqs in enumerate(q['generated_questions']):
@@ -471,7 +477,7 @@ def edit(request):
                 synonym.save()
             # Relation model regist
             kd_synonym_links.append(kd_synonym_model.KnowledgeDataSynonymLink(
-                id=(next_synonym_link_id+i),
+                id=(next_synonym_link_id + i),
                 knowledge_data=knowledge_data,
                 synonym=synonym,
                 word=word
@@ -491,7 +497,8 @@ def validate(request, mode):
     if not ('intent' in request.data and request.data.get('intent').strip()):
         errors.append('Missing intent id')
     else:
-        knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(intent__iexact=request.data.get('intent')).first()
+        knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(
+            intent__iexact=request.data.get('intent')).first()
         if knowledge_data is not None and mode == 'add':
             errors.append('Duplicated intent id')
 
@@ -532,15 +539,25 @@ def validate(request, mode):
             if sj['type'] not in subject_model.SUBJECT_TYPES:
                 errors.append('Subject data #{} is invalid ({})'.format(i + 1, sj['type']))
             if not sj['word']:
-                errors.append('Subject data #{} is empty'.format(i+1))
+                errors.append('Subject data #{} is empty'.format(i + 1))
 
     # Reference document
     if not ('documentReference' in request.data and request.data.get('documentReference')):
         errors.append('Knowledge data must belong to atleast one reference document')
 
     # Questions
-    if not ('questions' in request.data and request.data.get('questions')):
+    if not ('questions' in request.data
+            and isinstance(request.data.get('questions'), list)
+            and len(request.data.get('questions')) > 0):
         errors.append('Knowledge data must has atleast 1 question')
+    else:
+        for idx, question in enumerate(request.data.get('questions')):
+            if not ('type' in question
+                    and isinstance(question.get('type'), list)
+                    and len(question.get('type')) > 0):
+                errors.append('Question "{}", type not defined'.format(question.get('question', '#'+str(idx+1))))
+            elif any([t not in question_model.QUESTION_TYPES_IDX2T for t in question.get('type')]):
+                errors.append('Question "{}", unknow question type included'.format(question.get('question', '#'+str(idx+1))))
 
     # Raw data
     if not ('rawData' in request.data and request.data.get('rawData').strip()):

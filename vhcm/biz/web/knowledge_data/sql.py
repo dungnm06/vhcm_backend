@@ -1,5 +1,6 @@
 GET_ALL_KNOWLEDGE_DATA = '''
     SELECT 
+        kd.knowledge_data_id as id,
         kd.intent as intent,
         kd.intent_fullname as intent_fullname,
         kd.status as status,

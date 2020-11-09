@@ -13,3 +13,4 @@ from .report import Report
 from .system_settings import SystemSetting
 from .user import User
 from .blacklisted_token import BlacklistedToken
+from .train_data import TrainData

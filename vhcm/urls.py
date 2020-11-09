@@ -9,7 +9,7 @@ import vhcm.biz.web.knowledge_data.views as knowledge_data_views
 import vhcm.biz.web.synonym.views as synonym_views
 import vhcm.biz.web.reference_document.views as reference_document_views
 import vhcm.biz.web.user.views as user_views
-import vhcm.biz.web.train_classifier.views as trainer_views
+import vhcm.biz.web.train_data.views as train_data_views
 
 
 urlpatterns = [
@@ -51,6 +51,9 @@ urlpatterns = [
     path('reference-document/add', reference_document_views.AddNewReferenceDocument.as_view(), name='add-new-reference'),
     path('reference-document/edit', reference_document_views.EditReferenceDocument.as_view(), name='edit-reference'),
     path('reference-document/delete', reference_document_views.delete, name='delete_document'),
+    # Train data processing
+    path('train-data/all', train_data_views.all, name='get available training data'),
+    path('train-data/add', train_data_views.add, name='create training data'),
     # Classifier training service
     # path('trainer/is-running', trainer_views.is_process_running, name='check_trainning_process'),
 ]

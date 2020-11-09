@@ -16,6 +16,7 @@ UTF8 = 'utf-8'
 UTF16 = 'utf-16'
 # System
 ACCESS_TOKEN = 'accesstoken'
+TRAIN_DATA_FOLDER = 'extras/nlp/data/train_data/'
 # Websocket
 WEBSOCKET_ROOM = 'ws'
 TRAIN_CLASSIFIER_ROOM_GROUP = '_train_classifier'
