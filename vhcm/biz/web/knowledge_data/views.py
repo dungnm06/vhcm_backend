@@ -116,7 +116,7 @@ def get(request):
         questions_display.append({
             'question': question.question,
             'generated_questions': generated_questions,
-            'type': question.type.split(COMMA)
+            'type': [int(t) for t in question.type.split(COMMA)]
         })
 
     # Synonyms

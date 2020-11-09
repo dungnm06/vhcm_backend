@@ -57,6 +57,7 @@ urlpatterns = [
     path('train-data/add', train_data_views.add, name='create training data'),
     path('train-data/change-description', train_data_views.update_description, name='update training data description'),
     path('train-data/delete', train_data_views.delete, name='delete training data'),
+    path('train-data/download', train_data_views.download, name='download training data'),
     # Classifier training service
     # path('trainer/is-running', trainer_views.is_process_running, name='check_trainning_process'),
 ]

@@ -1,8 +1,9 @@
 import os
 from django.db import transaction
 from django.http import HttpResponse
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.exceptions import APIException
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from vhcm.biz.authentication.user_session import ensure_admin
 from vhcm.common.response_json import ResponseJSON
@@ -171,9 +172,25 @@ def update_description(request):
 
 @api_view(['GET'])
 def download(request):
-    response = HttpResponse(open("uploads/something.txt", 'rb').read())
-    response['Content-Type'] = 'text/plain'
-    response['Content-Disposition'] = 'attachment; filename=DownloadedText.txt'
+    ensure_admin(request)
+
+    train_data_id = int(request.GET[train_data_model.ID])
+    train_data = train_data_model.TrainData.objects.filter(id=train_data_id).first()
+    if not train_data:
+        return HttpResponse('Training file not exists', content_type="text/plain", status=404)
+
+    if train_data.type == 3:
+        return HttpResponse('This training data already deleted', content_type="text/plain", status=403)
+
+    filename = train_data.filename + PICKLE_EXTENSION
+    filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + filename)
+    if not os.path.exists(filepath):
+        return HttpResponse('Training file not exists', content_type="text/plain", status=404)
+
+    content = open(filepath, 'rb').read()
+    response = HttpResponse(content)
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment; filename=' + filename
     return response
 
 

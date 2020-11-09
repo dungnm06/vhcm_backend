@@ -34,7 +34,7 @@ def raise_exception(exc, context):
 
 @renderer_classes([JSONRenderer])
 def exception_cleaner(request, response):
-    if not hasattr(response, 'data'):
+    if not hasattr(response, 'data') and not response['Content-Type'] in ['application/octet-stream', 'text/plain']:
         # raise exceptions.APIException(detail='An error has occured', code=response.status_code)
         result = ResponseJSON()
         result.set_messages(['An error has occured'])
