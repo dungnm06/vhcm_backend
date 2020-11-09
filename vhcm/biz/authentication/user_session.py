@@ -29,3 +29,9 @@ def get_current_user(request):
         raise exceptions.AuthenticationFailed('Access token expired')
 
     return user
+
+
+def ensure_admin(request):
+    current_user = get_current_user(request)
+    if not current_user.admin:
+        raise exceptions.PermissionDenied('Only superuser can use this API')

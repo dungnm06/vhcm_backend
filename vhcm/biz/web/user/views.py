@@ -9,7 +9,7 @@ import vhcm.models.knowledge_data as knowledge_data_model
 from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.user import UserSerializer
 from .forms import UserEditForm, UserAddForm
-from vhcm.biz.authentication.user_session import get_current_user
+from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
 from vhcm.common.config.config_manager import CONFIG_LOADER, DEFAULT_PASSWORD
 from vhcm.biz.validation.image import image_validate
@@ -19,9 +19,8 @@ from vhcm.biz.validation.image import image_validate
 def all(request):
     response = Response()
     result = ResponseJSON()
-    current_user = get_current_user(request)
-    if not current_user.admin:
-        raise exceptions.PermissionDenied('Only superuser can use this API')
+
+    ensure_admin(request)
 
     all_users = user_model.User.objects.filter()
     serialized_user = UserSerializer(all_users, many=True)
@@ -72,10 +71,7 @@ class AddUser(APIView):
     def add_user(self, request):
         response = Response()
         result = ResponseJSON()
-        current_user = get_current_user(request)
-
-        if not current_user.admin:
-            raise exceptions.PermissionDenied('Only superuser uses this API')
+        ensure_admin(request)
 
         form = UserAddForm(request.data)
         if form.is_valid():
@@ -195,10 +191,7 @@ class EditUser(APIView):
 def change_status(request):
     response = Response()
     result = ResponseJSON()
-    current_user = get_current_user(request)
-
-    if not current_user.admin:
-        raise exceptions.PermissionDenied('Only superuser can use this API')
+    ensure_admin(request)
 
     try:
         user_id = int(request.data.get('id')) if request.method == 'POST' else int(request.GET.get('id'))
