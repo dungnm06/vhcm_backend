@@ -126,7 +126,11 @@ def get(request):
     for synonym in synonym_links:
         if synonym.word not in tmp_dict:
             tmp_dict[synonym.word] = []
-        tmp_dict[synonym.word].append(synonym.synonym.synonym_id)
+        tmp_dict[synonym.word].append({
+            'id': synonym.synonym.synonym_id,
+            'meaning': synonym.synonym.meaning,
+            'words': synonym.synonym.words.split(COMMA)
+        })
     for word in tmp_dict:
         synonyms_display.append({
             'word': word,
