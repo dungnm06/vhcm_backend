@@ -70,6 +70,9 @@ def add(request):
     synonym.save()
 
     serilized_synonym = SynonymSerializer(synonym).data
+    words = serilized_synonym['words']
+    words = [w for w in words.split(COMMA)]
+    serilized_synonym['words'] = words
 
     result.set_status(True)
     result.set_result_data(serilized_synonym)
@@ -104,6 +107,9 @@ def edit(request):
     synonym.save()
 
     serilized_synonym = SynonymSerializer(synonym).data
+    words = serilized_synonym['words']
+    words = [w for w in words.split(COMMA)]
+    serilized_synonym['words'] = words
 
     result.set_status(True)
     result.set_result_data(serilized_synonym)
