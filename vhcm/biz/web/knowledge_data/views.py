@@ -415,12 +415,9 @@ def edit(request):
         subject_data = []
         for word in sj['word']:
             subject_data.append((word['type'], word['word']))
-        if type == 'MISC':
-            # Eg: MISC:N:Thư+V:chúc_mừng+N:năm+R:mới
-            subject_data = PLUS.join([(s1[0] + COLON + s1[1]) for s1 in subject_data])
-        else:
-            # Eg: LOC:làng Kim_Liên
-            subject_data = SPACE.join([s1[1] for s1 in subject_data])
+        # Eg: MISC:N:Thư+V:chúc_mừng+N:năm+R:mới
+        # Eg2: LOC:N:làng+Np:Kim_Liên
+        subject_data = PLUS.join([(s1[0] + COLON + s1[1]) for s1 in subject_data])
 
         # Verbs
         if not sj['verb']:
