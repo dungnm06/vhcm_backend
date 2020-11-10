@@ -44,6 +44,18 @@ class ConfigLoader(object, metaclass=Singleton):
 
         return int(value)
 
+    def get_setting_value_float(self, key):
+        setting = self.settings.filter(setting_id=key).first()
+        if setting is None:
+            raise Exception('Setting not found: ', key)
+        value = None
+        if setting.value:
+            value = setting.value
+        else:
+            value = setting.default
+
+        return float(value)
+
     def get_setting(self, key):
         return self.settings.filter(setting_id=key).first()
 
@@ -68,6 +80,7 @@ NAMED_ENTITY_TYPES = 'named_entity_types'
 CRITICAL_DATA_NG_PATTERNS = 'subject_data_ng_pattern'
 EXCLUDE_POS_TAG = 'exclude_pos_tag'
 EXCLUDE_WORDS = 'exclude_word'
+PREDICT_THRESHOLD = 'predict_threshold'
 
 # Instance
 SYSTEM_SETTINGS = SystemSetting.objects.all()
@@ -137,6 +150,12 @@ def add_system_settings(request):
          SETTING_TYPES[SYSTEM],
          'vhcm-user',
          '123'),
+        ('predict_threshold',
+         'Language Processing: Predict threshold value (For question types predicting)',
+         'Predict label as positive when predicted value >= threshold value',
+         SETTING_TYPES[NLP],
+         '0.75',
+         '0.5'),
         # ('train_data_folder',
         #  'System: Train data folder path',
         #  'System path where train data files storing (absolute/relative path OK)',

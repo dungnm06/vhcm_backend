@@ -16,6 +16,7 @@ import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
 import vhcm.models.knowledge_data_generated_question as gq_model
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.common.constants import *
+from vhcm.common.utils.CH import isInt
 from .sql import GET_ALL_KNOWLEDGE_DATA
 from vhcm.common.dao.native_query import execute_native_query
 
@@ -344,13 +345,16 @@ def edit(request):
         return response
 
     # Get existing Knowledge data
-    intent = request.data.get('intent').strip()
-    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(intent__iexact=intent).first()
+    kd_id = request.data.get('id')
+    if not (kd_id and isInt(kd_id)):
+        raise APIException('Invalid intent id: ID({})'.format(kd_id))
+
+    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=kd_id).first()
     if knowledge_data is None:
-        raise APIException('Invalid intent: {}'.format(intent))
+        raise APIException('Intent id not found: ID({})'.format(kd_id))
 
     # Intent
-    knowledge_data.intent = intent
+    knowledge_data.intent = request.data.get('intent').strip()
     # Intent fullname
     knowledge_data.intent_fullname = request.data.get('intentFullName').strip()
     # Base response

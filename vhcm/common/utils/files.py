@@ -1,5 +1,5 @@
 import pickle
-
+import json
 
 PICKLE_EXTENSION = '.pickle'
 
@@ -14,3 +14,9 @@ def pickle_file(datas, filename):
     """Storing datas to the file using pickle."""
     with open(filename, 'wb') as fp:
         pickle.dump(datas, fp, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def load_json(path):
+    with open(path) as json_file:
+        data = json.load(json_file)
+    return data

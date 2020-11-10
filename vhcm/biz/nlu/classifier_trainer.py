@@ -2,9 +2,11 @@ import subprocess
 import multiprocessing
 import os
 from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync
 from vhcm.common.constants import *
 from vhcm.common.utils.process import kill_child_proc
+from vhcm.biz.nlu.classifiers.intent_classifier import predict_instance as intent_classifier
+from vhcm.biz.nlu.classifiers.question_type_classifier import predict_instance as question_type_classifier
 
 
 def send_stdout_to_client(stdout):
@@ -56,9 +58,17 @@ class ClassifierTrainer(object):
 
         return status
 
-    @sync_to_async
-    def reload_model(self):
-        pass
+    def reload_model(self, type):
+        if type == 1:
+            send_stdout_to_client('Reloading model... This can take up to 5 minutes....')
+            intent_classifier.load()
+            send_stdout_to_client('Intent classifier model reloaded.')
+        elif type == 2:
+            send_stdout_to_client('Reloading model... This can take up to 5 minutes....')
+            question_type_classifier.load()
+            send_stdout_to_client('Question type classifier model reloaded.')
+        else:
+            send_stdout_to_client('Invalid classifier type')
 
     def is_running(self):
         return True if self.process else False

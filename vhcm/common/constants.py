@@ -16,7 +16,6 @@ UTF8 = 'utf-8'
 UTF16 = 'utf-16'
 # System
 ACCESS_TOKEN = 'accesstoken'
-TRAIN_DATA_FOLDER = 'extras/nlp/data/train_data/'
 # Websocket
 WEBSOCKET_ROOM = 'ws'
 TRAIN_CLASSIFIER_ROOM_GROUP = '_train_classifier'
@@ -27,21 +26,19 @@ OBJ2IDX = 'obj2idx'
 BERT = 'bert'
 INTENT = 'intent'
 QUESTION = 'question'
+TRAIN_DATA_FOLDER = 'extras/nlp/data/train_data/'
+MODEL_DATA_FOLDER = 'extras/nlp/classifier/trained/'
+INTENT_MODEL_NAME = 'intent/model_weights'
+INTENT_MODEL_CONFIG = 'extras/nlp/classifier/trained/intent.config'
+QUESTION_TYPE_MODEL_NAME = 'question_type/model_weights'
+QUESTION_TYPE_MODEL_CONFIG = 'extras/nlp/classifier/trained/question_type.config'
+INTENT_MAP_FILE_PATH = 'extras/nlp/classifier/trained/intent_map.pickle'
+QUESTION_TYPE_MAP_FILE_PATH = 'extras/nlp/classifier/trained/question_type_map.pickle'
 CLASSIFIER_TYPES = {
     INTENT: 1,
     QUESTION: 2
 }
-QUESTION_TYPE_DATA_PATH = 'question_type_data_path'
-QUESTION_TYPE_MODEL_PATH = 'question_type_model_weights'
-QUESTION_TYPE_MAP_FILE_PATH = 'question_type_map_file_path'
 QUESTION_TYPE_MAP_PREDEFINE = 'question_type_map'
-INTENT_DATA_PATH = 'intent_data_path'
-INTENT_MODEL_PATH = 'intent_model_weights'
-INTENT_MAP_FILE_PATH = 'intent_map_file_path'
-SYNONYMS_FILE_PATH = 'synonyms_file_path'
-GLOBAL_SYNONYMS_FILE_PATH = 'global_synonyms_file_path'
-PREDICT_THRESHOLD = 'predict_threshold'
-MAX_SENTENCE_LENGTH = 'max_sentence_length'
 
 
 # Date format
