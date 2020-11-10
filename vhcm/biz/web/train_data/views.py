@@ -9,6 +9,7 @@ from vhcm.biz.authentication.user_session import ensure_admin
 from vhcm.common.response_json import ResponseJSON
 from vhcm.common.constants import COMMA, MINUS, TRAIN_DATA_FOLDER, PROJECT_ROOT
 from vhcm.common.utils.files import pickle_file, PICKLE_EXTENSION
+from vhcm.common.utils.CH import isInt
 from vhcm.serializers.train_data import TrainDataSerializer, TrainDataDeletedSerializer
 from vhcm.common.dao.native_query import execute_native_query
 from vhcm.biz.web.train_data.sql import GET_TRAIN_DATA
@@ -22,6 +23,21 @@ def all(request):
     ensure_admin(request)
 
     train_datas = train_data_model.TrainData.objects.exclude(type=3).order_by(MINUS + train_data_model.CDATE)
+    serialized_data = TrainDataSerializer(train_datas, many=True)
+
+    result.set_status(True)
+    result.set_result_data(serialized_data.data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['GET', 'POST'])
+def all_trainable(request):
+    response = Response()
+    result = ResponseJSON()
+    ensure_admin(request)
+
+    train_datas = train_data_model.TrainData.objects.filter(type=1).order_by(MINUS + train_data_model.CDATE)
     serialized_data = TrainDataSerializer(train_datas, many=True)
 
     result.set_status(True)
@@ -171,6 +187,36 @@ def update_description(request):
 
 
 @api_view(['GET'])
+def on_off_data(request):
+    response = Response()
+    result = ResponseJSON()
+    ensure_admin(request)
+
+    errors = validate(request, 'onoff')
+    if errors:
+        result.set_status(False)
+        result.set_messages(errors)
+        response.data = result.to_json()
+        return response
+
+    train_data_id = int(request.GET.get(train_data_model.ID))
+    train_data = train_data_model.TrainData.objects.filter(id=train_data_id).first()
+    if not train_data:
+        raise APIException('Training file id not exists')
+    if train_data.type == 3:
+        raise APIException('This training data already deleted')
+
+    train_data.type = 1 if train_data.type == 2 else 2
+    train_data.save()
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@authentication_classes([])
 def download(request):
     ensure_admin(request)
 
@@ -197,10 +243,11 @@ def download(request):
 def validate(request, mode):
     errors = []
 
-    if mode == 'update' or mode == 'delete':
+    if mode == 'update' or mode == 'delete' or mode == 'onoff':
         # ID
-        if not (train_data_model.ID in request.data
-                and isinstance(request.data.get(train_data_model.ID), int)):
+        id = request.data.get(train_data_model.ID) if request.method == 'POST' else request.GET.get(
+            train_data_model.ID)
+        if not (id and isInt(id)):
             errors.append('Invalid training file id')
 
     if mode == 'update' or mode == 'add':

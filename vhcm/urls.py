@@ -53,7 +53,9 @@ urlpatterns = [
     path('reference-document/delete', reference_document_views.delete, name='delete_document'),
     # Train data processing
     path('train-data/all', train_data_views.all, name='get available training data'),
+    path('train-data/all-trainable', train_data_views.all_trainable, name='get trainable data'),
     path('train-data/all-deleted', train_data_views.all_deleted, name='get deleted training data'),
+    path('train-data/toggle', train_data_views.on_off_data, name='toggle data trainable status'),
     path('train-data/add', train_data_views.add, name='create training data'),
     path('train-data/change-description', train_data_views.update_description, name='update training data description'),
     path('train-data/delete', train_data_views.delete, name='delete training data'),

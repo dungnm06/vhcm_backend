@@ -2,7 +2,7 @@ import subprocess
 import multiprocessing
 import os
 from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from vhcm.common.constants import *
 from vhcm.common.utils.process import kill_child_proc
 
@@ -31,11 +31,11 @@ class ClassifierTrainer(object):
             target=self.train,
             args=(self.script, self.communicate_queue, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation,),
             daemon=True)
-        self.process.start()
         self.listening_process = multiprocessing.Process(
             target=self.wait_for_stdout,
             args=(self.communicate_queue,),
             daemon=True)
+        self.process.start()
         self.listening_process.start()
 
     def stop(self):
@@ -55,6 +55,10 @@ class ClassifierTrainer(object):
             self.listening_process = None
 
         return status
+
+    @sync_to_async
+    def reload_model(self):
+        pass
 
     def is_running(self):
         return True if self.process else False
@@ -96,4 +100,6 @@ class ClassifierTrainer(object):
                 # console_log.write(stdout)
                 # console_log.flush()
         rc = process.poll()
+        return_message = 'training_done' if rc == 0 else 'training_error'
+        communicate_queue.put(return_message)
         # console_log.close()
