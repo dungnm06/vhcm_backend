@@ -4,16 +4,20 @@ from rest_framework.response import Response
 from vhcm.models.system_settings import SystemSetting
 from vhcm.common.response_json import ResponseJSON
 from vhcm.common.singleton import Singleton
+from vhcm.common.dao.model_query import is_table_exists
 
 
 class ConfigLoader(object, metaclass=Singleton):
-    def __init__(self, settings):
-        self.settings = settings
+    def __init__(self):
+        self.settings = None
+        # Only load setting when project did its first migration
+        if is_table_exists('system_settings'):
+            self.settings = SystemSetting.objects.all()
 
     def get_setting_value(self, key):
         setting = self.settings.filter(setting_id=key).first()
         if setting is None:
-            raise Exception('Setting not found: ', key)
+            raise KeyError('Setting not found: ', key)
 
         if setting.value:
             return setting.value
@@ -23,7 +27,7 @@ class ConfigLoader(object, metaclass=Singleton):
     def get_setting_value_array(self, key, separator):
         setting = self.settings.filter(setting_id=key).first()
         if setting is None:
-            raise Exception('Setting not found: ', key)
+            raise KeyError('Setting not found: ', key)
         value = None
         if setting.value:
             value = setting.value
@@ -35,7 +39,7 @@ class ConfigLoader(object, metaclass=Singleton):
     def get_setting_value_int(self, key):
         setting = self.settings.filter(setting_id=key).first()
         if setting is None:
-            raise Exception('Setting not found: ', key)
+            raise KeyError('Setting not found: ', key)
         value = None
         if setting.value:
             value = setting.value
@@ -47,7 +51,7 @@ class ConfigLoader(object, metaclass=Singleton):
     def get_setting_value_float(self, key):
         setting = self.settings.filter(setting_id=key).first()
         if setting is None:
-            raise Exception('Setting not found: ', key)
+            raise KeyError('Setting not found: ', key)
         value = None
         if setting.value:
             value = setting.value
@@ -72,7 +76,6 @@ SETTING_TYPES = {
 LOGIN_EXPIRATION_LIMIT = 'login_expiration_limit'
 ACCEPT_IMAGE_FORMAT = 'accept_image_format'
 DEFAULT_PASSWORD = 'default_password'
-# TRAIN_DATA_FOLDER = 'train_data_folder'
 # NLP
 VNCORENLP = 'vncorenlp'
 CLASSIFIER_TRAINER_SCRIPT = 'classifier_train_script'
@@ -83,8 +86,7 @@ EXCLUDE_WORDS = 'exclude_word'
 PREDICT_THRESHOLD = 'predict_threshold'
 
 # Instance
-SYSTEM_SETTINGS = SystemSetting.objects.all()
-CONFIG_LOADER = ConfigLoader(SYSTEM_SETTINGS)
+config_loader = ConfigLoader()
 
 
 @api_view(['GET'])
@@ -164,8 +166,8 @@ def add_system_settings(request):
         #  'extras/nlp/data/train_data/'),
     ]
 
-    settings = [SystemSetting(setting_id=s[0], setting_name=s[1], description=s[2], type=s[3], value=s[4], default=s[5]) for s in
-                settings]
+    settings = [SystemSetting(setting_id=s[0], setting_name=s[1], description=s[2], type=s[3], value=s[4], default=s[5])
+                for s in settings]
     SystemSetting.objects.all().delete()
     SystemSetting.objects.bulk_create(settings)
 

@@ -16,3 +16,18 @@ GET_ALL_KNOWLEDGE_DATA = '''
     INNER JOIN vhcm.user u2
     ON kd.edit_user_id = u2.user_id
 '''
+
+GET_ALL_TRAINABLE_KNOWLEDGE_DATA = '''
+    SELECT 
+        kd.knowledge_data_id as id,
+        kd.intent as intent,
+        kd.intent_fullname as intent_fullname,
+        u.username as edit_user,
+        u.user_id as edit_user_id,
+        kd.cdate as cdate,
+        kd.mdate as mdate
+    FROM vhcm.knowledge_data kd
+    INNER JOIN vhcm.user u
+    ON kd.edit_user_id = u.user_id
+    WHERE kd.status = 2
+'''

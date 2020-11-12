@@ -1,14 +1,14 @@
 from rest_framework import serializers
 from datetime import datetime
 import vhcm.models.user as user_model
-from vhcm.common.constants import DATETIME_DJANGO_DEFUALT, DATETIME_DDMMYYYY
+from vhcm.common.constants import DATETIME_DJANGO_DEFUALT_DDMMYYYY, DATETIME_DDMMYYYY
 
 
 class UserSerializer(serializers.ModelSerializer):
     def to_representation(self, obj):
         data = super().to_representation(obj)
         # Reformat date
-        tmp_date = datetime.strptime(data[user_model.DATE_OF_BIRTH], DATETIME_DJANGO_DEFUALT.regex)
+        tmp_date = datetime.strptime(data[user_model.DATE_OF_BIRTH], DATETIME_DJANGO_DEFUALT_DDMMYYYY.regex)
         data[user_model.DATE_OF_BIRTH] = tmp_date.strftime(DATETIME_DDMMYYYY.regex)
         return data
 

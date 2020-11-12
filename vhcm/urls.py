@@ -10,6 +10,7 @@ import vhcm.biz.web.synonym.views as synonym_views
 import vhcm.biz.web.reference_document.views as reference_document_views
 import vhcm.biz.web.user.views as user_views
 import vhcm.biz.web.train_data.views as train_data_views
+import vhcm.biz.web.chat_history.views as chat_history_views
 
 
 urlpatterns = [
@@ -60,6 +61,9 @@ urlpatterns = [
     path('train-data/change-description', train_data_views.update_description, name='update training data description'),
     path('train-data/delete', train_data_views.delete, name='delete training data'),
     path('train-data/download', train_data_views.download, name='download training data'),
+    # Chat history
+    path('chat-history/all', chat_history_views.all, name='view all logged chat session'),
+    path('chat-history/get', chat_history_views.get, name='get chat log details'),
     # Classifier training service
     # path('trainer/is-running', trainer_views.is_process_running, name='check_trainning_process'),
 ]

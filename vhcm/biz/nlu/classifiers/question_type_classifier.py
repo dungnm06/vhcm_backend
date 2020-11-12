@@ -44,28 +44,31 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
         if any([os.path.exists(p) for p in [config_path, question_type_maps_path, model_path]]):
             return False
 
-        # Unload current model first
-        self.unload()
-        # Model config
-        self.config = unpickle_file(config_path)
+        try:
+            # Unload current model first
+            self.unload()
+            # Model config
+            self.config = unpickle_file(config_path)
 
-        # Intent maps
-        intent_maps = unpickle_file(question_type_maps_path)
-        self.intent_to_idx = intent_maps[OBJ2IDX]
-        self.idx_to_intent = intent_maps[IDX2OBJ]
+            # Intent maps
+            intent_maps = unpickle_file(question_type_maps_path)
+            self.intent_to_idx = intent_maps[OBJ2IDX]
+            self.idx_to_intent = intent_maps[IDX2OBJ]
 
-        # Label Binarizer
-        self.label_binarizer = MultiLabelBinarizer()
-        self.label_binarizer.fit_transform([list(self.idx_to_intent.values())])
-        
-        # Threshold
-        self.threshold = config.CONFIG_LOADER.get_setting_value_float(config.PREDICT_THRESHOLD)
+            # Label Binarizer
+            self.label_binarizer = MultiLabelBinarizer()
+            self.label_binarizer.fit_transform([list(self.idx_to_intent.values())])
 
-        # Pretrained model
-        print('(IntentClassifier) Loading pretrained model from: ', model_path)
-        self.model, self.tokenizer = build_PhoBERT_classifier_model(
-            self.config.sequence_length, self.config.output_layer_size, self.config.activation, self.config.name)
-        self.model.load_weights(model_path)
+            # Threshold
+            self.threshold = config.config_loader.get_setting_value_float(config.PREDICT_THRESHOLD)
+
+            # Pretrained model
+            print('(IntentClassifier) Loading pretrained model from: ', model_path)
+            self.model, self.tokenizer = build_PhoBERT_classifier_model(
+                self.config.sequence_length, self.config.output_layer_size, self.config.activation, self.config.name)
+            self.model.load_weights(model_path)
+        except Exception:
+            return False
 
         return True
 
@@ -103,3 +106,6 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
 
 
 predict_instance = QuestionTypeClassifier()
+result = predict_instance.load()
+if not result:
+    print('[startup] QuestionTypeClassifier not loaded')

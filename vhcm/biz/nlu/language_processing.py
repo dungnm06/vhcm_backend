@@ -10,7 +10,7 @@ from itertools import product
 class LanguageProcessor(object, metaclass=Singleton):
     def __init__(self):
         # Variables for language understanding tasks
-        self.config = config.CONFIG_LOADER
+        self.config = config.config_loader
         self.rdrsegmenter = VnCoreNLP(
             os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.VNCORENLP))))
 

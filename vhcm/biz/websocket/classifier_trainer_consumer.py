@@ -19,7 +19,7 @@ class ClassifierConsumer(WebsocketConsumer):
             self.channel_name
         )
         self.accept()
-        script_path = config.CONFIG_LOADER.get_setting_value(config.CLASSIFIER_TRAINER_SCRIPT)
+        script_path = config.config_loader.get_setting_value(config.CLASSIFIER_TRAINER_SCRIPT)
         self.trainer = ClassifierTrainer(script_path)
 
     def disconnect(self, close_code):
@@ -77,6 +77,3 @@ class ClassifierConsumer(WebsocketConsumer):
     # Check if train process running
     def is_process_running(self):
         return self.trainer.is_running()
-
-
-# train_service_consumer = ClassifierConsumer()

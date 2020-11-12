@@ -38,21 +38,25 @@ class IntentClassifier(object, metaclass=Singleton):
         if any([os.path.exists(p) for p in [config_path, intent_maps_path, model_path]]):
             return False
 
-        # Unload current model first
-        self.unload()
-        # Model config
-        self.config = unpickle_file(config_path)
+        try:
+            # Unload current model first
+            self.unload()
+            # Model config
+            self.config = unpickle_file(config_path)
 
-        # Intent maps
-        intent_maps = unpickle_file(intent_maps_path)
-        self.intent_to_idx = intent_maps[OBJ2IDX]
-        self.idx_to_intent = intent_maps[IDX2OBJ]
+            # Intent maps
+            intent_maps = unpickle_file(intent_maps_path)
+            self.intent_to_idx = intent_maps[OBJ2IDX]
+            self.idx_to_intent = intent_maps[IDX2OBJ]
 
-        # Pretrained model
-        print('(IntentClassifier) Loading pretrained model from: ', model_path)
-        self.model, self.tokenizer = build_PhoBERT_classifier_model(
-            self.config.sequence_length, self.config.output_layer_size, self.config.activation, self.config.name)
-        self.model.load_weights(model_path)
+            # Pretrained model
+            print('(IntentClassifier) Loading pretrained model from: ', model_path)
+            self.model, self.tokenizer = build_PhoBERT_classifier_model(
+                self.config.sequence_length, self.config.output_layer_size, self.config.activation, self.config.name)
+            self.model.load_weights(model_path)
+        except Exception:
+            self.unload()
+            return False
 
         return True
 
@@ -86,3 +90,6 @@ class IntentClassifier(object, metaclass=Singleton):
 
 
 predict_instance = IntentClassifier()
+result = predict_instance.load()
+if not result:
+    print('[startup] IntentClassifier not loaded')

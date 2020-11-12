@@ -52,6 +52,36 @@ def all(request):
 
 
 @api_view(['GET', 'POST'])
+def all_trainable(request):
+    response = Response()
+    result = ResponseJSON()
+
+    query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA)
+    result_data = {
+        'knowledges': []
+    }
+    for data in query_data:
+        knowledge_data = {
+            'id': data.id,
+            'intent': data.intent,
+            'intent_fullname': data.intent_fullname,
+            'status': knowledge_data_model.PROCESS_STATUS_DICT[data.status],
+            'create_user': data.create_user,
+            'create_user_id': data.create_user_id,
+            'edit_user': data.edit_user,
+            'edit_user_id': data.edit_user_id,
+            'cdate': data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'mdate': data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+        }
+        result_data['knowledges'].append(knowledge_data)
+
+    result.set_status(True)
+    result.set_result_data(result_data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['GET', 'POST'])
 def get(request):
     response = Response()
     result = ResponseJSON()

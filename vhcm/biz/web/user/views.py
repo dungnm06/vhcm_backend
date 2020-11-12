@@ -11,7 +11,7 @@ from vhcm.serializers.user import UserSerializer
 from .forms import UserEditForm, UserAddForm
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
-from vhcm.common.config.config_manager import CONFIG_LOADER, DEFAULT_PASSWORD
+from vhcm.common.config.config_manager import config_loader, DEFAULT_PASSWORD
 from vhcm.biz.validation.image import image_validate
 
 
@@ -80,7 +80,7 @@ class AddUser(APIView):
             user.username = datas.username
             user.fullname = datas.fullname
             user.gender = datas.gender
-            user.set_password(CONFIG_LOADER.get_setting_value(DEFAULT_PASSWORD))
+            user.set_password(config_loader.get_setting_value(DEFAULT_PASSWORD))
             user.nationality = datas.nationality
             user.place_of_birth = datas.place_of_birth
             user.date_of_birth = datas.date_of_birth

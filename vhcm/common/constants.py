@@ -29,16 +29,24 @@ QUESTION = 'question'
 TRAIN_DATA_FOLDER = 'extras/nlp/data/train_data/'
 MODEL_DATA_FOLDER = 'extras/nlp/classifier/trained/'
 INTENT_MODEL_NAME = 'intent/model_weights'
-INTENT_MODEL_CONFIG = 'extras/nlp/classifier/trained/intent.config'
+INTENT_MODEL_CONFIG = 'extras/nlp/classifier/trained/intent_config.pickle'
 QUESTION_TYPE_MODEL_NAME = 'question_type/model_weights'
-QUESTION_TYPE_MODEL_CONFIG = 'extras/nlp/classifier/trained/question_type.config'
+QUESTION_TYPE_MODEL_CONFIG = 'extras/nlp/classifier/trained/question_type_config.pickle'
 INTENT_MAP_FILE_PATH = 'extras/nlp/classifier/trained/intent_map.pickle'
 QUESTION_TYPE_MAP_FILE_PATH = 'extras/nlp/classifier/trained/question_type_map.pickle'
 CLASSIFIER_TYPES = {
     INTENT: 1,
     QUESTION: 2
 }
-QUESTION_TYPE_MAP_PREDEFINE = 'question_type_map'
+QUESTION_TYPE_MAP = {
+    1: "what",
+    2: "when",
+    3: "where",
+    4: "who",
+    5: "why",
+    6: "how",
+    7: "yesno"
+}
 
 
 # Date format
@@ -50,4 +58,5 @@ class DateFormat(object):
 
 DATETIME_DDMMYYYY = DateFormat('DD/MM/YYYY', '%d/%m/%Y')
 DATETIME_DDMMYYYY_HHMMSS = DateFormat('DD/MM/YYYY HH:MM:SS', '%d/%m/%Y %H:%M:%S')
-DATETIME_DJANGO_DEFUALT = DateFormat('YYYY-MM-DD', '%Y-%m-%d')
+DATETIME_DJANGO_DEFUALT_DDMMYYYY = DateFormat('YYYY-MM-DD', '%Y-%m-%d')
+DATETIME_DJANGO_DEFUALT_DDMMYYYY_HHMMSS = DateFormat('YYYY-MM-DD', '%Y-%m-%dT%H:%M:%S.%f')

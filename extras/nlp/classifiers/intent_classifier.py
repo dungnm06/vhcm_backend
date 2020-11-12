@@ -1,13 +1,19 @@
 import random
 import pickle
-from datetime import datetime
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
-from transformers import AutoTokenizer, TFAutoModel
 from collections import Counter
 from bert.PhoBERT import build_PhoBERT_classifier_model
+
+
+class IntentModelConfig(object):
+    def __init__(self, name, sequence_length, output_layer_size, activation):
+        self.name = name
+        self.sequence_length = sequence_length
+        self.output_layer_size = output_layer_size
+        self.activation = activation
 
 
 def unpickle_file(filename):
@@ -53,9 +59,10 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
     # config = AutoConfig.from_pretrained(BERT_MODEL)
     # config.output_hidden_states = True
     # Load BERT tokenizer, build the model
+    model_name = 'Intent_Classifier_BERT_MultiClass'
     model, tokenizer = build_PhoBERT_classifier_model(sequence_length=SENTENCE_MAX_LENGTH,
                                                       output_layer_size=len(intents_count),
-                                                      activation=activation, name='Intent_Classifier_BERT_MultiClass')
+                                                      activation=activation, name=model_name)
 
     ###################################
     # ------- Train the model ------- #
@@ -99,14 +106,17 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
         epochs=EPOCHES)
 
     # Save weight of trained model
-    SAVE_NAME = 'intent_reconizer'
-    save_path = output
-    path = save_path + '/{time}/'.format(time=datetime.now().strftime('%d-%m-%Y_%H-%M-%S'))
-    model.save_weights(path + SAVE_NAME)
+    SAVE_NAME = 'intent/model_weights'
+    save_path = output + SAVE_NAME
+    model.save_weights(save_path)
 
     # Save intent map
     map_datas = {
         'obj2idx': INTENT_TO_IDX,
         'idx2obj': IDX_TO_INTENT
     }
-    pickle_file(map_datas, path + '/intent_map.pickle')
+    pickle_file(map_datas, output + '/intent_map.pickle')
+
+    # Save training config
+    config = IntentModelConfig(model_name, SENTENCE_MAX_LENGTH, len(intents_count), activation)
+    pickle_file(config, output + '/intent_config.pickle')
