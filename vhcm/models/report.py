@@ -14,7 +14,7 @@ class Report(models.Model):
     report_id = models.AutoField(
         primary_key=True, verbose_name='report id', serialize=True
     )
-    chat_id = models.ForeignKey(
+    log = models.ForeignKey(
         ChatHistory, verbose_name='chat history id', on_delete=models.CASCADE
     )
     report_data = models.TextField(

@@ -14,10 +14,10 @@ import vhcm.models.knowledge_data_reference_document_link as kd_document_model
 import vhcm.models.knowledge_data_question as question_model
 import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
 import vhcm.models.knowledge_data_generated_question as gq_model
-from vhcm.biz.authentication.user_session import get_current_user
+from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.constants import *
 from vhcm.common.utils.CH import isInt
-from .sql import GET_ALL_KNOWLEDGE_DATA
+from .sql import GET_ALL_KNOWLEDGE_DATA, GET_ALL_TRAINABLE_KNOWLEDGE_DATA
 from vhcm.common.dao.native_query import execute_native_query
 
 
@@ -26,7 +26,7 @@ def all(request):
     response = Response()
     result = ResponseJSON()
 
-    query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA)
+    query_data = execute_native_query(GET_ALL_TRAINABLE_KNOWLEDGE_DATA)
     result_data = {
         'knowledges': []
     }
@@ -56,7 +56,9 @@ def all_trainable(request):
     response = Response()
     result = ResponseJSON()
 
-    query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA)
+    ensure_admin(request)
+
+    query_data = execute_native_query(GET_ALL_TRAINABLE_KNOWLEDGE_DATA)
     result_data = {
         'knowledges': []
     }

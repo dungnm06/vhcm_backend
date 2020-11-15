@@ -43,7 +43,7 @@ KNOWLEDGE_DATA_GET_SYNONYMS = '''
 
 
 class Intent:
-    def __init__(self, intent_id=0, intent='', name='', questions=None,
+    def __init__(self, intent_id=0, name='', fullname='', questions=None,
                  raw_data='', base_response='',
                  intent_types=None, corresponding_datas=None, subjects=None,
                  sentence_components=None, synonym_sets=None):
@@ -63,8 +63,8 @@ class Intent:
             synonym_sets = {}
         # Assign attributes
         self.intent_id = intent_id
-        self.intent = intent
         self.name = name
+        self.fullname = fullname
         self.questions = questions
         self.raw_data = raw_data
         self.base_response = base_response

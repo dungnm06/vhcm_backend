@@ -3,17 +3,19 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from vhcm.biz.nlu.classifier_trainer import ClassifierTrainer
 import vhcm.common.config.config_manager as config
-from vhcm.common.constants import WEBSOCKET_ROOM, TRAIN_CLASSIFIER_ROOM_GROUP
+from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP
 
 
 class ClassifierConsumer(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.trainer = None
-        self.room_name = WEBSOCKET_ROOM
-        self.room_group_name = self.room_name + TRAIN_CLASSIFIER_ROOM_GROUP
+        self.room_name = None
+        self.room_group_name = None
 
     def connect(self):
+        self.room_name = TRAIN_CLASSIFIER_ROOM_GROUP
+        self.room_group_name = self.room_name
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
@@ -32,6 +34,10 @@ class ClassifierConsumer(WebsocketConsumer):
             self.trainer.stop()
 
     def close(self, code=None):
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
         self.trainer.stop()
 
     def receive(self, text_data=None, bytes_data=None):

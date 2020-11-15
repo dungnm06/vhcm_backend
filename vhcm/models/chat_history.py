@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.db import models
 from .user import User
+from .train_data import TrainData
 
 # Fields
 ID = 'log_id'
@@ -21,8 +22,11 @@ class ChatHistory(models.Model):
     log = models.BinaryField(
         verbose_name='chat history', blank=True
     )
+    data_version = models.ForeignKey(
+        TrainData, verbose_name='chatbot data version', on_delete=models.CASCADE
+    )
     session_start = models.DateTimeField(
-        verbose_name='chat session start time', default=datetime.now
+        verbose_name='chat session start time'
     )
     session_end = models.DateTimeField(
         verbose_name='chat session end time', auto_now_add=True
@@ -30,3 +34,10 @@ class ChatHistory(models.Model):
 
     class Meta:
         db_table = 'chat_history'
+
+
+class LogMessage(object):
+    def __init__(self, sent_from, message, time):
+        self.sent_from = sent_from
+        self.message = message
+        self.time = time

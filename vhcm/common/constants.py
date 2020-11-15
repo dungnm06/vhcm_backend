@@ -17,8 +17,8 @@ UTF16 = 'utf-16'
 # System
 ACCESS_TOKEN = 'accesstoken'
 # Websocket
-WEBSOCKET_ROOM = 'ws'
-TRAIN_CLASSIFIER_ROOM_GROUP = '_train_classifier'
+TRAIN_CLASSIFIER_ROOM_GROUP = 'ws_train_classifier'
+CHAT_ROOM_GROUP = 'ws_chat_'
 # Other
 IDX2OBJ = 'idx2obj'
 OBJ2IDX = 'obj2idx'

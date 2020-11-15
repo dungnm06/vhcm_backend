@@ -30,6 +30,7 @@ urlpatterns = [
     path('nlp/generate-similaries', nlp_views.generate_similaries, name='generate_similary_sentences'),
     # Knowledge data processing
     path('knowledge-data/all', knowledge_data_views.all, name='get_list_knowledge_data'),
+    path('knowledge-data/all-trainable', knowledge_data_views.all_trainable, name='get_list_trainable_knowledge_data'),
     path('knowledge-data/get', knowledge_data_views.get, name='get_knowledge_data'),
     path('knowledge-data/add', knowledge_data_views.add, name='add_new_knowledge_data'),
     path('knowledge-data/edit', knowledge_data_views.edit, name='edit_knowledge_data'),

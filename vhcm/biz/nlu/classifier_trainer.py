@@ -12,7 +12,7 @@ from vhcm.biz.nlu.classifiers.question_type_classifier import predict_instance a
 def send_stdout_to_client(stdout):
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        WEBSOCKET_ROOM + TRAIN_CLASSIFIER_ROOM_GROUP,
+        TRAIN_CLASSIFIER_ROOM_GROUP,
         {
             'type': 'send_message',
             'message': stdout

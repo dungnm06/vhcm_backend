@@ -2,50 +2,76 @@ from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.biz.nlu.classifiers.intent_classifier import predict_instance as intent_classifier
 from vhcm.biz.nlu.classifiers.question_type_classifier import predict_instance as question_type_classifier
 from vhcm.biz.nlu.model.intent import Intent
-from vhcm.common.constants import QUESTION_TYPE_MAP
-from vhcm.models.chat_session import *
+from vhcm.models.knowledge_data_question import QUESTION_TYPES_IDX2T, QUESTION_TYPES_T2IDX
+from vhcm.models import chat_message
+from vhcm.common.state.state_manager import state_manager
+
+# Constants
+CURRENT_BOT_VERSION = 'current_bot_version'
+BOT_UNAVAILABLE_MESSAGE = 'Bác đi ngủ rồi, quay lại lúc khác!'
+
+# Bot version
+system_bot_version = int(state_manager.get_state(CURRENT_BOT_VERSION, 0))
+
+
+# Chatbot state
+class State(object):
+    def __init__(self, intent=Intent(), type=None, action=chat_message.INITIAL):
+        self.intent = intent
+        self.type = type
+        self.action = action
+
+
+# TODO: Load intent data
+intent_datas = {}
+
+
+def is_bot_ready():
+    return system_bot_version > 0 and question_type_classifier and intent_classifier
+
+
+def version_check(session_bot_version):
+    return system_bot_version == session_bot_version
 
 
 class VirtualHCMChatbot(object):
     def __init__(self, user):
-        # For dialogue states tracking (list of tuples(intent,types,action))
+        # For dialogue states tracking (list of dictionary(intent,types,action))
         self.state_tracker = []
-        self.state_tracker.append((Intent(), None, INITIAL))
+        self.state_tracker.append(State())
         # Answer generator
         self.answer_generator = AnswerGenerator()
-        # TODO: Load intent data
-        self.intent_datas = None
 
     def __regis_history(self, intent, types, action):
-        self.state_tracker.append((intent, types, action))
+        self.state_tracker.append(State(intent, types, action))
 
     def get_last_state(self):
-        return self.state_tracker[len(self.state_tracker)-1]
+        return self.state_tracker[len(self.state_tracker) - 1]
 
     @staticmethod
     def __decide_action(chat_input, intent, types, last_state):
         """Combines intent and question type recognition to decide bot action"""
         # print(last_state)
-        if intent.intent_id == last_state[0].intent_id and last_state[2] == AWAIT_CONFIRMATION:
+        if intent.intent_id == last_state.intent.intent_id and last_state.action == chat_message.AWAIT_CONFIRMATION:
             if chat_input.lower() == 'đúng':
-                return CONFIRMATION_OK
+                return chat_message.CONFIRMATION_OK
             else:
-                return CONFIRMATION_NG
+                return chat_message.CONFIRMATION_NG
         else:
             if language_processor.analyze_sentence_components(intent, chat_input):
-                return ANSWER
+                return chat_message.ANSWER
             else:
-                return AWAIT_CONFIRMATION
+                return chat_message.AWAIT_CONFIRMATION
 
     def chat(self, chat_input):
         last_state = self.get_last_state()
-        if last_state[2] != AWAIT_CONFIRMATION:
+        if last_state.action != chat_message.AWAIT_CONFIRMATION:
             intent_name = intent_classifier.predict(chat_input)
             types = question_type_classifier.predict(chat_input)
-            intent = self.intent_datas[intent_name]
+            intent = intent_datas[intent_name]
         else:
-            intent = last_state[0]
-            types = last_state[1]
+            intent = last_state.intent
+            types = last_state.type
         action = self.__decide_action(chat_input, intent, types, last_state)
         # print(action)
         self.__regis_history(intent, types, action)
@@ -54,17 +80,17 @@ class VirtualHCMChatbot(object):
 
 class AnswerGenerator:
     def __init__(self):
-        self.question_id2type = QUESTION_TYPE_MAP
-        self.question_type2id = {v: k for k, v in self.question_id2type.items()}
+        self.question_id2type = QUESTION_TYPES_IDX2T
+        self.question_type2id = QUESTION_TYPES_T2IDX
 
     def get_response(self, intent, types, action, last_state):
-        if action == ANSWER:
+        if action == chat_message.ANSWER:
             return self.answer(intent, types)
-        elif action == AWAIT_CONFIRMATION:
+        elif action == chat_message.AWAIT_CONFIRMATION:
             return self.confirmation(intent)
-        elif action == CONFIRMATION_OK:
+        elif action == chat_message.CONFIRMATION_OK:
             return self.answer(last_state[0], last_state[1])
-        elif action == CONFIRMATION_NG:
+        elif action == chat_message.CONFIRMATION_NG:
             return self.confirmation_ng()
 
     @staticmethod
@@ -78,7 +104,8 @@ class AnswerGenerator:
     def answer(self, intent, types):
         response = intent.base_response
         # Get type data exists in intent
-        existing_types = [int(self.question_type2id[t]) for t in types if int(self.question_id2type[t]) in intent.intent_types]
+        existing_types = [int(self.question_type2id[t]) for t in types if
+                          int(self.question_id2type[t]) in intent.intent_types]
         # If any of user asking data types not exist in intent so just print all intent data
         if not existing_types:
             existing_types = intent.intent_types

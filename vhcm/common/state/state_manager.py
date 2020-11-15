@@ -10,12 +10,14 @@ class StateManager(object, metaclass=Singleton):
         if is_table_exists('system_states'):
             self.states = SystemStates.objects.all()
 
-    def get_state(self, name):
+    def get_state(self, name, default=None):
+        if not self.states:
+            return default
         model = self.states.filter(name=name).first()
         if model:
             return model.state
         else:
-            return None
+            return default
 
 
 # Instance

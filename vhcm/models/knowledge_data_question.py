@@ -9,23 +9,30 @@ QUESTION = 'question'
 TYPE = 'type'
 
 # Constants
+WHAT = 1
+WHEN = 2
+WHERE = 3
+WHO = 4
+WHY = 5
+HOW = 6
+YESNO = 7
 QUESTION_TYPES = [
-    (1, 'what'),
-    (2, 'when'),
-    (3, 'where'),
-    (4, 'who'),
-    (5, 'why'),
-    (6, 'how'),
-    (7, 'yesno')
+    (WHAT, 'what'),
+    (WHEN, 'when'),
+    (WHERE, 'where'),
+    (WHO, 'who'),
+    (WHY, 'why'),
+    (HOW, 'how'),
+    (YESNO, 'yesno')
 ]
 QUESTION_TYPES_T2IDX = {
-    'what':     1,
-    'when':     2,
-    'where':    3,
-    'who':      4,
-    'why':      5,
-    'how':      6,
-    'yesno':    7
+    'what':     WHAT,
+    'when':     WHEN,
+    'where':    WHERE,
+    'who':      WHO,
+    'why':      WHY,
+    'how':      HOW,
+    'yesno':    YESNO
 }
 QUESTION_TYPES_IDX2T = {v: k for k, v in QUESTION_TYPES_T2IDX.items()}
 
