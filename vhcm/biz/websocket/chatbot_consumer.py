@@ -14,7 +14,6 @@ from vhcm.common.utils.files import pickle_file
 LAST_SESSION_MESSAGES = 'last_session_messages'
 FORCE_NEW_SESSION = 'force_new_session'
 CHAT_RESPONSE = 'chat_response'
-START_NEW_SESSION_FAILED = 'new_session_failed'
 END_SESSION_STATUS = 'end_session_status'
 
 
@@ -29,23 +28,21 @@ class ChatbotConsumer(WebsocketConsumer):
         self.chatbot = None
 
     def connect(self):
-        user_id = self.scope["session"].get['user_id']
+        user_id = self.scope["session"].get('user_id')
         if not user_id:
             self.send({"close": True})
-        user = user_model.User.objects.filter(user_id=user_id)
+        user = user_model.User.objects.filter(user_id=user_id).first()
         if not user:
             self.send({"close": True})
         self.user = user
         self.room_name = self.user.username
         self.chatbot = bot.VirtualHCMChatbot(self.user)
-        last_session_messages = self.restore_last_session()
         self.room_group_name = CHAT_ROOM_GROUP + self.room_name
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
         )
         self.accept()
-        self.send_response(LAST_SESSION_MESSAGES, last_session_messages)
 
     def close(self, code=None):
         async_to_sync(self.channel_layer.group_discard)(
@@ -64,19 +61,18 @@ class ChatbotConsumer(WebsocketConsumer):
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         command = text_data_json.get('command')
-        if command == 'new_session':
-            status = self.log_last_session()
-            if not status:
-                self.send_response(START_NEW_SESSION_FAILED, None)
-                return
+        if command == 'newsession':
             self.start_new_session()
+        elif command == 'getlastsession':
+            last_session_messages = self.restore_last_session()
+            self.send_response(LAST_SESSION_MESSAGES, last_session_messages)
         elif command == 'chat':
             input = text_data_json.get('message')
             self.chat(input)
         elif command == 'report':
             self.report()
-        elif command == 'end_session':
-            end_status = self.log_last_session()
+        elif command == 'endsession':
+            end_status = self.end_last_session()
             self.send_response(END_SESSION_STATUS, end_status)
 
     def restore_last_session(self):
@@ -86,7 +82,7 @@ class ChatbotConsumer(WebsocketConsumer):
         if last_session:
             session_bot_version = last_session[0].data_version.id
             if not bot.version_check(session_bot_version):
-                self.log_last_session()
+                self.end_last_session()
                 self.send_response(FORCE_NEW_SESSION, None)
                 return
 
@@ -107,7 +103,7 @@ class ChatbotConsumer(WebsocketConsumer):
         if not bot.is_bot_ready():
             self.send_response(CHAT_RESPONSE, bot.BOT_UNAVAILABLE_MESSAGE)
         else:
-            self.send_response(CHAT_RESPONSE, 'Hello')
+            self.send_response(CHAT_RESPONSE, 'Chào cháu bác đêy cháu ei')
 
     def chat(self, input):
         if not bot.is_bot_ready():
@@ -115,7 +111,7 @@ class ChatbotConsumer(WebsocketConsumer):
             return
 
         if not bot.version_check(self.session_bot_version):
-            self.log_last_session()
+            self.end_last_session()
             self.send_response(FORCE_NEW_SESSION, None)
             return
 
@@ -146,7 +142,8 @@ class ChatbotConsumer(WebsocketConsumer):
 
         message_to_regist.save()
 
-    def log_last_session(self):
+    def end_last_session(self):
+        # Log current session
         last_session = session_model.Message.objects.filter(user=self.user)
         if last_session:
             # Messages
@@ -176,6 +173,9 @@ class ChatbotConsumer(WebsocketConsumer):
                 data_version=session_bot_version,
                 session_start=start_time
             )
+            # Clear session messages on DB
+            last_session.delete()
+
         return True
 
     # TODO: Implement
