@@ -1,12 +1,9 @@
 import subprocess
 import multiprocessing
-import os
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from vhcm.common.constants import *
 from vhcm.common.utils.process import kill_child_proc
-from vhcm.biz.nlu.classifiers.intent_classifier import predict_instance as intent_classifier
-from vhcm.biz.nlu.classifiers.question_type_classifier import predict_instance as question_type_classifier
 
 
 def send_stdout_to_client(stdout):
@@ -14,7 +11,7 @@ def send_stdout_to_client(stdout):
     async_to_sync(channel_layer.group_send)(
         TRAIN_CLASSIFIER_ROOM_GROUP,
         {
-            'type': 'send_message',
+            'type': 'send_message_event',
             'message': stdout
         }
     )
@@ -28,16 +25,16 @@ class ClassifierTrainer(object):
         self.listening_process = None
 
     def start(self, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation):
-        self.communicate_queue = multiprocessing.JoinableQueue()
+        self.communicate_queue = multiprocessing.Queue()
         self.process = multiprocessing.Process(
             target=self.train,
             args=(self.script, self.communicate_queue, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation,),
             daemon=True)
-        self.process.start()
         self.listening_process = multiprocessing.Process(
             target=self.wait_for_stdout,
             args=(self.communicate_queue,),
             daemon=True)
+        self.process.start()
         self.listening_process.start()
 
     def stop(self):
@@ -57,19 +54,6 @@ class ClassifierTrainer(object):
             self.listening_process = None
 
         return status
-
-    @staticmethod
-    def reload_model(type):
-        if type == 1:
-            send_stdout_to_client('Reloading model... This can take up to 5 minutes....')
-            intent_classifier.load()
-            send_stdout_to_client('Intent classifier model reloaded.')
-        elif type == 2:
-            send_stdout_to_client('Reloading model... This can take up to 5 minutes....')
-            question_type_classifier.load()
-            send_stdout_to_client('Question type classifier model reloaded.')
-        else:
-            send_stdout_to_client('Invalid classifier type')
 
     def is_running(self):
         return True if self.process else False

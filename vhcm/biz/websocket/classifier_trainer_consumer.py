@@ -7,6 +7,14 @@ import vhcm.common.config.config_manager as config
 from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FOLDER
 from vhcm.common.utils.files import PICKLE_EXTENSION
 from vhcm.models import train_data as train_data_model
+from vhcm.biz.nlu.classifiers.intent_classifier import predict_instance as intent_classifier
+from vhcm.biz.nlu.classifiers.question_type_classifier import predict_instance as question_type_classifier
+
+# Response types
+SEND_MESSAGE = 'message'
+TRAIN_START_FAILED = 'start_failed'
+PROCESS_RUNNING_STATUS = 'running_status'
+TRAIN_PROCESS_STOP_STATUS = 'stop_status'
 
 
 class ClassifierConsumer(WebsocketConsumer):
@@ -26,7 +34,6 @@ class ClassifierConsumer(WebsocketConsumer):
         self.accept()
         script_path = config.config_loader.get_setting_value(config.CLASSIFIER_TRAINER_SCRIPT)
         script_path = os.path.join(PROJECT_ROOT, script_path)
-        print(script_path)
         self.trainer = ClassifierTrainer(script_path)
 
     def disconnect(self, close_code):
@@ -53,10 +60,7 @@ class ClassifierConsumer(WebsocketConsumer):
             data_id = text_data_json['data']
             train_data = train_data_model.TrainData.objects.filter(id=data_id).first()
             if not train_data:
-                self.send(text_data=json.dumps({
-                    'type': 'start_failed',
-                    'data': None
-                }))
+                self.send_response(TRAIN_START_FAILED)
                 return
             train_data_filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + PICKLE_EXTENSION)
             train_type = text_data_json['type']
@@ -71,28 +75,37 @@ class ClassifierConsumer(WebsocketConsumer):
         elif command == 'stop':
             status = self.trainer.stop()
             # Send status to WebSocket
-            self.send(text_data=json.dumps({
-                'type': 'stop_status',
-                'data': status
-            }))
+            self.send_response(TRAIN_PROCESS_STOP_STATUS, status)
 
         elif command == 'check_status':
             status = self.is_process_running()
-            self.send(text_data=json.dumps({
-                'type': 'running_status',
-                'data': status
-            }))
+            self.send_response(PROCESS_RUNNING_STATUS, status)
 
-    # Receive message from room group
-    def send_message(self, event):
+    # Receive message from trainer service
+    def send_message_event(self, event):
         message = event['message']
+        # Send message to WebSocket
+        self.send_response(SEND_MESSAGE, message)
 
+    def send_response(self, datatype, data=None):
         # Send message to WebSocket
         self.send(text_data=json.dumps({
-            'type': 'message',
-            'data': message
+            'type': datatype,
+            'data': data
         }))
 
     # Check if train process running
     def is_process_running(self):
         return self.trainer.is_running()
+
+    def reload_model(self, type):
+        if type == 1:
+            self.send_response(SEND_MESSAGE, 'Reloading model... This can take up to 5 minutes....')
+            intent_classifier.load()
+            self.send_response(SEND_MESSAGE, 'Intent classifier model reloaded.')
+        elif type == 2:
+            self.send_response(SEND_MESSAGE, 'Reloading model... This can take up to 5 minutes....')
+            question_type_classifier.load()
+            self.send_response(SEND_MESSAGE, 'Question type classifier model reloaded.')
+        else:
+            self.send_response(SEND_MESSAGE, 'Invalid classifier type')

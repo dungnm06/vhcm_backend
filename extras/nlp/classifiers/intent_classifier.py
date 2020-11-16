@@ -34,8 +34,8 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
     # Import datas
     TRAIN_DATA = data
     data = unpickle_file(TRAIN_DATA)
-    x = data['x']
-    y = data['y']
+    x = data['question']
+    y = data['intent']
     # Intent mapping for future uses
     intents_count = Counter(y)
     INTENT_TO_IDX = {intent: i for i, intent in enumerate(intents_count)}
