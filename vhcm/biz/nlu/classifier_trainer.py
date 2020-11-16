@@ -33,11 +33,11 @@ class ClassifierTrainer(object):
             target=self.train,
             args=(self.script, self.communicate_queue, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation,),
             daemon=True)
+        self.process.start()
         self.listening_process = multiprocessing.Process(
             target=self.wait_for_stdout,
             args=(self.communicate_queue,),
             daemon=True)
-        self.process.start()
         self.listening_process.start()
 
     def stop(self):
@@ -58,7 +58,8 @@ class ClassifierTrainer(object):
 
         return status
 
-    def reload_model(self, type):
+    @staticmethod
+    def reload_model(type):
         if type == 1:
             send_stdout_to_client('Reloading model... This can take up to 5 minutes....')
             intent_classifier.load()
@@ -83,7 +84,7 @@ class ClassifierTrainer(object):
     def train(script_path, communicate_queue, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation):
         # console_log = open('C:/Users/Tewi/Desktop/log.txt', 'w', buffering=1)
         args = [
-            'python', os.path.join(PROJECT_ROOT, script_path),
+            'python', script_path,
             '-t', str(train_type),
             '-d', data
         ]

@@ -1,9 +1,12 @@
 import json
+import os
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from vhcm.biz.nlu.classifier_trainer import ClassifierTrainer
 import vhcm.common.config.config_manager as config
-from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP
+from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FOLDER
+from vhcm.common.utils.files import PICKLE_EXTENSION
+from vhcm.models import train_data as train_data_model
 
 
 class ClassifierConsumer(WebsocketConsumer):
@@ -22,6 +25,8 @@ class ClassifierConsumer(WebsocketConsumer):
         )
         self.accept()
         script_path = config.config_loader.get_setting_value(config.CLASSIFIER_TRAINER_SCRIPT)
+        script_path = os.path.join(PROJECT_ROOT, script_path)
+        print(script_path)
         self.trainer = ClassifierTrainer(script_path)
 
     def disconnect(self, close_code):
@@ -45,7 +50,15 @@ class ClassifierConsumer(WebsocketConsumer):
         command = text_data_json['command']
 
         if command == 'start':
-            data = 'C:/Users/Tewi/Desktop/train_data.pickle'
+            data_id = text_data_json['data']
+            train_data = train_data_model.TrainData.objects.filter(id=data_id).first()
+            if not train_data:
+                self.send(text_data=json.dumps({
+                    'type': 'start_failed',
+                    'data': None
+                }))
+                return
+            train_data_filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + PICKLE_EXTENSION)
             train_type = text_data_json['type']
             sentence_length = text_data_json['sentence_length']
             batch = text_data_json['batch']
@@ -54,7 +67,7 @@ class ClassifierConsumer(WebsocketConsumer):
             epsilon = text_data_json['epsilon']
             activation = text_data_json['activation']
 
-            self.trainer.start(train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation)
+            self.trainer.start(train_type, train_data_filepath, sentence_length, batch, epoch, learning_rate, epsilon, activation)
         elif command == 'stop':
             status = self.trainer.stop()
             # Send status to WebSocket
