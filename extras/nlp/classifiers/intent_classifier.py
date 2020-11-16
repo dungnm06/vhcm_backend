@@ -1,6 +1,8 @@
 import random
 import pickle
 import tensorflow as tf
+import os
+from pathlib import Path
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
@@ -107,7 +109,7 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
 
     # Save weight of trained model
     SAVE_NAME = 'intent/model_weights'
-    save_path = output + SAVE_NAME
+    save_path = os.path.join(output, SAVE_NAME)
     model.save_weights(save_path)
 
     # Save intent map

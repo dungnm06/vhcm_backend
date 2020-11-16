@@ -11,7 +11,7 @@ def send_stdout_to_client(stdout):
     async_to_sync(channel_layer.group_send)(
         TRAIN_CLASSIFIER_ROOM_GROUP,
         {
-            'type': 'send_message_event',
+            'type': 'send_message',
             'message': stdout
         }
     )

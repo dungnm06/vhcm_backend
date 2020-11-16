@@ -26,7 +26,7 @@ def all(request):
     response = Response()
     result = ResponseJSON()
 
-    query_data = execute_native_query(GET_ALL_TRAINABLE_KNOWLEDGE_DATA)
+    query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA)
     result_data = {
         'knowledges': []
     }

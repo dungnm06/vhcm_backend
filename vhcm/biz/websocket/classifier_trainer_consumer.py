@@ -82,7 +82,7 @@ class ClassifierConsumer(WebsocketConsumer):
             self.send_response(PROCESS_RUNNING_STATUS, status)
 
     # Receive message from trainer service
-    def send_message_event(self, event):
+    def send_message(self, event):
         message = event['message']
         # Send message to WebSocket
         self.send_response(SEND_MESSAGE, message)
