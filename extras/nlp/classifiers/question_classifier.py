@@ -52,6 +52,7 @@ def train_question_classifier(datapath, output, sentencelength, batch, epoch, le
     y = [[int(t) for t in types.split(',')] for types in y]
     mlb = MultiLabelBinarizer()
     y = mlb.fit_transform(y)
+    print(y)
     # print(y)
     # get all question types
     types = mlb.classes_
@@ -107,8 +108,8 @@ def train_question_classifier(datapath, output, sentencelength, batch, epoch, le
         clipnorm=1.0)
 
     # Set loss and metrics
-    loss = {'type': CategoricalCrossentropy(from_logits=True)}
-    metric = {'type': CategoricalAccuracy('accuracy')}
+    loss = {'classifier': CategoricalCrossentropy(from_logits=True)}
+    metric = {'classifier': CategoricalAccuracy('accuracy')}
     # Compile the model
     model.compile(
         optimizer=optimizer,

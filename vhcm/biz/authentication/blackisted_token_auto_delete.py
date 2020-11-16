@@ -6,7 +6,7 @@ from vhcm.models.blacklisted_token import BlacklistedToken
 def run_auto_delete_expire_token_task():
     tl = Timeloop()
 
-    @tl.job(interval=timedelta(seconds=600))
+    @tl.job(interval=timedelta(seconds=300))
     def delete_expired_token():
         now = datetime.now()
         expired_token = BlacklistedToken.objects.filter(expire__lte=now)
