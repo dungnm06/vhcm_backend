@@ -54,7 +54,6 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
 
     #####################################
     # ------- Setup BERT model -------- #
-    BERT_MODEL = 'vinai/phobert-base'
     # Max length of tokens
     SENTENCE_MAX_LENGTH = sentencelength
     # # Load transformers config and set output_hidden_states to False
@@ -108,8 +107,8 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
         epochs=EPOCHES)
 
     # Save weight of trained model
-    SAVE_NAME = 'intent/model_weights'
-    save_path = os.path.join(output, SAVE_NAME)
+    print('Saving data....')
+    save_path = os.path.join(output, 'intent/model_weights')
     model.save_weights(save_path)
 
     # Save intent map

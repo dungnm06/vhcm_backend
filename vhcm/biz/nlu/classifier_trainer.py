@@ -95,6 +95,6 @@ class ClassifierTrainer(object):
                 # console_log.write(stdout)
                 # console_log.flush()
         rc = process.poll()
-        return_message = 'training_done' if rc == 0 else 'training_error'
+        return_message = 'Training process done' if rc == 0 else 'Training process error'
         communicate_queue.put(return_message)
         # console_log.close()

@@ -1,7 +1,7 @@
 from collections import namedtuple
 from .synonym import SynonymSet
 import vhcm.models.knowledge_data_subject as subject_model
-import vhcm.models.knowledge_data_verbs as verbs_model
+# import vhcm.models.knowledge_data_verbs as verbs_model
 import vhcm.models.knowledge_data_question as question_model
 import vhcm.models.knowledge_data_generated_question as generated_question_model
 import vhcm.models.knowledge_data_response_data as response_model
@@ -106,11 +106,12 @@ def load_from_db(models):
         # Subjects
         subjects = subject_model.Subject.objects.filter(knowledge_data=knowledge_data)
         for subject in subjects:
+            pass
             # Subject
 
             # Verbs
-            verbs = verbs_model.Verb.objects.filter(subject=subject)
-            intent.subjects.append(None)
+            # verbs = verbs_model.Verb.objects.filter(subject=subject)
+            # intent.subjects.append(None)
         # Verbs
 
         # Synonym words dictionary

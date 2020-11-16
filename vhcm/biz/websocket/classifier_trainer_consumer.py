@@ -84,6 +84,8 @@ class ClassifierConsumer(WebsocketConsumer):
     # Receive message from trainer service
     def send_message(self, event):
         message = event['message']
+        if message == 'Training process done' or message == 'Training process error':
+            self.trainer.stop()
         # Send message to WebSocket
         self.send_response(SEND_MESSAGE, message)
 

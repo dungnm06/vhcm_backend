@@ -343,7 +343,7 @@ def add(request):
             if synonym is None:
                 raise Exception('Invalid synonym group ids: {}'.format(s_id))
             # If word metion in data not in synonyms dictionary so add it
-            syn_words = [s.lower() for s in synonym.words.split()]
+            syn_words = [s.lower() for s in synonym.words.split(COMMA)]
             if word.lower() not in syn_words:
                 syn_words.append(word)
                 synonym.words = COMMA.join(syn_words)
@@ -507,7 +507,7 @@ def edit(request):
             if synonym is None:
                 raise Exception('Invalid synonym group ids: {}'.format(s_id))
             # If word metion in data not in synonyms dictionary so add it
-            syn_words = [s.lower() for s in synonym.words.split()]
+            syn_words = [s.lower() for s in synonym.words.split(COMMA)]
             if word.lower() not in syn_words:
                 syn_words.append(word)
                 synonym.words = COMMA.join(syn_words)

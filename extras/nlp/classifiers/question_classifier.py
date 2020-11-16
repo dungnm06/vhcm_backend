@@ -1,3 +1,4 @@
+import os
 import random
 import pickle
 import tensorflow as tf
@@ -39,13 +40,12 @@ def types_map_generate(types):
     return t2i, i2t
 
 
-def train_question_classifier(data, output, sentencelength, batch, epoch, learning_rate, epsilon, activation):
+def train_question_classifier(datapath, output, sentencelength, batch, epoch, learning_rate, epsilon, activation):
     ###################################
     # --------- Import data --------- #
     # Import data from csv
     # Import datas
-    TRAIN_DATA = data
-    data = unpickle_file(TRAIN_DATA)
+    data = unpickle_file(datapath)
     x = data['question']
     y = data['type']
     # Ready output data for the model
@@ -70,7 +70,6 @@ def train_question_classifier(data, output, sentencelength, batch, epoch, learni
 
     #####################################
     # ------- Setup BERT model -------- #
-    BERT_MODEL = 'vinai/phobert-base'
     # Max length of tokens
     SENTENCE_MAX_LENGTH = sentencelength
     # # Load transformers config and set output_hidden_states to False
@@ -116,7 +115,7 @@ def train_question_classifier(data, output, sentencelength, batch, epoch, learni
         loss=loss,
         metrics=metric)
     # Fit the model
-    history = model.fit(
+    model.fit(
         x={
             'input_ids': x['input_ids'],
             'attention_mask': x['attention_mask']
@@ -127,8 +126,8 @@ def train_question_classifier(data, output, sentencelength, batch, epoch, learni
         epochs=EPOCHES)
 
     # Save weight of trained model
-    SAVE_NAME = 'question_type/model_weights'
-    save_path = output + SAVE_NAME
+    print('Saving data....')
+    save_path = os.path.join(output, 'intent/model_weights')
     model.save_weights(save_path)
 
     # Save intent map
