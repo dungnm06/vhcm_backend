@@ -49,7 +49,9 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     # React server
     '127.0.0.1',
-    '127.0.0.1:3000'
+    'localhost,'
+    '127.0.0.1:3000',
+    'localhost:3000'
 ]
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True

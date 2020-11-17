@@ -1,4 +1,6 @@
 import os
+import json
+import traceback
 import numpy as np
 from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.common.constants import *
@@ -45,20 +47,25 @@ class IntentClassifier(object, metaclass=Singleton):
             # Unload current model first
             self.unload()
             # Model config
-            self.config = unpickle_file(config_path)
+            with open(config_path) as json_file:
+                self.config = json.load(json_file)
 
             # Intent maps
-            intent_maps = unpickle_file(intent_maps_path)
+            with open(intent_maps_path) as json_file:
+                intent_maps = json.load(json_file)
             self.intent_to_idx = intent_maps[OBJ2IDX]
             self.idx_to_intent = intent_maps[IDX2OBJ]
 
             # Pretrained model
             print('(IntentClassifier) Loading pretrained model from: ', model_path)
             self.model, self.tokenizer = build_PhoBERT_classifier_model(
-                self.config.sequence_length, self.config.output_layer_size, self.config.activation, self.config.name)
+                self.config['sentence_max_length'], self.config['output_size'],
+                self.config['activation_function'], self.config['model_name']
+            )
             self.model.load_weights(model_path)
         except Exception as e:
             print(e)
+            print(traceback.format_exc())
             self.unload()
             return False
 

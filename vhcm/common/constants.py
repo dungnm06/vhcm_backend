@@ -26,14 +26,18 @@ OBJ2IDX = 'obj2idx'
 BERT = 'bert'
 INTENT = 'intent'
 QUESTION = 'question'
+INTENT_DATA_FILE_NAME = 'intent_data.csv'
+REFERENCES_FILE_NAME = 'references.json'
+SYNONYMS_FILE_NAME = 'synonyms.json'
+TRAIN_DATA_FILE_NAME = 'train_data.pickle'
 TRAIN_DATA_FOLDER = 'extras/nlp/data/train_data/'
 MODEL_DATA_FOLDER = 'extras/nlp/classifiers/trained/'
 INTENT_MODEL_NAME = 'intent/model_weights'
-INTENT_MODEL_CONFIG = 'extras/nlp/classifiers/trained/intent_config.pickle'
+INTENT_MODEL_CONFIG = 'extras/nlp/classifiers/trained/intent_config.json'
 QUESTION_TYPE_MODEL_NAME = 'question_type/model_weights'
-QUESTION_TYPE_MODEL_CONFIG = 'extras/nlp/classifiers/trained/question_type_config.pickle'
-INTENT_MAP_FILE_PATH = 'extras/nlp/classifiers/trained/intent_map.pickle'
-QUESTION_TYPE_MAP_FILE_PATH = 'extras/nlp/classifiers/trained/question_type_map.pickle'
+QUESTION_TYPE_MODEL_CONFIG = 'extras/nlp/classifiers/trained/question_type_config.json'
+INTENT_MAP_FILE_PATH = 'extras/nlp/classifiers/trained/intent_map.json'
+QUESTION_TYPE_MAP_FILE_PATH = 'extras/nlp/classifiers/trained/question_type_map.json'
 CLASSIFIER_MODEL_FILES = ['checkpoint', 'model_weights.data-00000-of-00001', 'model_weights.index']
 CLASSIFIER_TYPES = {
     INTENT: 1,
@@ -48,6 +52,7 @@ QUESTION_TYPE_MAP = {
     6: "how",
     7: "yesno"
 }
+BOT_VERSION_FILE_PATH = 'extras/nlp/classifiers/trained/bot_version'
 
 
 # Date format

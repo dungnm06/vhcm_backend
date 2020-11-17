@@ -4,8 +4,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from vhcm.biz.nlu.classifier_trainer import ClassifierTrainer
 import vhcm.common.config.config_manager as config
-from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FOLDER
-from vhcm.common.utils.files import PICKLE_EXTENSION
+from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FILE_NAME, TRAIN_DATA_FOLDER
 from vhcm.models import train_data as train_data_model
 from vhcm.biz.nlu.classifiers.intent_classifier import predict_instance as intent_classifier
 from vhcm.biz.nlu.classifiers.question_type_classifier import predict_instance as question_type_classifier
@@ -62,7 +61,9 @@ class ClassifierConsumer(WebsocketConsumer):
             if not train_data:
                 self.send_response(TRAIN_START_FAILED)
                 return
-            train_data_filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + PICKLE_EXTENSION)
+            train_data_filepath = os.path.join(
+                PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + '/' + TRAIN_DATA_FILE_NAME
+            )
             train_type = text_data_json['type']
             sentence_length = text_data_json['sentence_length']
             batch = text_data_json['batch']

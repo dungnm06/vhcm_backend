@@ -1,17 +1,34 @@
+import os
+import json
 from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.biz.nlu.classifiers.intent_classifier import predict_instance as intent_classifier
 from vhcm.biz.nlu.classifiers.question_type_classifier import predict_instance as question_type_classifier
 from vhcm.biz.nlu.model.intent import Intent
 from vhcm.models.knowledge_data_question import QUESTION_TYPES_IDX2T, QUESTION_TYPES_T2IDX
 from vhcm.models import chat_message
-from vhcm.common.state.state_manager import state_manager
+from vhcm.common.constants import PROJECT_ROOT, BOT_VERSION_FILE_PATH
 
 # Constants
-CURRENT_BOT_VERSION = 'current_bot_version'
+CURRENT_BOT_VERSION = 'current'
+NEXT_STARTUP_VERSION = 'next_startup'
 BOT_UNAVAILABLE_MESSAGE = 'Bác đi ngủ rồi, quay lại lúc khác!'
 
+
 # Bot version
-system_bot_version = int(state_manager.get_state(CURRENT_BOT_VERSION, 0))
+def load_bot_meta():
+    meta_path = os.path.join(PROJECT_ROOT, BOT_VERSION_FILE_PATH)
+    if os.path.exists(meta_path):
+        with open(meta_path) as f:
+            meta = json.load(f)
+    else:
+        meta = {
+            CURRENT_BOT_VERSION: 0,
+            NEXT_STARTUP_VERSION: 0
+        }
+    return meta
+
+
+system_bot_version = load_bot_meta()
 
 
 # Chatbot state
@@ -27,11 +44,11 @@ intent_datas = {}
 
 
 def is_bot_ready():
-    return system_bot_version > 0 and question_type_classifier and intent_classifier
+    return system_bot_version[CURRENT_BOT_VERSION] > 0 and question_type_classifier and intent_classifier
 
 
 def version_check(session_bot_version):
-    return system_bot_version == session_bot_version
+    return system_bot_version[CURRENT_BOT_VERSION] == session_bot_version
 
 
 class VirtualHCMChatbot(object):

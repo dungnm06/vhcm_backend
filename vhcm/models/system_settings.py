@@ -22,7 +22,7 @@ class SystemSetting(models.Model):
         primary_key=True, max_length=50, verbose_name='report id'
     )
     setting_name = models.CharField(
-        max_length=60, verbose_name='setting name'
+        max_length=100, verbose_name='setting name'
     )
     description = models.TextField(
         verbose_name='setting description', null=True, blank=True

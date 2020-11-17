@@ -1,4 +1,5 @@
 import os
+import json
 import random
 import pickle
 import tensorflow as tf
@@ -31,10 +32,9 @@ def pickle_file(datas, filename):
 
 def types_map_generate(types):
     t2i = {}
-    i2t = {}
     id_count = 1
     for t in types:
-        t2i[t] = id_count
+        t2i[str(t)] = str(id_count)
         id_count += 1
     i2t = {v: k for k, v in t2i.items()}
     return t2i, i2t
@@ -128,7 +128,7 @@ def train_question_classifier(datapath, output, sentencelength, batch, epoch, le
 
     # Save weight of trained model
     print('Saving data....')
-    save_path = os.path.join(output, 'intent/model_weights')
+    save_path = os.path.join(output, 'question_type/model_weights')
     model.save_weights(save_path)
 
     # Save intent map
@@ -136,8 +136,15 @@ def train_question_classifier(datapath, output, sentencelength, batch, epoch, le
         'obj2idx': type2id_map,
         'idx2obj': id2type_map
     }
-    pickle_file(map_datas, output + '/question_type_map.pickle')
+    with open(output + '/question_type_map.json', 'w') as fp:
+        json.dump(map_datas, fp, indent=4)
 
     # Save training config
-    config = QuestionModelConfig(model_name, SENTENCE_MAX_LENGTH, len(types), activation)
-    pickle_file(config, output + '/question_type_config.pickle')
+    config = {
+        'model_name': model_name,
+        'sentence_max_length': SENTENCE_MAX_LENGTH,
+        'output_size': len(types),
+        'activation_function': activation
+    }
+    with open(output + '/question_type_config.json', 'w') as fp:
+        json.dump(config, fp, indent=4)

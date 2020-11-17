@@ -2,6 +2,7 @@ import random
 import pickle
 import tensorflow as tf
 import os
+import json
 from pathlib import Path
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
@@ -116,8 +117,15 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
         'obj2idx': INTENT_TO_IDX,
         'idx2obj': IDX_TO_INTENT
     }
-    pickle_file(map_datas, output + '/intent_map.pickle')
+    with open(output + '/intent_map.json', 'w') as fp:
+        json.dump(map_datas, fp, indent=4)
 
     # Save training config
-    config = IntentModelConfig(model_name, SENTENCE_MAX_LENGTH, len(intents_count), activation)
-    pickle_file(config, output + '/intent_config.pickle')
+    config = {
+        'model_name': model_name,
+        'sentence_max_length': SENTENCE_MAX_LENGTH,
+        'output_size': len(intents_count),
+        'activation_function': activation
+    }
+    with open(output + '/intent_config.json', 'w') as fp:
+        json.dump(config, fp, indent=4)

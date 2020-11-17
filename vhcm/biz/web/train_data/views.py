@@ -61,13 +61,16 @@ def add(request):
         return response
 
     filename = request.data.get(train_data_model.FILENAME).strip()
-    filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + filename + PICKLE_EXTENSION)
-    if os.path.exists(filepath):
+    train_data_check = train_data_model.TrainData.objects.filter(filename=filename).first()
+    if train_data_check:
         result.set_status(False)
         result.set_messages('Duplicated file name')
         response.data = result.to_json()
         return response
-
+    storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + filename)
+    if not os.path.exists(storepath):
+        os.mkdir(storepath)
+    filepath = os.path.join(storepath, TRAIN_DATA_FILE_NAME)
     include_datas = request.data.get(train_data_model.INCLUDE_DATA)
     if not (include_datas and isinstance(include_datas, list)):
         raise APIException('Create train data form is malformed')
@@ -95,11 +98,15 @@ def add(request):
     # Save intent data
     knowledge_datas = knowledge_data_model.KnowledgeData.objects\
         .filter(knowledge_data_id__in=include_datas)\
-        .prefetch_related('references__reference_document', 'synonym__synonym', 'responsedata_set', 'subject_set')
-    intent_data_filepath = filename + '_intent_data.csv'
+        .prefetch_related(
+            'knowledgedatarefercencedocumentlink_set__reference_document',
+            'knowledgedatasynonymlink_set__synonym',
+            'responsedata_set', 'subject_set'
+        )
+    intent_data_filepath = os.path.join(storepath, INTENT_DATA_FILE_NAME)
     intent_references_for_file_saving = {}
     synonyms_for_file_saving = {}
-    with open(intent_data_filepath, 'w', newline='') as file:
+    with open(intent_data_filepath, 'w', newline='', encoding=UTF8) as file:
         writer = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)
         # Titles
         writer.writerow(INTENT_DATA_COLUMNS)
@@ -124,14 +131,13 @@ def add(request):
             verbs = []
             for subject in subjects_query:
                 subjects.append(str(subject.type) + COLON + subject.subject_data)
-                verbs.append(subject.verbs)
+                verbs.append(subject.verbs if subject.verbs else 'empty')
             intent_subjects = HASH.join(subjects)
             intent_verbs = HASH.join(verbs)
             # References
-            references = kd.references.all()
+            references = kd.knowledgedatarefercencedocumentlink_set.all()
             intent_references = []
             for reference in references:
-                reference_id = reference.reference_document.reference_document_id
                 if intent_id not in intent_references_for_file_saving:
                     intent_references_for_file_saving[intent_id] = []
                 intent_references_for_file_saving[intent_id].append({
@@ -140,9 +146,9 @@ def add(request):
                     'extra_info': reference.extra_info
                 })
                 intent_references.append(reference.reference_document.reference_document_id)
-            intent_references = COMMA.join(intent_references)
+            intent_references = COMMA.join(str(i) for i in intent_references)
             # Synonyms
-            synonyms = kd.synonym.all()
+            synonyms = kd.knowledgedatasynonymlink_set.all()
             intent_synonyms = []
             for synonym_link in synonyms:
                 synonym_id = synonym_link.synonym.synonym_id
@@ -159,13 +165,14 @@ def add(request):
                              intent_responses, intent_subjects, intent_verbs, intent_references, intent_synonyms])
 
     # Write references data to file
-    references_filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + 'references.json')
-    with open(references_filepath, 'w') as fp:
+
+    references_filepath = os.path.join(storepath, REFERENCES_FILE_NAME)
+    with open(references_filepath, 'w', encoding=UTF8) as fp:
         json.dump(intent_references_for_file_saving, fp, indent=4)
 
     # Write synonyms data to file
-    synonyms_filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + 'synonyms.json')
-    with open(synonyms_filepath, 'w') as fp:
+    synonyms_filepath = os.path.join(storepath, SYNONYMS_FILE_NAME)
+    with open(synonyms_filepath, 'w', encoding=UTF8) as fp:
         json.dump(synonyms_for_file_saving, fp, indent=4)
 
     train_data = train_data_model.TrainData(

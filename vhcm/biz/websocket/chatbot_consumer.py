@@ -173,6 +173,7 @@ class ChatbotConsumer(WebsocketConsumer):
                 data_version=session_bot_version,
                 session_start=start_time
             )
+            log_model.save()
             # Clear session messages on DB
             last_session.delete()
 
