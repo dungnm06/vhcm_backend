@@ -1,4 +1,5 @@
 import os
+import csv
 from django.db import transaction
 from django.http import HttpResponse
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -7,13 +8,13 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from vhcm.biz.authentication.user_session import ensure_admin
 from vhcm.common.response_json import ResponseJSON
-from vhcm.common.constants import COMMA, MINUS, TRAIN_DATA_FOLDER, PROJECT_ROOT
 from vhcm.common.utils.files import pickle_file, PICKLE_EXTENSION
-from vhcm.common.utils.CH import isInt
 from vhcm.serializers.train_data import TrainDataSerializer, TrainDataDeletedSerializer
-from vhcm.common.dao.native_query import execute_native_query
 from vhcm.biz.web.train_data.sql import GET_TRAIN_DATA
+from vhcm.biz.nlu.model.intent import *
+from vhcm.common.utils.CH import isInt
 import vhcm.models.train_data as train_data_model
+import vhcm.models.knowledge_data as knowledge_data_model
 
 
 @api_view(['GET', 'POST'])
@@ -59,8 +60,8 @@ def add(request):
         response.data = result.to_json()
         return response
 
-    filename = request.data.get(train_data_model.FILENAME).strip() + PICKLE_EXTENSION
-    filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + filename)
+    filename = request.data.get(train_data_model.FILENAME).strip()
+    filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + filename + PICKLE_EXTENSION)
     if os.path.exists(filepath):
         result.set_status(False)
         result.set_messages('Duplicated file name')
@@ -68,6 +69,9 @@ def add(request):
         return response
 
     include_datas = request.data.get(train_data_model.INCLUDE_DATA)
+    if not (include_datas and isinstance(include_datas, list)):
+        raise APIException('Create train data form is malformed')
+
     include_datas_str = [str(id) for id in include_datas]
     sql = GET_TRAIN_DATA.format(knowledge_ids=COMMA.join(['(' + id + ')' for id in include_datas_str]))
     query_data = execute_native_query(sql)
@@ -88,6 +92,82 @@ def add(request):
 
     pickle_file(train_data_to_pickle, filepath)
 
+    # Save intent data
+    knowledge_datas = knowledge_data_model.KnowledgeData.objects\
+        .filter(knowledge_data_id__in=include_datas)\
+        .prefetch_related('references__reference_document', 'synonym__synonym', 'responsedata_set', 'subject_set')
+    intent_data_filepath = filename + '_intent_data.csv'
+    intent_references_for_file_saving = {}
+    synonyms_for_file_saving = {}
+    with open(intent_data_filepath, 'w', newline='') as file:
+        writer = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)
+        # Titles
+        writer.writerow(INTENT_DATA_COLUMNS)
+        # Intents
+        for kd in knowledge_datas:
+            # ID
+            intent_id = kd.knowledge_data_id
+            # Name
+            intent_name = kd.intent
+            # Fullname
+            intent_fullname = kd.intent_fullname
+            # Raw data
+            intent_rawdata = kd.raw_data
+            # Base response
+            intent_base_response = kd.base_response
+            # Response answers
+            responses_query = kd.responsedata_set.all()
+            intent_responses = HASH.join((str(response.type) + UNDERSCORE + response.answer) for response in responses_query)
+            # Subjects + Verbs
+            subjects_query = kd.subject_set.all()
+            subjects = []
+            verbs = []
+            for subject in subjects_query:
+                subjects.append(str(subject.type) + COLON + subject.subject_data)
+                verbs.append(subject.verbs)
+            intent_subjects = HASH.join(subjects)
+            intent_verbs = HASH.join(verbs)
+            # References
+            references = kd.references.all()
+            intent_references = []
+            for reference in references:
+                reference_id = reference.reference_document.reference_document_id
+                if intent_id not in intent_references_for_file_saving:
+                    intent_references_for_file_saving[intent_id] = []
+                intent_references_for_file_saving[intent_id].append({
+                    'name': reference.reference_document.reference_name,
+                    'page': reference.page,
+                    'extra_info': reference.extra_info
+                })
+                intent_references.append(reference.reference_document.reference_document_id)
+            intent_references = COMMA.join(intent_references)
+            # Synonyms
+            synonyms = kd.synonym.all()
+            intent_synonyms = []
+            for synonym_link in synonyms:
+                synonym_id = synonym_link.synonym.synonym_id
+                if synonym_id not in synonyms_for_file_saving:
+                    synonyms_for_file_saving[synonym_id] = {
+                        'meaning': synonym_link.synonym.meaning,
+                        'words': synonym_link.synonym.words.split(COMMA)
+                    }
+                intent_synonyms.append(synonym_id)
+            intent_synonyms = COMMA.join(str(i) for i in intent_synonyms)
+
+            # Write to csv
+            writer.writerow([intent_id, intent_name, intent_fullname, intent_rawdata, intent_base_response,
+                             intent_responses, intent_subjects, intent_verbs, intent_references, intent_synonyms])
+
+    # Write references data to file
+    references_filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + 'references.json')
+    with open(references_filepath, 'w') as fp:
+        json.dump(intent_references_for_file_saving, fp, indent=4)
+
+    # Write synonyms data to file
+    synonyms_filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + 'synonyms.json')
+    with open(synonyms_filepath, 'w') as fp:
+        json.dump(synonyms_for_file_saving, fp, indent=4)
+
     train_data = train_data_model.TrainData(
         filename=request.data.get(train_data_model.FILENAME).strip(),
         description=request.data.get(train_data_model.DESCRIPTION),
@@ -95,6 +175,7 @@ def add(request):
         delete_reason=None,
         type=1
     )
+
     train_data.save()
     serilized_data = TrainDataSerializer(train_data)
 

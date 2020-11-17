@@ -41,7 +41,9 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
         config_path = os.path.join(PROJECT_ROOT, QUESTION_TYPE_MODEL_CONFIG)
         question_type_maps_path = os.path.join(PROJECT_ROOT, QUESTION_TYPE_MAP_FILE_PATH)
         model_path = os.path.join(PROJECT_ROOT, MODEL_DATA_FOLDER + QUESTION_TYPE_MODEL_NAME)
-        if any([os.path.exists(p) for p in [config_path, question_type_maps_path, model_path]]):
+        model_folder = os.path.join(PROJECT_ROOT, MODEL_DATA_FOLDER) + 'question_type/'
+        model_file_to_check = [model_folder + f for f in CLASSIFIER_MODEL_FILES]
+        if any([not os.path.exists(p) for p in [config_path, question_type_maps_path, *model_file_to_check]]):
             return False
 
         try:

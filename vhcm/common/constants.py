@@ -27,13 +27,14 @@ BERT = 'bert'
 INTENT = 'intent'
 QUESTION = 'question'
 TRAIN_DATA_FOLDER = 'extras/nlp/data/train_data/'
-MODEL_DATA_FOLDER = 'extras/nlp/classifier/trained/'
+MODEL_DATA_FOLDER = 'extras/nlp/classifiers/trained/'
 INTENT_MODEL_NAME = 'intent/model_weights'
-INTENT_MODEL_CONFIG = 'extras/nlp/classifier/trained/intent_config.pickle'
+INTENT_MODEL_CONFIG = 'extras/nlp/classifiers/trained/intent_config.pickle'
 QUESTION_TYPE_MODEL_NAME = 'question_type/model_weights'
-QUESTION_TYPE_MODEL_CONFIG = 'extras/nlp/classifier/trained/question_type_config.pickle'
-INTENT_MAP_FILE_PATH = 'extras/nlp/classifier/trained/intent_map.pickle'
-QUESTION_TYPE_MAP_FILE_PATH = 'extras/nlp/classifier/trained/question_type_map.pickle'
+QUESTION_TYPE_MODEL_CONFIG = 'extras/nlp/classifiers/trained/question_type_config.pickle'
+INTENT_MAP_FILE_PATH = 'extras/nlp/classifiers/trained/intent_map.pickle'
+QUESTION_TYPE_MAP_FILE_PATH = 'extras/nlp/classifiers/trained/question_type_map.pickle'
+CLASSIFIER_MODEL_FILES = ['checkpoint', 'model_weights.data-00000-of-00001', 'model_weights.index']
 CLASSIFIER_TYPES = {
     INTENT: 1,
     QUESTION: 2
