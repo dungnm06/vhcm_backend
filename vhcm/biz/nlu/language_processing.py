@@ -250,7 +250,7 @@ class LanguageProcessor(object, metaclass=Singleton):
         # Obtain named entity in the sentence
         ner = self.named_entity_reconize(sentence)
         # Data for the process
-        intent_critical_datas = intent.critical_datas
+        intent_critical_datas = intent.subjects
         tokenized_sentence = self.word_segmentation(sentence)
         tokenized_sentence_list = tokenized_sentence.split()
 
@@ -268,10 +268,9 @@ class LanguageProcessor(object, metaclass=Singleton):
                 break
             entities_in_intent = []
             for c in intent_critical_datas:
-                for c1 in c:
-                    if c1[0] == typ:
-                        entities_in_intent.append(c)
-                        break
+                if c['type'] == typ:
+                    entities_in_intent.append(c)
+
             # if len(entities_in_intent) > 0:
             #     print(entities_in_intent)
             # else:
@@ -280,22 +279,17 @@ class LanguageProcessor(object, metaclass=Singleton):
             # Find in the sentence for intent critical datas
             eit_1 = entities_in_intent[:]
             for eit in eit_1:
-                # get components structure
-                struct = [c[0] for c in eit]
-                # get main component index
-                main_pos = struct.index(typ)
+                # # get components structure
+                # struct = [c[0] for c in eit]
+                # # get main component index
+                # main_pos = struct.index(typ)
                 # find entity existence in the sentence
                 # corresponse_part: (phrase, entity start pos, entity end pos)
-                if typ == 'MISC':
-                    content = [part.split(':')[1] for part in eit[main_pos][1].split('+') if
-                               part.split(':')[0] not in self.exclude_pos_tag]
-                    content = [c for c in content if c not in self.exclude_words]
-                    # print(content)
-                    corresponse_part = self.find_phrase_in_sentence(content, tokenized_sentence_list, intent.synonym_sets)
-                else:
-                    eit_arr = [e[1] for e in eit if e[1] not in self.exclude_words and e[0] not in self.exclude_pos_tag]
-                    # print(eit_arr)
-                    corresponse_part = self.find_phrase_in_sentence(eit_arr, tokenized_sentence_list, intent.synonym_sets)
+                content = [part.split(':')[1] for part in eit['words'].split('+') if
+                           part.split(':')[0] not in self.exclude_pos_tag]
+                content = [c.lower() for c in content if c not in self.exclude_words]
+                # print(content)
+                corresponse_part = self.find_phrase_in_sentence(content, tokenized_sentence_list, intent.synonym_sets)
                 # Critical part still not found -> not same intent
                 if not corresponse_part:
                     check_flag = False
@@ -314,7 +308,7 @@ class LanguageProcessor(object, metaclass=Singleton):
         # Obtain named entity in the sentence
         ner = self.named_entity_reconize(sentence)
         # Data for the process
-        intent_critical_datas = intent.critical_datas
+        # intent_critical_datas = intent.critical_datas
         tokenized_sentence = self.word_segmentation(sentence)
         tokenized_sentence_list = tokenized_sentence.split()
 

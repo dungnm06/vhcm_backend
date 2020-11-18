@@ -136,7 +136,6 @@ def add(request):
             intent_verbs = HASH.join(verbs)
             # References
             references = kd.knowledgedatarefercencedocumentlink_set.all()
-            intent_references = []
             for reference in references:
                 if intent_id not in intent_references_for_file_saving:
                     intent_references_for_file_saving[intent_id] = []
@@ -145,8 +144,6 @@ def add(request):
                     'page': reference.page,
                     'extra_info': reference.extra_info
                 })
-                intent_references.append(reference.reference_document.reference_document_id)
-            intent_references = COMMA.join(str(i) for i in intent_references)
             # Synonyms
             synonyms = kd.knowledgedatasynonymlink_set.all()
             intent_synonyms = []
@@ -162,10 +159,9 @@ def add(request):
 
             # Write to csv
             writer.writerow([intent_id, intent_name, intent_fullname, intent_rawdata, intent_base_response,
-                             intent_responses, intent_subjects, intent_verbs, intent_references, intent_synonyms])
+                             intent_responses, intent_subjects, intent_verbs, intent_synonyms])
 
     # Write references data to file
-
     references_filepath = os.path.join(storepath, REFERENCES_FILE_NAME)
     with open(references_filepath, 'w', encoding=UTF8) as fp:
         json.dump(intent_references_for_file_saving, fp, indent=4)

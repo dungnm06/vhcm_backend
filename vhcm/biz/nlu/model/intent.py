@@ -21,11 +21,11 @@ INTENT_RESPONSE_ANSWERS = 'ResponseAnswers'
 INTENT_SUBJECTS = 'Subjects'
 INTENT_REFERENCES = 'ReferenceDocuments'
 INTENT_VERBS = 'Verbs'
-INTENT_SYNONYM_IDS = 'Synonyms ID'
+INTENT_SYNONYM_IDS = 'SynonymsID'
 
 # Intent data columns
 INTENT_DATA_COLUMNS = [INTENT_ID, INTENT_NAME, INTENT_FULL_NAME, INTENT_RAW_DATA, INTENT_BASE_RESPONSE,
-                       INTENT_RESPONSE_ANSWERS, INTENT_SUBJECTS, INTENT_VERBS, INTENT_REFERENCES, INTENT_SYNONYM_IDS]
+                       INTENT_RESPONSE_ANSWERS, INTENT_SUBJECTS, INTENT_VERBS, INTENT_SYNONYM_IDS]
 
 # Named tuple
 Question = namedtuple('Question', ['question', 'generated_questions'])
@@ -50,7 +50,7 @@ class Intent:
     def __init__(self, intent_id=0, name='', fullname='',
                  raw_data='', base_response='',
                  corresponding_datas=None, subjects=None,
-                 sentence_components=None, synonym_sets=None):
+                 sentence_components=None, synonym_sets=None, references=None):
         # Default argument value is mutable
         # https://florimond.dev/blog/articles/2018/08/python-mutable-defaults-are-the-source-of-all-evil
         # if intent_types is None:
@@ -65,6 +65,8 @@ class Intent:
         #     questions = []
         if synonym_sets is None:
             synonym_sets = {}
+        if references is None:
+            references = []
         # Assign attributes
         self.intent_id = intent_id
         self.name = name
@@ -76,6 +78,7 @@ class Intent:
         self.corresponding_datas = corresponding_datas
         self.subjects = subjects
         self.synonym_sets = synonym_sets
+        self.references = references
 
 
 def load_from_db(models):
@@ -133,11 +136,12 @@ def load_from_db(models):
 
 
 def load_from_data_file(intents_data_path, references_path, synonyms_path):
-    with open(synonyms_path, encoding=UTF8) as s, open(references_path, encoding=UTF8) as r:
+    with open(synonyms_path, encoding=UTF8) as synonym_file, open(references_path, encoding=UTF8) as references_file:
         intent_maps = {}
         intent_datas = pd.read_csv(intents_data_path)
-        # Synonyms
-        synonyms = json.load(s)
+        references = json.load(references_file)
+        synonyms = json.load(synonym_file)
+
         for idx, data in intent_datas.iterrows():
             intent = Intent()
             # ID
@@ -175,21 +179,12 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
             sc = data[INTENT_VERBS]
             if not pd.isnull(cd) and not pd.isnull(sc):
                 for cdi, sci in zip(cd.split(HASH), sc.split(HASH)):
-                    group_data = []
                     split_idx = cdi.find(COLON)
-                    if cdi.startswith('MISC'):
-                        group_data.append({
-                            'type': 'MISC',
-                            'words': cdi[(split_idx + 1):],
-                            'verbs': sci
-                        })
-                    else:
-                        group_data.append({
-                            'type': cdi[:split_idx],
-                            'words': cdi[(split_idx + 1):],
-                            'verbs': sci
-                        })
-                    intent.subjects.append(group_data)
+                    intent.subjects.append({
+                        'type': cdi[:split_idx],
+                        'words': cdi[(split_idx + 1):],
+                        'verbs': sci
+                    })
             # # Sentence components
             # if not pd.isnull(sc):
             #     sc = sc.split(HASH)
@@ -203,14 +198,14 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
             #     # print(sentence_components)
             #     intent.sentence_components = sentence_components
 
-            # Reference document id
-            rdi = data[INTENT_REFERENCES]
-            if not pd.isnull(rdi):
-                intent.reference_doc_id = rdi
+            # Reference document
+            rdi = references[data[INTENT_ID]]
+            if rdi:
+                intent.references = rdi
 
             # Synonym words dictionary
             synonym_ids = data[INTENT_SYNONYM_IDS]
-            if not pd.isnull(synonym_ids):
+            if synonym_ids:
                 synonym_ids = synonym_ids.split(COMMA)
                 for s in synonym_ids:
                     synonym_set = SynonymSet()
