@@ -5,7 +5,6 @@ import numpy as np
 from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.common.constants import *
 from vhcm.common.singleton import Singleton
-from vhcm.common.utils.files import unpickle_file
 from extras.nlp.bert.PhoBERT import build_PhoBERT_classifier_model
 
 
@@ -41,35 +40,27 @@ class IntentClassifier(object, metaclass=Singleton):
         model_file_to_check = [model_folder + f for f in CLASSIFIER_MODEL_FILES]
         print(config_path, intent_maps_path, *model_file_to_check)
         if any([not os.path.exists(p) for p in [config_path, intent_maps_path, *model_file_to_check]]):
-            return False
+            raise RuntimeError('[startup] Missing initial data for intent classifier')
 
-        try:
-            # Unload current model first
-            self.unload()
-            # Model config
-            with open(config_path) as json_file:
-                self.config = json.load(json_file)
+        # Unload current model first
+        self.unload()
+        # Model config
+        with open(config_path) as json_file:
+            self.config = json.load(json_file)
 
-            # Intent maps
-            with open(intent_maps_path) as json_file:
-                intent_maps = json.load(json_file)
-            self.intent_to_idx = intent_maps[OBJ2IDX]
-            self.idx_to_intent = intent_maps[IDX2OBJ]
+        # Intent maps
+        with open(intent_maps_path) as json_file:
+            intent_maps = json.load(json_file)
+        self.intent_to_idx = intent_maps[OBJ2IDX]
+        self.idx_to_intent = intent_maps[IDX2OBJ]
 
-            # Pretrained model
-            print('(IntentClassifier) Loading pretrained model from: ', model_path)
-            self.model, self.tokenizer = build_PhoBERT_classifier_model(
-                self.config['sentence_max_length'], self.config['output_size'],
-                self.config['activation_function'], self.config['model_name']
-            )
-            self.model.load_weights(model_path)
-        except Exception as e:
-            print(e)
-            print(traceback.format_exc())
-            self.unload()
-            return False
-
-        return True
+        # Pretrained model
+        print('(IntentClassifier) Loading pretrained model from: ', model_path)
+        self.model, self.tokenizer = build_PhoBERT_classifier_model(
+            self.config['sentence_max_length'], self.config['output_size'],
+            self.config['activation_function'], self.config['model_name']
+        )
+        self.model.load_weights(model_path)
 
     def predict(self, input_query):
         if not (self.model or self.idx_to_intent or self.tokenizer or self.config):
@@ -98,9 +89,3 @@ class IntentClassifier(object, metaclass=Singleton):
             pred_intent = self.idx_to_intent[intent_idx]
             print("Intent: ", pred_intent)
         return pred_intent
-
-
-predict_instance = IntentClassifier()
-result = predict_instance.load()
-if not result:
-    print('[startup] IntentClassifier not loaded')

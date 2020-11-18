@@ -1,34 +1,18 @@
 import os
 import json
+import traceback
 from vhcm.biz.nlu.language_processing import language_processor
-from vhcm.biz.nlu.classifiers.intent_classifier import predict_instance as intent_classifier
-from vhcm.biz.nlu.classifiers.question_type_classifier import predict_instance as question_type_classifier
-from vhcm.biz.nlu.model.intent import Intent
+from vhcm.biz.nlu.classifiers.intent_classifier import IntentClassifier
+from vhcm.biz.nlu.classifiers.question_type_classifier import QuestionTypeClassifier
+from vhcm.biz.nlu.model.intent import Intent, load_from_data_file
 from vhcm.models.knowledge_data_question import QUESTION_TYPES_IDX2T, QUESTION_TYPES_T2IDX
-from vhcm.models import chat_message
-from vhcm.common.constants import PROJECT_ROOT, BOT_VERSION_FILE_PATH
+from vhcm.models import chat_message, train_data
+from vhcm.common.constants import *
 
 # Constants
 CURRENT_BOT_VERSION = 'current'
 NEXT_STARTUP_VERSION = 'next_startup'
 BOT_UNAVAILABLE_MESSAGE = 'Bác đi ngủ rồi, quay lại lúc khác!'
-
-
-# Bot version
-def load_bot_meta():
-    meta_path = os.path.join(PROJECT_ROOT, BOT_VERSION_FILE_PATH)
-    if os.path.exists(meta_path):
-        with open(meta_path) as f:
-            meta = json.load(f)
-    else:
-        meta = {
-            CURRENT_BOT_VERSION: 0,
-            NEXT_STARTUP_VERSION: 0
-        }
-    return meta
-
-
-system_bot_version = load_bot_meta()
 
 
 # Chatbot state
@@ -39,12 +23,62 @@ class State(object):
         self.action = action
 
 
-# TODO: Load intent data
-intent_datas = {}
+# Loadup chatbot data
+def init_bot():
+    try:
+        # Bot version
+        version_file_path = os.path.join(PROJECT_ROOT, BOT_VERSION_FILE_PATH)
+        try:
+            if os.path.exists(version_file_path):
+                with open(version_file_path) as f:
+                    version = json.load(f)
+                    version[CURRENT_BOT_VERSION] = version[NEXT_STARTUP_VERSION]
+            else:
+                version = {
+                    CURRENT_BOT_VERSION: 0,
+                    NEXT_STARTUP_VERSION: 0
+                }
+        except IOError:
+            version = {
+                CURRENT_BOT_VERSION: 0,
+                NEXT_STARTUP_VERSION: 0
+            }
+        raise RuntimeError
+
+        # Intent classifier
+        intent_classifier_instance = IntentClassifier()
+        intent_classifier_instance.load()
+
+        # Question classifier
+        question_classifier_instance = QuestionTypeClassifier()
+        question_classifier_instance.load()
+
+        # Intents data
+        train_data_model = train_data.TrainData.objects.filter(id=version[CURRENT_BOT_VERSION]).first()
+        if not train_data_model:
+            raise RuntimeError('[startup] Cannot initial bot due to invalid intents data.')
+        train_data_storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data_model.filename)
+        intent_data_filepath = os.path.join(train_data_storepath, INTENT_DATA_FILE_NAME)
+        references_filepath = os.path.join(train_data_storepath, REFERENCES_FILE_NAME)
+        synonyms_filepath = os.path.join(train_data_storepath, SYNONYMS_FILE_NAME)
+        idatas = load_from_data_file(intent_data_filepath, references_filepath, synonyms_filepath)
+
+        return intent_classifier_instance, question_classifier_instance, idatas, version
+    except (RuntimeError, IOError) as e:
+        # Lul
+        print(e)
+        print(traceback.format_exc())
+        return None, None, None, version
+
+
+intent_classifier, question_type_classifier, intent_datas, system_bot_version = init_bot()
 
 
 def is_bot_ready():
-    return system_bot_version[CURRENT_BOT_VERSION] > 0 and question_type_classifier and intent_classifier
+    return system_bot_version[CURRENT_BOT_VERSION] > 0 \
+           and question_type_classifier \
+           and intent_classifier \
+           and intent_datas
 
 
 def version_check(session_bot_version):

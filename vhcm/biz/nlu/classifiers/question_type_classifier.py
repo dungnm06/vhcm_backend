@@ -45,42 +45,33 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
         model_folder = os.path.join(PROJECT_ROOT, MODEL_DATA_FOLDER) + 'question_type/'
         model_file_to_check = [model_folder + f for f in CLASSIFIER_MODEL_FILES]
         if any([not os.path.exists(p) for p in [config_path, question_type_maps_path, *model_file_to_check]]):
-            return False
+            raise RuntimeError('[startup] Missing initial data for intent classifier')
+        # Unload current model first
+        self.unload()
+        # Model config
+        with open(config_path) as json_file:
+            self.config = json.load(json_file)
 
-        try:
-            # Unload current model first
-            self.unload()
-            # Model config
-            with open(config_path) as json_file:
-                self.config = json.load(json_file)
+        # Intent maps
+        with open(question_type_maps_path) as json_file:
+            question_type_map = json.load(json_file)
+        self.type_to_idx = question_type_map[OBJ2IDX]
+        self.idx_to_type = question_type_map[IDX2OBJ]
 
-            # Intent maps
-            with open(question_type_maps_path) as json_file:
-                question_type_map = json.load(json_file)
-            self.type_to_idx = question_type_map[OBJ2IDX]
-            self.idx_to_type = question_type_map[IDX2OBJ]
+        # Label Binarizer
+        self.label_binarizer = MultiLabelBinarizer()
+        self.label_binarizer.fit_transform([list(self.idx_to_type.values())])
 
-            # Label Binarizer
-            self.label_binarizer = MultiLabelBinarizer()
-            self.label_binarizer.fit_transform([list(self.idx_to_type.values())])
+        # Threshold
+        self.threshold = config.config_loader.get_setting_value_float(config.PREDICT_THRESHOLD)
 
-            # Threshold
-            self.threshold = config.config_loader.get_setting_value_float(config.PREDICT_THRESHOLD)
-
-            # Pretrained model
-            print('(QuestionTypeClassifier) Loading pretrained model from: ', model_path)
-            self.model, self.tokenizer = build_PhoBERT_classifier_model(
-                self.config['sentence_max_length'], self.config['output_size'],
-                self.config['activation_function'], self.config['model_name']
-            )
-            self.model.load_weights(model_path)
-        except Exception as e:
-            print(e)
-            print(traceback.format_exc())
-            self.unload()
-            return False
-
-        return True
+        # Pretrained model
+        print('(QuestionTypeClassifier) Loading pretrained model from: ', model_path)
+        self.model, self.tokenizer = build_PhoBERT_classifier_model(
+            self.config['sentence_max_length'], self.config['output_size'],
+            self.config['activation_function'], self.config['model_name']
+        )
+        self.model.load_weights(model_path)
 
     def predict(self, input_query):
         if not (self.model or self.label_binarizer or self.tokenizer or self.config or self.threshold):
@@ -112,9 +103,3 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
             # for predict in preds:
             print('Predicted types: ', ', '.join(preds[0]))
             return list(preds[0])
-
-
-predict_instance = QuestionTypeClassifier()
-result = predict_instance.load()
-if not result:
-    print('[startup] QuestionTypeClassifier not loaded')

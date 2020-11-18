@@ -132,96 +132,94 @@ def load_from_db(models):
     return intent_maps
 
 
-def load_from_data_file(config):
-    intent_maps = {}
-    intent_datas = pd.read_csv('intentpath')
-    f = open('synonympath', encoding=UTF8)
-    # Synonyms
-    synonyms = json.load(f)
-    for idx, data in intent_datas.iterrows():
-        intent = Intent()
-        # ID
-        intent.intent_id = int(data[INTENT_ID])
+def load_from_data_file(intents_data_path, references_path, synonyms_path):
+    with open(synonyms_path, encoding=UTF8) as s, open(references_path, encoding=UTF8) as r:
+        intent_maps = {}
+        intent_datas = pd.read_csv(intents_data_path)
+        # Synonyms
+        synonyms = json.load(s)
+        for idx, data in intent_datas.iterrows():
+            intent = Intent()
+            # ID
+            intent.intent_id = int(data[INTENT_ID])
 
-        # Intent name
-        intent.intent = data[INTENT_NAME]
+            # Intent name
+            intent.intent = data[INTENT_NAME]
 
-        # Intent full name
-        intent.name = data[INTENT_FULL_NAME]
+            # Intent full name
+            intent.name = data[INTENT_FULL_NAME]
 
-        # # Questions
-        # intent.questions = [q.strip() for q in data[INTENT_QUESTIONS].split(HASH)]
+            # # Questions
+            # intent.questions = [q.strip() for q in data[INTENT_QUESTIONS].split(HASH)]
 
-        # Raw data
-        intent.raw_data = data[INTENT_RAW_DATA]
+            # Raw data
+            intent.raw_data = data[INTENT_RAW_DATA]
 
-        # Base response
-        intent.base_response = data[INTENT_BASE_RESPONSE]
+            # Base response
+            intent.base_response = data[INTENT_BASE_RESPONSE]
 
-        # # Intent types
-        # intent.intent_types = [int(t) for t in data[INTENT_INTENT_TYPES].split(COMMA)]
+            # # Intent types
+            # intent.intent_types = [int(t) for t in data[INTENT_INTENT_TYPES].split(COMMA)]
 
-        # Corresponding answers
-        cd = data[INTENT_RESPONSE_ANSWERS].split(HASH)
-        for answer in cd:
-            type, answer = answer.split(UNDERSCORE)
-            type = int(type)
-            if type not in intent.corresponding_datas:
-                intent.corresponding_datas[type] = []
-            intent.corresponding_datas[type].append(answer)
+            # Corresponding answers
+            cd = data[INTENT_RESPONSE_ANSWERS].split(HASH)
+            for answer in cd:
+                type, answer = answer.split(UNDERSCORE)
+                type = int(type)
+                if type not in intent.corresponding_datas:
+                    intent.corresponding_datas[type] = []
+                intent.corresponding_datas[type].append(answer)
 
-        # Subjects (Critical datas)
-        cd = data[INTENT_SUBJECTS]
-        sc = data[INTENT_VERBS]
-        if not pd.isnull(cd) and not pd.isnull(sc):
-            for cdi, sci in zip(cd.split(HASH), sc.split(HASH)):
-                group_data = []
-                split_idx = cdi.find(COLON)
-                if cdi.startswith('MISC'):
-                    group_data.append({
-                        'type': 'MISC',
-                        'words': cdi[(split_idx + 1):],
-                        'verbs': sci
-                    })
-                else:
-                    group_data.append({
-                        'type': cdi[:split_idx],
-                        'words': cdi[(split_idx + 1):],
-                        'verbs': sci
-                    })
-                intent.subjects.append(group_data)
-        # # Sentence components
-        # if not pd.isnull(sc):
-        #     sc = sc.split(HASH)
-        #     sentence_components = []
-        #     for c in sc:
-        #         if c == 'empty':
-        #             sentence_components.append([])
-        #         else:
-        #             sentence_components.append(
-        #                 [(c1.split(COLON)[0], c1.split(COLON)[1]) for c1 in c.split(PLUS)])
-        #     # print(sentence_components)
-        #     intent.sentence_components = sentence_components
+            # Subjects (Critical datas)
+            cd = data[INTENT_SUBJECTS]
+            sc = data[INTENT_VERBS]
+            if not pd.isnull(cd) and not pd.isnull(sc):
+                for cdi, sci in zip(cd.split(HASH), sc.split(HASH)):
+                    group_data = []
+                    split_idx = cdi.find(COLON)
+                    if cdi.startswith('MISC'):
+                        group_data.append({
+                            'type': 'MISC',
+                            'words': cdi[(split_idx + 1):],
+                            'verbs': sci
+                        })
+                    else:
+                        group_data.append({
+                            'type': cdi[:split_idx],
+                            'words': cdi[(split_idx + 1):],
+                            'verbs': sci
+                        })
+                    intent.subjects.append(group_data)
+            # # Sentence components
+            # if not pd.isnull(sc):
+            #     sc = sc.split(HASH)
+            #     sentence_components = []
+            #     for c in sc:
+            #         if c == 'empty':
+            #             sentence_components.append([])
+            #         else:
+            #             sentence_components.append(
+            #                 [(c1.split(COLON)[0], c1.split(COLON)[1]) for c1 in c.split(PLUS)])
+            #     # print(sentence_components)
+            #     intent.sentence_components = sentence_components
 
-        # Reference document id
-        rdi = data[INTENT_REFERENCES]
-        if not pd.isnull(rdi):
-            intent.reference_doc_id = rdi
+            # Reference document id
+            rdi = data[INTENT_REFERENCES]
+            if not pd.isnull(rdi):
+                intent.reference_doc_id = rdi
 
-        # Synonym words dictionary
-        synonym_ids = data[INTENT_SYNONYM_IDS]
-        if not pd.isnull(synonym_ids):
-            synonym_ids = synonym_ids.split(COMMA)
-            for s in synonym_ids:
-                synonym_set = SynonymSet()
-                synonym_set.id = int(s)
-                synonym_set.meaning = synonyms[s][SYNONYM_MEANING]
-                synonym_set.words = synonyms[s][SYNONYM_WORDS]
-                intent.synonym_sets[s] = synonym_set
-        # Push to intents map
-        intent_maps[intent.intent] = intent
-    # Close file reading
-    f.close()
+            # Synonym words dictionary
+            synonym_ids = data[INTENT_SYNONYM_IDS]
+            if not pd.isnull(synonym_ids):
+                synonym_ids = synonym_ids.split(COMMA)
+                for s in synonym_ids:
+                    synonym_set = SynonymSet()
+                    synonym_set.id = int(s)
+                    synonym_set.meaning = synonyms[s][SYNONYM_MEANING]
+                    synonym_set.words = synonyms[s][SYNONYM_WORDS]
+                    intent.synonym_sets[s] = synonym_set
+            # Push to intents map
+            intent_maps[intent.intent] = intent
 
     return intent_maps
 

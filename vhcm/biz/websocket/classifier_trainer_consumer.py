@@ -6,8 +6,7 @@ from vhcm.biz.nlu.classifier_trainer import ClassifierTrainer
 import vhcm.common.config.config_manager as config
 from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FILE_NAME, TRAIN_DATA_FOLDER
 from vhcm.models import train_data as train_data_model
-from vhcm.biz.nlu.classifiers.intent_classifier import predict_instance as intent_classifier
-from vhcm.biz.nlu.classifiers.question_type_classifier import predict_instance as question_type_classifier
+from vhcm.biz.nlu.vhcm_chatbot import intent_classifier, question_type_classifier
 
 # Response types
 SEND_MESSAGE = 'message'
