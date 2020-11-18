@@ -1,5 +1,6 @@
 import os
 import json
+import random
 import traceback
 from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.biz.nlu.classifiers.intent_classifier import IntentClassifier
@@ -43,7 +44,9 @@ def init_bot():
                 CURRENT_BOT_VERSION: 0,
                 NEXT_STARTUP_VERSION: 0
             }
-        raise RuntimeError
+
+        with open(version_file_path, 'w') as f:
+            json.dump(version, f, indent=4)
 
         # Intent classifier
         intent_classifier_instance = IntentClassifier()
@@ -156,10 +159,10 @@ class AnswerGenerator:
         response = intent.base_response
         # Get type data exists in intent
         existing_types = [int(self.question_type2id[t]) for t in types if
-                          int(self.question_id2type[t]) in intent.intent_types]
+                          int(self.question_id2type[t]) in intent.corresponding_datas]
         # If any of user asking data types not exist in intent so just print all intent data
         if not existing_types:
-            existing_types = intent.intent_types
-        for t in existing_types:
-            response += (' ' + intent.corresponding_datas[t])
+            response += (SPACE + SPACE.join(random.choice(intent.corresponding_datas[key]) for key in intent.corresponding_datas))
+        else:
+            response += (SPACE + SPACE.join(random.choice(intent.corresponding_datas[key]) for key in existing_types))
         return response

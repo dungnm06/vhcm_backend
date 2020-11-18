@@ -13,6 +13,7 @@ from vhcm.serializers.train_data import TrainDataSerializer, TrainDataDeletedSer
 from vhcm.biz.web.train_data.sql import GET_TRAIN_DATA
 from vhcm.biz.nlu.model.intent import *
 from vhcm.common.utils.CH import isInt
+from vhcm.biz.nlu.vhcm_chatbot import system_bot_version, NEXT_STARTUP_VERSION
 import vhcm.models.train_data as train_data_model
 import vhcm.models.knowledge_data as knowledge_data_model
 
@@ -178,7 +179,6 @@ def add(request):
         delete_reason=None,
         type=1
     )
-
     train_data.save()
     serilized_data = TrainDataSerializer(train_data)
 

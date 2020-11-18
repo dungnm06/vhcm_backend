@@ -51,9 +51,9 @@ class Message(models.Model):
         verbose_name='predicted intent name',
         null=True
     )
-    question_type = models.SmallIntegerField(
+    question_type = models.CharField(
         verbose_name='predicted question types',
-        choices=QUESTION_TYPES,
+        max_length=20,
         null=True
     )
     action = models.SmallIntegerField(

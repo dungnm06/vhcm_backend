@@ -7,6 +7,7 @@ from vhcm.models import report
 from vhcm.models import chat_message
 from vhcm.models import user as user_model
 from vhcm.models import chat_history
+from vhcm.models import train_data
 from vhcm.common.constants import *
 from vhcm.common.utils.files import pickle_file
 
@@ -15,6 +16,7 @@ LAST_SESSION_MESSAGES = 'last_session_messages'
 FORCE_NEW_SESSION = 'force_new_session'
 CHAT_RESPONSE = 'chat_response'
 END_SESSION_STATUS = 'end_session_status'
+SERVER_ERROR = 'error'
 
 
 class ChatbotConsumer(WebsocketConsumer):
@@ -24,7 +26,7 @@ class ChatbotConsumer(WebsocketConsumer):
         self.user = None
         self.room_name = ''
         self.room_group_name = ''
-        self.session_bot_version = 0
+        self.session_bot_version = None
         self.chatbot = None
 
     def connect(self):
@@ -67,7 +69,7 @@ class ChatbotConsumer(WebsocketConsumer):
             last_session_messages = self.restore_last_session()
             self.send_response(LAST_SESSION_MESSAGES, last_session_messages)
         elif command == 'chat':
-            input = text_data_json.get('message')
+            input = text_data_json.get('data')
             self.chat(input)
         elif command == 'report':
             self.report()
@@ -81,25 +83,37 @@ class ChatbotConsumer(WebsocketConsumer):
         last_session = session_model.Message.objects.filter(user=self.user)
         if last_session:
             session_bot_version = last_session[0].data_version.id
+            train_data_model = train_data.TrainData.objects.filter(id=session_bot_version).first()
+            if not train_data_model:
+                self.send_response(SERVER_ERROR)
+                return
+            self.session_bot_version = train_data_model
             if not bot.version_check(session_bot_version):
                 self.end_last_session()
-                self.send_response(FORCE_NEW_SESSION, None)
+                self.send_response(FORCE_NEW_SESSION)
                 return
 
             states = []
             for m in last_session:
                 message = {
                     'sent': m.sent_from,
-                    'text': m.message,
-                    'time': m.recorded_time
+                    'text': m.message
+                    # 'time': m.recorded_time
                 }
                 last_session_messages.append(message)
-                states.append(bot.State(bot.intent_datas[m.intent], m.question_type, m.action))
+                if m.sent_from == chat_message.BOT_SENT:
+                    states.append(bot.State(bot.intent_datas[m.intent], m.question_type, m.action))
             self.chatbot.state_tracker.extend(states)
+
         return last_session_messages
 
     def start_new_session(self):
         self.chatbot = bot.VirtualHCMChatbot(self.user)
+        self.session_bot_version = train_data.TrainData.objects.filter(
+            id=bot.system_bot_version[bot.CURRENT_BOT_VERSION]
+        ).first()
+        if not self.session_bot_version:
+            self.send_response(SERVER_ERROR)
         if not bot.is_bot_ready():
             self.send_response(CHAT_RESPONSE, bot.BOT_UNAVAILABLE_MESSAGE)
         else:
@@ -110,9 +124,9 @@ class ChatbotConsumer(WebsocketConsumer):
             self.send_response(CHAT_RESPONSE, bot.BOT_UNAVAILABLE_MESSAGE)
             return
 
-        if not bot.version_check(self.session_bot_version):
+        if not bot.version_check(self.session_bot_version.id):
             self.end_last_session()
-            self.send_response(FORCE_NEW_SESSION, None)
+            self.send_response(FORCE_NEW_SESSION)
             return
 
         if input:
@@ -122,7 +136,7 @@ class ChatbotConsumer(WebsocketConsumer):
             self.send_response(CHAT_RESPONSE, response)
 
     # Receive message from room group
-    def send_response(self, datatype, data):
+    def send_response(self, datatype, data=None):
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'type': datatype,
@@ -130,14 +144,16 @@ class ChatbotConsumer(WebsocketConsumer):
         }))
 
     def regist_message(self, sent_from, message, bot_state=None):
-        message_to_regist = chat_message.Message()
-        message_to_regist.sent_from = sent_from
-        message_to_regist.message = message
-        message_to_regist.data_version = bot.system_bot_version
+        message_to_regist = chat_message.Message(
+            user=self.user,
+            sent_from=sent_from,
+            message=message,
+            data_version=self.session_bot_version
+        )
 
         if bot_state:
             message_to_regist.intent = bot_state.intent.name
-            message_to_regist.question_type = bot_state.type
+            message_to_regist.question_type = COMMA.join(str(t) for t in bot_state.type)
             message_to_regist.action = bot_state.action
 
         message_to_regist.save()

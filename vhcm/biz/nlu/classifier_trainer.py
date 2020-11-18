@@ -24,11 +24,12 @@ class ClassifierTrainer(object):
         self.process = None
         self.listening_process = None
 
-    def start(self, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation):
+    def start(self, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation, bot_version):
         self.communicate_queue = multiprocessing.Queue()
         self.process = multiprocessing.Process(
             target=self.train,
-            args=(self.script, self.communicate_queue, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation,),
+            args=(self.script, self.communicate_queue, train_type, data, sentence_length,
+                  batch, epoch, learning_rate, epsilon, activation, bot_version,),
             daemon=True)
         self.listening_process = multiprocessing.Process(
             target=self.wait_for_stdout,
@@ -65,12 +66,14 @@ class ClassifierTrainer(object):
             send_stdout_to_client(out)
 
     @staticmethod
-    def train(script_path, communicate_queue, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation):
+    def train(script_path, communicate_queue, train_type, data, sentence_length,
+              batch, epoch, learning_rate, epsilon, activation, bot_version):
         # console_log = open('C:/Users/Tewi/Desktop/log.txt', 'w', buffering=1)
         args = [
             'python', script_path,
             '-t', str(train_type),
-            '-d', data
+            '-d', data,
+            '-v', str(bot_version)
         ]
         if sentence_length:
             args.extend(['-sl', str(sentence_length)])

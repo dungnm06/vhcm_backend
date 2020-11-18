@@ -31,7 +31,7 @@ def pickle_file(datas, filename):
         pickle.dump(datas, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def train_intent_classifier(data, output, sentencelength, batch, epoch, learning_rate, epsilon, activation):
+def train_intent_classifier(data, output, sentencelength, batch, epoch, learning_rate, epsilon, activation, bot_version):
     ###################################
     # --------- Import data --------- #
     # Import datas
@@ -129,3 +129,17 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
     }
     with open(output + '/intent_config.json', 'w') as fp:
         json.dump(config, fp, indent=4)
+
+    # Save bot version for next startup load
+    bot_version_path = output + '/bot_version'
+    if os.path.exists(bot_version_path):
+        with open(bot_version_path) as f:
+            version = json.load(f)
+            version['next_startup'] = bot_version
+    else:
+        version = {
+            'current': 0,
+            'next_startup': bot_version
+        }
+    with open(bot_version_path, 'w') as f:
+        json.dump(version, f, indent=4)

@@ -70,8 +70,9 @@ class ClassifierConsumer(WebsocketConsumer):
             learning_rate = text_data_json['learning_rate']
             epsilon = text_data_json['epsilon']
             activation = text_data_json['activation']
+            version = train_data.id
 
-            self.trainer.start(train_type, train_data_filepath, sentence_length, batch, epoch, learning_rate, epsilon, activation)
+            self.trainer.start(train_type, train_data_filepath, sentence_length, batch, epoch, learning_rate, epsilon, activation, version)
         elif command == 'stop':
             status = self.trainer.stop()
             # Send status to WebSocket

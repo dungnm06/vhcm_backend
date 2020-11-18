@@ -84,7 +84,7 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
                 text=x,
                 return_tensors='tf',
                 add_special_tokens=True,  # add [CLS], [SEP]
-                max_length=self.config.sequence_length,  # max length of the text that can go to BERT
+                max_length=self.config['sentence_max_length'],  # max length of the text that can go to BERT
                 padding='max_length',  # add [PAD] tokens
                 return_attention_mask=True,  # add attention mask to not focus on pad tokens
                 return_token_type_ids=False,
@@ -98,7 +98,7 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
             # print(x_tensor)
             preds = self.model.predict(input_dict)
             # print(preds['type'])
-            preds = np.array([[1 if acc > self.threshold else 0 for acc in p] for p in preds['type']])
+            preds = np.array([[1 if acc > self.threshold else 0 for acc in p] for p in preds['classifier']])
             preds = self.label_binarizer.inverse_transform(preds)
             # for predict in preds:
             print('Predicted types: ', ', '.join(preds[0]))

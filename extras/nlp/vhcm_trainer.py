@@ -10,6 +10,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--type', type=int, help='Training type (Intent: 1, Question: 2)', required=True)
     parser.add_argument('-d', '--data', help='Train data file path', required=True)
+    parser.add_argument('-v', '--version', type=int, help='Intent version', required=True)
     parser.add_argument('-o', '--output', help='Output path', default='classifiers/trained')
     parser.add_argument('-sl', '--sentencelength', type=int, help='Sentence max length', default=30)
     parser.add_argument('-b', '--batch', type=int, help='Training batch size', default=32)
@@ -21,6 +22,7 @@ if __name__ == '__main__':
 
     type = args.type
     data = args.data
+    version = args.version
     output = args.output
     output = os.path.join(ROOT, output)
     sentence_length = args.sentencelength
@@ -33,8 +35,8 @@ if __name__ == '__main__':
     if args.type == 1:
         if activation is None:
             activation = 'softmax'
-        train_intent_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation)
+        train_intent_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation, version)
     if args.type == 2:
         if activation is None:
             activation = 'sigmoid'
-        train_question_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation)
+        train_question_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation, version)

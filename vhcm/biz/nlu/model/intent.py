@@ -145,7 +145,7 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
         for idx, data in intent_datas.iterrows():
             intent = Intent()
             # ID
-            intent.intent_id = int(data[INTENT_ID])
+            intent.intent_id = data[INTENT_ID]
 
             # Intent name
             intent.intent = data[INTENT_NAME]
@@ -199,7 +199,7 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
             #     intent.sentence_components = sentence_components
 
             # Reference document
-            rdi = references[data[INTENT_ID]]
+            rdi = references[str(data[INTENT_ID])]
             if rdi:
                 intent.references = rdi
 

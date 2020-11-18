@@ -73,7 +73,7 @@ class IntentClassifier(object, metaclass=Singleton):
                 text=x,
                 return_tensors='tf',
                 add_special_tokens=True,  # add [CLS], [SEP]
-                max_length=self.config.sequence_length,  # max length of the text that can go to BERT
+                max_length=self.config['sentence_max_length'],  # max length of the text that can go to BERT
                 padding='max_length',  # add [PAD] tokens
                 return_attention_mask=True,  # add attention mask to not focus on pad tokens
                 return_token_type_ids=False,
@@ -85,7 +85,7 @@ class IntentClassifier(object, metaclass=Singleton):
             }
             pred = self.model.predict(input_dict)
             # print(pred)
-            intent_idx = np.argmax(pred['intent'], axis=1)[0]
-            pred_intent = self.idx_to_intent[intent_idx]
+            intent_idx = np.argmax(pred['classifier'], axis=1)[0]
+            pred_intent = self.idx_to_intent[str(intent_idx)]
             print("Intent: ", pred_intent)
         return pred_intent
