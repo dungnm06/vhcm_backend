@@ -92,19 +92,17 @@ def generate_similaries(request):
         if error_ids:
             raise ValueError(COMMA.join(error_ids))
 
+        synonym_set_dicts = {}
+        for synonym in synonyms:
+            synonym_set_dicts[synonym.synonym_id] = SynonymSet(synonym)
+
         for data in sentences:
             sentence = data['sentence']
             synonym_ids = data['synonyms']
-            sentence_synonyms = synonyms.filter(synonym_id__in=synonym_ids)
-            synonym_set_dicts = {}
-
-            for synonym in sentence_synonyms:
-                s = sentence_synonyms.filter(synonym_id=synonym.synonym_id).first()
-                synonym_set_dicts[s.synonym_id] = SynonymSet(s)
 
             result_data['similaries'].append(
                 language_processor.generate_similary_sentences(
-                                    (sentence.split(SPACE), synonym_set_dicts),
+                                    (sentence.split(SPACE), {k: synonym_set_dicts[k] for k in synonym_ids}),
                                     word_segemented=True
                 ))
 
