@@ -102,7 +102,11 @@ class ChatbotConsumer(WebsocketConsumer):
                 }
                 last_session_messages.append(message)
                 if m.sent_from == chat_message.BOT_SENT:
-                    states.append(bot.State(bot.intent_datas[m.intent], m.question_type, m.action))
+                    states.append(bot.State(
+                        bot.intent_datas[m.intent],
+                        [int(i) for i in m.question_type.split(COMMA)],
+                        m.action
+                    ))
             self.chatbot.state_tracker.extend(states)
 
         return last_session_messages
@@ -153,7 +157,7 @@ class ChatbotConsumer(WebsocketConsumer):
 
         if bot_state:
             message_to_regist.intent = bot_state.intent.name
-            message_to_regist.question_type = COMMA.join(str(t) for t in bot_state.type)
+            message_to_regist.question_type = COMMA.join(str(t) for t in bot_state.type) if bot_state.type else None
             message_to_regist.action = bot_state.action
 
         message_to_regist.save()
