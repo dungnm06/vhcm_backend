@@ -1,3 +1,4 @@
+from datetime import datetime
 from collections import Counter
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
@@ -5,6 +6,7 @@ from rest_framework.response import Response
 from django.db import transaction
 from vhcm.common.dao.model_query import get_latest_id
 from vhcm.common.response_json import ResponseJSON
+import vhcm.models.user as user_model
 import vhcm.models.knowledge_data as knowledge_data_model
 import vhcm.models.knowledge_data_response_data as response_data_model
 import vhcm.models.knowledge_data_subject as subject_model
@@ -14,6 +16,9 @@ import vhcm.models.knowledge_data_reference_document_link as kd_document_model
 import vhcm.models.knowledge_data_question as question_model
 import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
 import vhcm.models.knowledge_data_generated_question as gq_model
+import vhcm.models.knowledge_data_comment as comment_model
+import vhcm.models.knowledge_data_review as review_model
+from vhcm.serializers.comment import CommentSerializer, DeletedCommentSerializer
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.constants import *
 from vhcm.common.utils.CH import isInt
@@ -527,6 +532,205 @@ def edit(request):
     return response
 
 
+@api_view(['GET', 'POST'])
+def all_comment(request):
+    response = Response()
+    result = ResponseJSON()
+
+    errors = validate_comment(request)
+    if errors:
+        result.set_status(False)
+        result.set_messages(errors)
+        response.data = result.to_json()
+        return response
+
+    user = get_current_user(request)
+
+    knowledge_data_id = request.data.get(comment_model.KNOWLEDGE_DATA) if request.method == 'POST' \
+        else request.GET.get(comment_model.KNOWLEDGE_DATA)
+
+    comments = comment_model.Comment.objects.filter(knowledge_data=knowledge_data_id).select_related('user')
+    display_comments = []
+    relative_users = {}
+    for comment in comments:
+        # Comment data
+        display_comment = {
+            comment_model.ID: comment.id,
+            comment_model.USER: comment.user.user_id,
+            comment_model.REPLY_TO: comment.reply_to_id,
+            comment_model.COMMENT: comment.comment if (user.admin or comment.status == comment_model.VIEWABLE) else None,
+            comment_model.VIEWABLE_STATUS: comment.status,
+            comment_model.EDITED: comment.edited,
+            comment_model.MDATE: comment.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+        }
+        display_comments.append(display_comment)
+        # User data
+        if comment.user.user_id not in relative_users:
+            relative_users[comment.user.user_id] = {
+                user_model.USERNAME: comment.user.username,
+                user_model.FULLNAME: comment.user.fullname,
+                user_model.EMAIL: comment.user.email
+            }
+
+    result_data = {
+        'comments': display_comments,
+        'users': relative_users
+    }
+
+    result.set_status(True)
+    result.set_result_data(result_data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['POST'])
+def post_comment(request):
+    response = Response()
+    result = ResponseJSON()
+
+    errors = validate_comment(request)
+    if errors:
+        result.set_status(False)
+        result.set_messages(errors)
+        response.data = result.to_json()
+        return response
+
+    user = get_current_user(request)
+
+    comment_message = request.data.get(comment_model.COMMENT)
+
+    reply_to = request.data.get(comment_model.REPLY_TO)
+    if reply_to:
+        reply_to = comment_model.Comment.objects.filter(id=reply_to).first()
+        if not reply_to:
+            raise APIException('Invalid mentioned comment id, comment not exists')
+
+    knowledge_data_id = request.data.get(comment_model.KNOWLEDGE_DATA)
+    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=knowledge_data_id).first()
+    if not knowledge_data:
+        raise APIException('Invalid knowledge data id, knowledge data not exists')
+
+    comment = comment_model.Comment(
+        user=user,
+        reply_to=reply_to,
+        knowledge_data=knowledge_data,
+        comment=comment_message,
+        status=comment_model.VIEWABLE
+    )
+    comment.save()
+
+    serialized_comment_data = CommentSerializer(comment).data
+    result.set_status(True)
+    result.set_result_data(serialized_comment_data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['POST'])
+def edit_comment(request):
+    response = Response()
+    result = ResponseJSON()
+
+    errors = validate_comment(request)
+    if errors:
+        result.set_status(False)
+        result.set_messages(errors)
+        response.data = result.to_json()
+        return response
+
+    user = get_current_user(request)
+
+    comment_id = request.data.get(comment_model.ID)
+    comment = comment_model.Comment.objects.filter(id=comment_id).select_related('user').first()
+    if not comment:
+        raise APIException('Invalid comment id, comment not exists')
+    if user.user_id != comment.user.user_id:
+        raise APIException('You cannot edit other users comment')
+
+    comment_message = request.data.get(comment_model.COMMENT)
+    comment.comment = comment_message
+    comment.edited = True
+    comment.save()
+
+    serialized_comment_data = CommentSerializer(comment).data
+    result.set_status(True)
+    result.set_result_data(serialized_comment_data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['GET'])
+def delete_comment(request):
+    response = Response()
+    result = ResponseJSON()
+
+    errors = validate_comment(request)
+    if errors:
+        result.set_status(False)
+        result.set_messages(errors)
+        response.data = result.to_json()
+        return response
+
+    user = get_current_user(request)
+
+    comment_id = request.data.get(comment_model.ID)
+    comment = comment_model.Comment.objects.filter(id=comment_id).select_related('user').first()
+    if not comment:
+        raise APIException('Invalid comment id, comment not exists')
+    if user.user_id != comment.user.user_id:
+        raise APIException('You cannot delete other users comment')
+
+    comment.status = comment_model.DELETED
+    comment.save()
+    if user.admin:
+        serialized_comment_data = CommentSerializer(comment).data
+    else:
+        serialized_comment_data = DeletedCommentSerializer(comment).data
+    result.set_status(True)
+    result.set_result_data(serialized_comment_data)
+    response.data = result.to_json()
+    return response
+
+
+def validate_comment(request):
+    errors = []
+
+    comment_id = request.data.get(comment_model.ID) if request.method == 'POST' \
+        else request.GET.get(comment_model.ID)
+    if comment_id and not isInt(comment_id):
+        errors.append('Comment id is invalid')
+
+    comment = request.data.get(comment_model.COMMENT)
+    if comment and not isinstance(comment, str):
+        errors.append('Comment is not filled correctly')
+
+    knowledge_data_id = request.data.get(comment_model.KNOWLEDGE_DATA) if request.method == 'POST' \
+        else request.GET.get(comment_model.KNOWLEDGE_DATA)
+    if knowledge_data_id and not isInt(knowledge_data_id):
+        errors.append('Knowledge data id is invalid')
+
+    reply_to = request.data.get(comment_model.REPLY_TO)
+    if reply_to and not isinstance(reply_to, int):
+        errors.append('Mentioned comment id is invalid')
+
+    return errors
+
+
+@api_view(['POST'])
+def review_data(request):
+    pass
+
+
+@api_view(['POST'])
+def save_draft_review_data(request):
+    pass
+
+
+@api_view(['POST'])
+def delete_review_data(request):
+    pass
+
+
 def validate(request, mode):
     errors = []
 
@@ -592,9 +796,10 @@ def validate(request, mode):
             if not ('type' in question
                     and isinstance(question.get('type'), list)
                     and len(question.get('type')) > 0):
-                errors.append('Question "{}", type not defined'.format(question.get('question', '#'+str(idx+1))))
+                errors.append('Question "{}", type not defined'.format(question.get('question', '#' + str(idx + 1))))
             elif any([t not in question_model.QUESTION_TYPES_IDX2T for t in question.get('type')]):
-                errors.append('Question "{}", unknow question type included'.format(question.get('question', '#'+str(idx+1))))
+                errors.append(
+                    'Question "{}", unknow question type included'.format(question.get('question', '#' + str(idx + 1))))
 
     # Raw data
     if not ('rawData' in request.data and request.data.get('rawData').strip()):
@@ -606,33 +811,3 @@ def validate(request, mode):
             errors.append('Synonyms #{} is empty'.format(i + 1))
 
     return errors
-
-
-@api_view(['POST'])
-def post_comment(request):
-    pass
-
-
-@api_view(['POST'])
-def edit_comment(request):
-    pass
-
-
-@api_view(['GET'])
-def delete_comment(request):
-    pass
-
-
-@api_view(['POST'])
-def review_data(request):
-    pass
-
-
-@api_view(['POST'])
-def save_draft_review_data(request):
-    pass
-
-
-@api_view(['POST'])
-def delete_review_data(request):
-    pass

@@ -9,6 +9,7 @@ from vhcm.biz.nlu.model.intent import Intent, load_from_data_file
 from vhcm.models.knowledge_data_question import QUESTION_TYPES_IDX2T, QUESTION_TYPES_T2IDX
 from vhcm.models import chat_message, train_data
 from vhcm.common.constants import *
+from vhcm.common.utils.files import unzip, ZIP_EXTENSION
 
 # Constants
 CURRENT_BOT_VERSION = 'current'
@@ -60,11 +61,17 @@ def init_bot():
         train_data_model = train_data.TrainData.objects.filter(id=version[CURRENT_BOT_VERSION]).first()
         if not train_data_model:
             raise RuntimeError('[startup] Cannot initial bot due to invalid intents data.')
-        train_data_storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data_model.filename)
+        train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data_model.filename + ZIP_EXTENSION)
+        unzip(train_data_zip)
+
         intent_data_filepath = os.path.join(train_data_storepath, INTENT_DATA_FILE_NAME)
         references_filepath = os.path.join(train_data_storepath, REFERENCES_FILE_NAME)
         synonyms_filepath = os.path.join(train_data_storepath, SYNONYMS_FILE_NAME)
         idatas = load_from_data_file(intent_data_filepath, references_filepath, synonyms_filepath)
+
+        tempstorepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data_model.filename)
+        if os.path.exists(tempstorepath):
+            shutil.rmtree(tempstorepath)
 
         return intent_classifier_instance, question_classifier_instance, idatas, version
     except (RuntimeError, IOError) as e:

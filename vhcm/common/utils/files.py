@@ -35,3 +35,8 @@ def zipdir(output, path):
             zipf.write(abspath, dirname + '/' + filename)
 
     zipf.close()
+
+
+def unzip(path, output='.'):
+    with zipfile.ZipFile(path, 'r') as zip_ref:
+        zip_ref.extractall(output)

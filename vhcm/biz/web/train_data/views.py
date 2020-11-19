@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from vhcm.biz.authentication.user_session import ensure_admin
 from vhcm.common.response_json import ResponseJSON
-from vhcm.common.utils.files import pickle_file, PICKLE_EXTENSION
+from vhcm.common.utils.files import pickle_file
 from vhcm.serializers.train_data import TrainDataSerializer, TrainDataDeletedSerializer
 from vhcm.biz.web.train_data.sql import GET_TRAIN_DATA
 from vhcm.biz.nlu.model.intent import *
@@ -200,6 +200,7 @@ def add(request):
         storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + filename)
         if os.path.exists(storepath):
             shutil.rmtree(storepath)
+        raise APIException('Failed to create training data')
 
 
 @api_view(['POST'])
