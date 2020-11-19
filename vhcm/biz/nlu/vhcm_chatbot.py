@@ -47,7 +47,7 @@ def init_bot():
 
         with open(version_file_path, 'w') as f:
             json.dump(version, f, indent=4)
-
+        raise RuntimeError
         # Intent classifier
         intent_classifier_instance = IntentClassifier()
         intent_classifier_instance.load()

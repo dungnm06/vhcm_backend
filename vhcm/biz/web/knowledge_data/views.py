@@ -606,3 +606,33 @@ def validate(request, mode):
             errors.append('Synonyms #{} is empty'.format(i + 1))
 
     return errors
+
+
+@api_view(['POST'])
+def post_comment(request):
+    pass
+
+
+@api_view(['POST'])
+def edit_comment(request):
+    pass
+
+
+@api_view(['GET'])
+def delete_comment(request):
+    pass
+
+
+@api_view(['POST'])
+def review_data(request):
+    pass
+
+
+@api_view(['POST'])
+def save_draft_review_data(request):
+    pass
+
+
+@api_view(['POST'])
+def delete_review_data(request):
+    pass
