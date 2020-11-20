@@ -2,6 +2,7 @@ import os
 import json
 import random
 import traceback
+import shutil
 from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.biz.nlu.classifiers.intent_classifier import IntentClassifier
 from vhcm.biz.nlu.classifiers.question_type_classifier import QuestionTypeClassifier
@@ -63,6 +64,8 @@ def init_bot():
             raise RuntimeError('[startup] Cannot initial bot due to invalid intents data.')
         train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data_model.filename + ZIP_EXTENSION)
         unzip(train_data_zip)
+
+        train_data_storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data_model.filename)
 
         intent_data_filepath = os.path.join(train_data_storepath, INTENT_DATA_FILE_NAME)
         references_filepath = os.path.join(train_data_storepath, REFERENCES_FILE_NAME)

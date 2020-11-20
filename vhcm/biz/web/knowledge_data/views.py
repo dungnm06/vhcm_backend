@@ -1,4 +1,3 @@
-from datetime import datetime
 from collections import Counter
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
@@ -17,7 +16,7 @@ import vhcm.models.knowledge_data_question as question_model
 import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
 import vhcm.models.knowledge_data_generated_question as gq_model
 import vhcm.models.knowledge_data_comment as comment_model
-import vhcm.models.knowledge_data_review as review_model
+# import vhcm.models.knowledge_data_review as review_model
 from vhcm.serializers.comment import CommentSerializer, DeletedCommentSerializer
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.constants import *

@@ -1,8 +1,10 @@
 Django superuser:
 	+ dungnm: 123
 
+Default login password for newly created user: 123
+
 DB:
-	+ NAME: vhcm-292513:asia-southeast1:vhcm-instance1
+	+ NAME: vhcm-db1 (for production DB use: vhcm-production)
 	+ USER: postgres
 	+ PASSWORD: uN9pEGKv14yMJB0a
 	+ HOST: 35.224.128.36 (On gcloud internal network: 10.41.144.3)
@@ -27,8 +29,10 @@ GCloud App Service
 	gcloud app versions start <version>
 	
 Install environment:
++ Anaconda
 + JDK8
 + postgresql 12
++ Redis >= 5.0.9 (https://github.com/tporadowski/redis/releases)
 + conda create -n django python=3.6.9
 + pip install -r requirements.txt
 	
@@ -38,8 +42,14 @@ Deploy local:
 Default port 8000
 daphne -e ssl:8000:privateKey=server_cert/key.pem:certKey=server_cert/cert.pem restapi_core.asgi:application
 
+* When have a "could not connect to server: Operation timed out" error:
+    ask dungnm for DB access permission
 
 * MacOS and Linux need to fix db certificates before deploy: add "postgres" user to default group -> change 3 cert keys permission to 0600
-+ Linux: https://askubuntu.com/questions/487527/give-specific-user-permission-to-write-to-a-folder-using-w-notation
-+ MacOS: https://superuser.com/questions/214004/how-to-add-user-to-a-group-from-mac-os-x-command-line
--> Do this only once
+    + Linux: https://askubuntu.com/questions/487527/give-specific-user-permission-to-write-to-a-folder-using-w-notation
+    + MacOS: https://superuser.com/questions/214004/how-to-add-user-to-a-group-from-mac-os-x-command-line
+    -> Do this only once
+
+DB switch (Stop server first!):
++ Delete vhcm/migrations folder
++ Copy contents inside db_switch/<db_name> folder and paste to project root

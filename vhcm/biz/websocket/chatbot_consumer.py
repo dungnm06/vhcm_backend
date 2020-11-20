@@ -24,40 +24,45 @@ class ChatbotConsumer(WebsocketConsumer):
         super().__init__(*args, **kwargs)
         # For surpass PyCharm syntax checking
         self.user = None
-        self.room_name = ''
-        self.room_group_name = ''
+        self.room_name = None
+        self.room_group_name = None
         self.session_bot_version = None
         self.chatbot = None
 
     def connect(self):
         user_id = self.scope["session"].get('user_id')
         if not user_id:
-            self.send({"close": True})
+            self.close()
+            return
         user = user_model.User.objects.filter(user_id=user_id).first()
-        if not user:
-            self.send({"close": True})
+        if not user or not bot.is_bot_ready():
+            self.close()
+            return
         self.user = user
         self.room_name = self.user.username
-        self.chatbot = bot.VirtualHCMChatbot(self.user)
         self.room_group_name = CHAT_ROOM_GROUP + self.room_name
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
         )
+        self.chatbot = bot.VirtualHCMChatbot(self.user)
+
         self.accept()
 
     def close(self, code=None):
-        async_to_sync(self.channel_layer.group_discard)(
-            self.room_group_name,
-            self.channel_name
-        )
-        print("DISCONNECTED CODE: ", code)
+        super().close(code)
+        if hasattr(self, 'room_group_name') and self.room_group_name:
+            async_to_sync(self.channel_layer.group_discard)(
+                self.room_group_name,
+                self.channel_name
+            )
 
     def disconnect(self, close_code):
-        async_to_sync(self.channel_layer.group_discard)(
-            self.room_group_name,
-            self.channel_name
-        )
+        if hasattr(self, 'room_group_name') and self.room_group_name:
+            async_to_sync(self.channel_layer.group_discard)(
+                self.room_group_name,
+                self.channel_name
+            )
         print("DISCONNECTED CODE: ", close_code)
 
     def receive(self, text_data=None, bytes_data=None):
