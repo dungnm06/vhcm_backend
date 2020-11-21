@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.urls import include
 from django.views.generic import RedirectView
 # Use static() to add url mapping to serve static files during development (only)
@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('vhcm.urls')),
     path('', RedirectView.as_view(url='admin/', permanent=True)),
+    re_path(r'^favicon\.ico$', RedirectView.as_view(url='/media/favicon.ico', permanent=True))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.USE_LOCAL_MEDIA:

@@ -39,6 +39,9 @@ urlpatterns = [
     path('knowledge-data/post-comment', knowledge_data_views.post_comment, name='post_comment'),
     path('knowledge-data/edit-comment', knowledge_data_views.edit_comment, name='edit_comment'),
     path('knowledge-data/delete-comment', knowledge_data_views.delete_comment, name='delete_comment'),
+    # Knowledge data / Review
+    path('knowledge-data/all-reviews', knowledge_data_views.all_reviews, name='all_reviews'),
+    path('knowledge-data/review', knowledge_data_views.review_data, name='review'),
     # User
     path('user/all', user_views.all, name='get_all_users'),
     path('user/get', user_views.get, name='get_user'),

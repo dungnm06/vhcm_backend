@@ -1,4 +1,6 @@
 from collections import Counter
+
+from django.db.models import Prefetch
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
@@ -16,7 +18,8 @@ import vhcm.models.knowledge_data_question as question_model
 import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
 import vhcm.models.knowledge_data_generated_question as gq_model
 import vhcm.models.knowledge_data_comment as comment_model
-# import vhcm.models.knowledge_data_review as review_model
+import vhcm.models.knowledge_data_review as review_model
+import vhcm.common.config.config_manager as config
 from vhcm.serializers.comment import CommentSerializer, DeletedCommentSerializer
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.constants import *
@@ -98,12 +101,25 @@ def get(request):
     except KeyError:
         raise APIException('Can\'t get knowledge data infomations, missing intent id')
 
-    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(intent=intent).first()
+    user = get_current_user(request)
+
+    knowledge_data = knowledge_data_model.KnowledgeData.objects\
+        .filter(intent=intent)\
+        .prefetch_related(
+            'knowledgedatarefercencedocumentlink_set__reference_document',
+            'knowledgedatasynonymlink_set__synonym',
+            'responsedata_set',
+            'subject_set',
+            'question_set',
+            'comment_kd__user',
+            Prefetch('review_kd', queryset=review_model.Review.objects.select_related('review_user').exclude(status=review_model.DRAFT))
+        )\
+        .first()
     if not knowledge_data:
         raise APIException('Invalid intent id, couldnt find knowledge data')
 
     # Response data
-    response_datas = response_data_model.ResponseData.objects.filter(knowledge_data=knowledge_data)
+    response_datas = knowledge_data.responsedata_set.all()
     response_data_display = []
     for response_data in response_datas:
         response_data_display.append({
@@ -112,7 +128,7 @@ def get(request):
         })
 
     # Subject
-    subjects = subject_model.Subject.objects.filter(knowledge_data=knowledge_data)
+    subjects = knowledge_data.subject_set.all()
     subjects_display = []
     for subject in subjects:
         # Words in subjects
@@ -139,7 +155,7 @@ def get(request):
         })
 
     # Questions
-    questions = question_model.Question.objects.filter(knowledge_data=knowledge_data)
+    questions = knowledge_data.question_set.all()
     questions_display = []
     for question in questions:
         # Generated questions
@@ -157,7 +173,7 @@ def get(request):
         })
 
     # Synonyms
-    synonym_links = kd_synonym_model.KnowledgeDataSynonymLink.objects.filter(knowledge_data=knowledge_data)
+    synonym_links = knowledge_data.knowledgedatasynonymlink_set.all()
     synonyms_display = []
     tmp_dict = {}
     for synonym in synonym_links:
@@ -175,7 +191,7 @@ def get(request):
         })
 
     # Reference Document
-    document_links = kd_document_model.KnowledgeDataRefercenceDocumentLink.objects.filter(knowledge_data=knowledge_data)
+    document_links = knowledge_data.knowledgedatarefercencedocumentlink_set.all()
     documents_display = []
     for document in document_links:
         documents_display.append({
@@ -185,26 +201,73 @@ def get(request):
             'extra_info': document.extra_info
         })
 
-    result_data = {
-        'knowledge_data': {
-            'id': knowledge_data.knowledge_data_id,
-            'intent': knowledge_data.intent,
-            'intentFullName': knowledge_data.intent_fullname,
-            'baseResponse': knowledge_data.base_response,
-            'coresponse': response_data_display,
-            'criticalData': subjects_display,
-            'documentReference': documents_display,
-            'questions': questions_display,
-            'rawData': knowledge_data.raw_data,
-            'synonyms': synonyms_display,
-            'status': knowledge_data_model.PROCESS_STATUS_DICT[knowledge_data.status],
-            'create_user': knowledge_data.create_user.username,
-            'create_user_id': knowledge_data.create_user.user_id,
-            'edit_user': knowledge_data.edit_user.username,
-            'edit_user_id': knowledge_data.edit_user.user_id,
-            'cdate': knowledge_data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
-            'mdate': knowledge_data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+    # Comments
+    comments = knowledge_data.comment_kd.all()
+    comments_display = []
+    relative_users = {}
+    for comment in comments:
+        # Comment data
+        display_comment = {
+            comment_model.ID: comment.id,
+            comment_model.USER: comment.user.user_id,
+            comment_model.REPLY_TO: comment.reply_to_id,
+            comment_model.COMMENT: comment.comment if (
+                        user.admin or comment.status == comment_model.VIEWABLE) else None,
+            comment_model.VIEWABLE_STATUS: comment.status,
+            comment_model.EDITED: comment.edited,
+            comment_model.MDATE: comment.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
         }
+        comments_display.append(display_comment)
+        # User data
+        if comment.user.user_id not in relative_users:
+            relative_users[comment.user.user_id] = {
+                user_model.USERNAME: comment.user.username,
+                user_model.FULLNAME: comment.user.fullname,
+                user_model.EMAIL: comment.user.email
+            }
+
+    # Reviews
+    reviews = knowledge_data.review_kd.all()
+    accept_reviews = reviews.filter(status=review_model.ACCEPT).count()
+    reject_reviews = reviews.filter(status=review_model.REJECT).count()
+
+    # User review
+    user_review = review_model.Review.objects.filter(knowledge_data=knowledge_data, review_user=user).first()
+    user_review_display = None
+    if user_review:
+        user_review_display = {
+            review_model.REVIEW_DETAIL: user_review.review_detail,
+            review_model.STATUS: user_review.status,
+            review_model.MDATE: user_review.mdate
+        }
+
+    result_data = {
+        'id': knowledge_data.knowledge_data_id,
+        'intent': knowledge_data.intent,
+        'intentFullName': knowledge_data.intent_fullname,
+        'baseResponse': knowledge_data.base_response,
+        'coresponse': response_data_display,
+        'criticalData': subjects_display,
+        'documentReference': documents_display,
+        'questions': questions_display,
+        'rawData': knowledge_data.raw_data,
+        'synonyms': synonyms_display,
+        'status': knowledge_data_model.PROCESS_STATUS_DICT[knowledge_data.status],
+        'create_user': knowledge_data.create_user.username,
+        'create_user_id': knowledge_data.create_user.user_id,
+        'edit_user': knowledge_data.edit_user.username,
+        'edit_user_id': knowledge_data.edit_user.user_id,
+        'cdate': knowledge_data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+        'mdate': knowledge_data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+        'comments': {
+            'data': comments_display,
+            'users': relative_users
+        },
+        'reviews': {
+            'accept': accept_reviews,
+            'reject': reject_reviews
+        },
+        'user_review': user_review_display
     }
 
     result.set_status(True)
@@ -572,7 +635,7 @@ def all_comment(request):
             }
 
     result_data = {
-        'comments': display_comments,
+        'data': display_comments,
         'users': relative_users
     }
 
@@ -715,19 +778,92 @@ def validate_comment(request):
     return errors
 
 
+@api_view(['GET', 'POST'])
+def all_reviews(request):
+    pass
+
+
 @api_view(['POST'])
 def review_data(request):
-    pass
+    response = Response()
+    result = ResponseJSON()
+
+    errors = validate_comment(request)
+    if errors:
+        result.set_status(False)
+        result.set_messages(errors)
+        response.data = result.to_json()
+        return response
+
+    user = get_current_user(request)
+
+    knowledge_data_id = request.data.get(review_model.KNOWLEDGE_DATA)
+    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=knowledge_data_id).first()
+    if not knowledge_data:
+        raise APIException('Invalid knowledge data id, knowledge data not exists')
+
+    all_reviews_query = review_model.Review.objects \
+        .select_related('review_user') \
+        .filter(knowledge_data=knowledge_data)
+    review = all_reviews_query.filter(review_user=user).first()
+    new = False
+    if not review:
+        review = review_model.Review(
+            review_user=user,
+            knowledge_data=knowledge_data
+        )
+        new = True
+    review_detail = request.data.get(review_model.REVIEW_DETAIL)
+    status = request.data.get(review_model.STATUS)
+    if status == review_model.DRAFT:
+        if review_detail:
+            review.review_detail = review_detail
+            review.status = review_model.DRAFT
+            review.save()
+        elif not new:
+            review.delete()
+        else:
+            result.set_status(False)
+            result.set_messages('Review detail must be filled')
+            response.data = result.to_json()
+            return response
+    else:
+        if not review_detail:
+            result.set_status(False)
+            result.set_messages('Review detail must be filled')
+            response.data = result.to_json()
+            return response
+        else:
+            review.review_detail = review_detail
+            review.status = status
+            review.save()
+            # Knowledge data approval state update
+            if all_reviews_query.filter(status=review_model.ACCEPT).count() >= config.config_loader.get_setting_value_int(config.MINIMUM_ACCEPT)\
+                    and all_reviews_query.filter(status=review_model.REJECT).count() <= config.config_loader.get_setting_value_int(config.MAXIMUM_REJECT):
+                knowledge_data.status = knowledge_data_model.DONE
+                knowledge_data.save()
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
 
 
-@api_view(['POST'])
-def save_draft_review_data(request):
-    pass
+def validate_review(request):
+    errors = []
 
+    detail = request.data.get(review_model.REVIEW_DETAIL)
+    if detail and not isinstance(detail, str):
+        errors.append('Review detail is not filled correctly')
 
-@api_view(['POST'])
-def delete_review_data(request):
-    pass
+    knowledge_data_id = request.data.get(review_model.KNOWLEDGE_DATA)
+    if not (knowledge_data_id and not isInt(knowledge_data_id)):
+        errors.append('Knowledge data id is invalid')
+
+    status = request.data.get(review_model.STATUS)
+    if not (status and not isinstance(status, int) and review_model.isValidStatus(status)):
+        errors.append('Review submit type is invalid')
+
+    return errors
 
 
 def validate(request, mode):

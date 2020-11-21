@@ -13,7 +13,8 @@ MDATE = 'mdate'
 # Setting types
 SETTING_TYPES = [
     (1, 'System'),
-    (2, 'NLP')
+    (2, 'NLP'),
+    (3, 'Review process')
 ]
 
 

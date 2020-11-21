@@ -135,9 +135,11 @@ class User(AbstractBaseUser):
         verbose_name='email address',
         max_length=60, null=True, db_index=True, blank=True
     )
-    avatar = models.BinaryField(
-        verbose_name='user display avatar',
-        null=True, blank=True)
+    avatar = models.ImageField(
+        verbose_name='user avatar',
+        upload_to='user_avatar/',
+        null=True, blank=True
+    )
     active = models.BooleanField(default=True, db_index=True)
     admin = models.BooleanField(default=False)  # a superuser
     first_login = models.BooleanField(default=False)

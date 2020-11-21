@@ -5,6 +5,7 @@ from vhcm.models.system_settings import SystemSetting
 from vhcm.common.response_json import ResponseJSON
 from vhcm.common.singleton import Singleton
 from vhcm.common.dao.model_query import is_table_exists
+from vhcm.common.utils.CH import isInt, isFloat
 
 
 class ConfigLoader(object, metaclass=Singleton):
@@ -40,25 +41,25 @@ class ConfigLoader(object, metaclass=Singleton):
         setting = self.settings.filter(setting_id=key).first()
         if setting is None:
             raise KeyError('Setting not found: ', key)
-        value = None
-        if setting.value:
-            value = setting.value
+        value = setting.value
+        if value and isInt(value):
+            value = int(value)
         else:
-            value = setting.default
+            value = int(setting.default)
 
-        return int(value)
+        return value
 
     def get_setting_value_float(self, key):
         setting = self.settings.filter(setting_id=key).first()
         if setting is None:
             raise KeyError('Setting not found: ', key)
-        value = None
-        if setting.value:
-            value = setting.value
+        value = setting.value
+        if value and isFloat(value):
+            value = float(value)
         else:
-            value = setting.default
+            value = float(setting.default)
 
-        return float(value)
+        return value
 
     def get_setting(self, key):
         return self.settings.filter(setting_id=key).first()
@@ -68,9 +69,11 @@ class ConfigLoader(object, metaclass=Singleton):
 # Setting types
 SYSTEM = 'system'
 NLP = 'nlp'
+REVIEW_PROCESS = 'review_process'
 SETTING_TYPES = {
     SYSTEM: 1,
-    NLP: 2
+    NLP: 2,
+    REVIEW_PROCESS: 3
 }
 # System
 LOGIN_EXPIRATION_LIMIT = 'login_expiration_limit'
@@ -84,6 +87,9 @@ CRITICAL_DATA_NG_PATTERNS = 'subject_data_ng_pattern'
 EXCLUDE_POS_TAG = 'exclude_pos_tag'
 EXCLUDE_WORDS = 'exclude_word'
 PREDICT_THRESHOLD = 'predict_threshold'
+# Data review process
+MAXIMUM_REJECT = 'maximum_reject'
+MINIMUM_ACCEPT = 'minumum_accept'
 
 # Instance
 config_loader = ConfigLoader()
@@ -98,62 +104,62 @@ def add_system_settings(request):
 
     # Adding settings to DB
     settings = [
-        ('vncorenlp',
-         'Language Processing: VNCoreNLP data path',
+        (VNCORENLP,
+         'Language processing: VNCoreNLP data path',
          'System path where VNCoreNLP files storing (absolute/relative path OK)',
          SETTING_TYPES[NLP],
          None,
          'extras/nlp/data/vncorenlp/VnCoreNLP-1.1.1.jar'),
-        ('classifier_train_script',
-         'Language Processing: Classifiers trainer script path',
+        (CLASSIFIER_TRAINER_SCRIPT,
+         'Language processing: Classifiers trainer script path',
          'System path where intent classifier trainer script file storing (absolute/relative path OK)',
          SETTING_TYPES[NLP],
          None,
          'extras/nlp/vhcm_trainer.py'),
-        ('exclude_pos_tag',
-         'Language Processing: Exclude POS-tag',
+        (EXCLUDE_POS_TAG,
+         'Language processing: Exclude POS-tag',
          'These POS-tag will be ignored when analyze sentence subjects and verbs in language processing phase (comma separated)',
          SETTING_TYPES[NLP],
          'E,A,L,CH,X',
          ''),
-        ('named_entity_types',
-         'Language Processing: Names entity types',
+        (NAMED_ENTITY_TYPES,
+         'Language processing: Names entity types',
          'Accepted NER types for extracting main subjects in sentence',
          SETTING_TYPES[NLP],
          'LOC,PER,ORG,MISC',
          ''),
         ('subject_data_ng_pattern',
-         'Language Processing: Bad subject structure patterns',
+         'Language processing: Bad subject structure patterns',
          'Using this to analyze main subjects in sentences is matching.\nInput pattern examples:\nX-main\nmain-X\nX-main-X\nIn that (main) is main subject, (X) is word types adjacent to main subject',
          SETTING_TYPES[NLP],
          'N-E-main,N-main',
          ''),
-        ('exclude_word',
-         'Language Processing: Exclude words',
+        (EXCLUDE_WORDS,
+         'Language processing: Exclude words',
          'These words will be ignored when analyze sentence subjects and verbs in language processing phase (comma separated)',
          SETTING_TYPES[NLP],
          'bị,được,giữa,và,là',
          ''),
-        ('login_expiration_limit',
+        (LOGIN_EXPIRATION_LIMIT,
          'System: Login expiration time',
          'Specify login expiration time threshold (in minutes)',
          SETTING_TYPES[SYSTEM],
          '5',
          '30'),
-        ('accept_image_format',
+        (ACCEPT_IMAGE_FORMAT,
          'System: Acceptable image file format ',
          'Specify image file format that can be uploaded to system.\nSee available types at: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html',
          SETTING_TYPES[SYSTEM],
          'JPEG,JPEG 2000,PNG',
          ''),
-        ('default_password',
+        (DEFAULT_PASSWORD,
          'System: New user default password',
          'Default password for newly created user',
          SETTING_TYPES[SYSTEM],
          None,
          '123'),
-        ('predict_threshold',
-         'Language Processing: Predict threshold value (For question types predicting)',
+        (PREDICT_THRESHOLD,
+         'Language processing: Predict threshold value (For question types predicting)',
          'Predict label as positive when predicted value >= threshold value',
          SETTING_TYPES[NLP],
          '0.75',
@@ -164,6 +170,18 @@ def add_system_settings(request):
         #  SETTING_TYPES[SYSTEM],
         #  '',
         #  'extras/nlp/data/train_data/'),
+        (MAXIMUM_REJECT,
+         'Knowledge data processing: Maximum rejects count',
+         'Knowledge data can only be considered as approvable when rejects count below this value threshold',
+         SETTING_TYPES[REVIEW_PROCESS],
+         None,
+         '3'),
+        (MINIMUM_ACCEPT,
+         'Knowledge data process: Predict threshold value (For question types predicting)',
+         'Knowledge data will be approved when accepts count reach this value threshold',
+         SETTING_TYPES[REVIEW_PROCESS],
+         None,
+         '5'),
     ]
 
     settings = [SystemSetting(setting_id=s[0], setting_name=s[1], description=s[2], type=s[3], value=s[4], default=s[5])

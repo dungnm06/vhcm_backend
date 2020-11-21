@@ -85,7 +85,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'vhcm',
-    'channels'
+    'channels',
+    'django_cleanup'
 ]
 
 # Middleware
@@ -244,4 +245,6 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = 'static'
 
-USE_LOCAL_MEDIA = False
+USE_LOCAL_MEDIA = True
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

@@ -15,17 +15,21 @@ RAW_DATA = 'raw_data'
 CDATE = 'cdate'
 MDATE = 'mdate'
 # Constant
+AVAILABLE = 0
+PROCESSING = 1
+DONE = 2
+DISABLE = 3
 PROCESS_STATUS = [
-    (0, 'Available'),
-    (1, 'Processing'),
-    (2, 'Done'),
-    (3, 'Disable')
+    (AVAILABLE, 'Available'),
+    (PROCESSING, 'Processing'),
+    (DONE, 'Done'),
+    (DISABLE, 'Disable')
 ]
 PROCESS_STATUS_DICT = {
-    0: 'Available',
-    1: 'Processing',
-    2: 'Done',
-    3: 'Disable'
+    AVAILABLE: 'Available',
+    PROCESSING: 'Processing',
+    DONE: 'Done',
+    DISABLE: 'Disable'
 }
 
 
