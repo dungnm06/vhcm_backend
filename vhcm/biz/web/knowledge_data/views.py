@@ -732,7 +732,7 @@ def delete_comment(request):
 
     user = get_current_user(request)
 
-    comment_id = request.data.get(comment_model.ID)
+    comment_id = int(request.GET.get(comment_model.ID))
     comment = comment_model.Comment.objects.filter(id=comment_id).select_related('user').first()
     if not comment:
         raise APIException('Invalid comment id, comment not exists')

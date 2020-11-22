@@ -30,6 +30,8 @@ def login(request):
         raise exceptions.AuthenticationFailed('User not found')
     if not user.check_password(password):
         raise exceptions.AuthenticationFailed('Wrong password')
+    if not user.active:
+        raise exceptions.AuthenticationFailed('User has been banned')
 
     serialized_user = UserSerializer(user).data
     request.session['user_id'] = user.user_id

@@ -5,12 +5,14 @@ from django.conf import settings
 from rest_framework import exceptions
 from vhcm.common.constants import ACCESS_TOKEN
 
+sessions_data = {}
+
 
 def get_current_user(request):
     user_id = -1
     # Trying to read from session
-    if request.session['user_id']:
-        user_id = request.session['user_id']
+    if request.session.get('user_id'):
+        user_id = request.session.get('user_id')
     # In case of user restart browser makes session not existed
     # Try to read user id from access token
     elif request.COOKIES.get(ACCESS_TOKEN):
@@ -23,7 +25,10 @@ def get_current_user(request):
         except (jwt.ExpiredSignatureError, ValueError):
             raise exceptions.AuthenticationFailed('Access token expired')
 
-    user = user_model.User.objects.filter(user_id=user_id).first()
+    user = sessions_data.get(user_id)
+    if not user:
+        user = user_model.User.objects.filter(user_id=user_id).first()
+        sessions_data[user_id] = user
 
     return user
 

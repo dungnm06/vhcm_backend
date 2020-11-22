@@ -1,5 +1,7 @@
 import random
 import string
+from django.db import transaction
+from rest_framework.exceptions import APIException
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework import exceptions
@@ -190,32 +192,28 @@ class EditUser(APIView):
 
 
 @api_view(['GET', 'POST'])
+@transaction.atomic
 def change_status(request):
     response = Response()
     result = ResponseJSON()
     ensure_admin(request)
 
-    try:
-        user_id = int(request.data.get('id')) if request.method == 'POST' else int(request.GET.get('id'))
+    user_id = int(request.data.get('id')) if request.method == 'POST' else int(request.GET.get('id'))
+    if user_id:
         user = user_model.User.objects.filter(user_id=user_id, admin=False).first()
-        if user is None:
-            raise ValueError('')
-    except ValueError:
-        raise Exception('Invalid user id: {}'.format(request.data.get('id')))
-    except KeyError:
-        raise Exception('Missing user id')
-
-    user.active = not user.active
+        if user:
+            user.active = not user.active
+            user.save()
+        else:
+            raise Exception('Invalid user id: {}'.format(user_id))
+    else:
+        raise APIException('Missing user id')
 
     # Change user's knowledge data status
     if not user.active:
         knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(edit_user=user)
-        if knowledge_data:
+        if knowledge_data.exists():
             knowledge_data.update(status=0)
-            knowledge_data.save()
-
-    # Save to DB
-    user.save()
 
     result.set_status(True)
     response.data = result.to_json()

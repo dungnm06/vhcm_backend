@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 # import vhcm.models.blacklisted_token as bl_token_model
 from vhcm.common.constants import ACCESS_TOKEN
+from vhcm.biz.authentication.user_session import sessions_data
 
 
 class CSRFCheck(CsrfViewMiddleware):
@@ -32,6 +33,7 @@ class JWTAuthentication(BaseAuthentication):
         try:
             payload = jwt.decode(
                 access_token, settings.SECRET_KEY, algorithms=['HS256'])
+            user_id = payload[jwt_utils.USER_ID]
 
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('Access token expired')
@@ -40,11 +42,15 @@ class JWTAuthentication(BaseAuthentication):
         # if blacklisted is not None:
         #     raise exceptions.AuthenticationFailed('Access token expired')
 
-        user = User.objects.filter(user_id=payload[jwt_utils.USER_ID]).first()
+        user = sessions_data.get(user_id)
+        if not user:
+            user = User.objects.filter(user_id=user_id).first()
+            sessions_data[user_id] = user
+
         if user is None:
             raise exceptions.AuthenticationFailed('User not found')
 
-        if not user.is_active:
+        if not user.active:
             raise exceptions.AuthenticationFailed('User is inactive')
 
         self.enforce_csrf(request)
