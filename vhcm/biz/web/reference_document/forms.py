@@ -7,7 +7,7 @@ class DocumentEditForm(ModelForm):
         # write the name of models for which the form is made
         model = document_model.RefercenceDocument
         # Custom fields
-        fields = [document_model.ID, document_model.NAME, document_model.LINK, document_model.AUTHOR]
+        fields = [document_model.ID, document_model.NAME, document_model.LINK, document_model.AUTHOR, document_model.COVER]
 
 
 class DocumentAddForm(ModelForm):
@@ -15,4 +15,4 @@ class DocumentAddForm(ModelForm):
         # write the name of models for which the form is made
         model = document_model.RefercenceDocument
         # Custom fields
-        fields = [document_model.NAME, document_model.LINK, document_model.AUTHOR]
+        fields = [document_model.NAME, document_model.LINK, document_model.AUTHOR, document_model.COVER]

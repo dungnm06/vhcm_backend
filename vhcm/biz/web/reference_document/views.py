@@ -9,7 +9,7 @@ from vhcm.serializers.reference_document import ReferenceDocumentSerializer
 from vhcm.common.utils.CV import ImageUploadParser, extract_validation_messages
 from vhcm.biz.authentication.user_session import get_current_user
 from .forms import DocumentAddForm, DocumentEditForm
-from vhcm.biz.validation.image import image_validate
+# from vhcm.biz.validation.image import image_validate
 from vhcm.common.constants import COMMA, SPACE
 
 
@@ -63,23 +63,24 @@ class AddNewReferenceDocument(APIView):
         result = ResponseJSON()
         user = get_current_user(request)
 
-        form = DocumentAddForm(request.data)
+        form = DocumentAddForm(request.data, request.FILES)
         if form.is_valid():
             document = document_model.RefercenceDocument()
             datas = form.instance
             document.reference_name = datas.reference_name
             document.link = datas.link
             document.author = datas.author
+            document.cover = datas.cover
 
-            if document_model.COVER in request.data and request.data.get(document_model.COVER):
-                f = request.data.get(document_model.COVER).read()
-                image_error = image_validate(f)
-                if image_error:
-                    result.set_status(False)
-                    result.set_messages(image_error)
-                    response.data = result.to_json()
-                    return response
-                document.cover = f
+            # if document_model.COVER in request.data and request.data.get(document_model.COVER):
+            #     f = request.data.get(document_model.COVER).read()
+            #     image_error = image_validate(f)
+            #     if image_error:
+            #         result.set_status(False)
+            #         result.set_messages(image_error)
+            #         response.data = result.to_json()
+            #         return response
+            #     document.cover = f
 
             document.create_user = user
             document.last_edit_user = user
@@ -120,22 +121,23 @@ class EditReferenceDocument(APIView):
             raise Exception('References document not found')
 
         result.set_status(True)
-        form = DocumentEditForm(request.data, instance=document)
+        form = DocumentEditForm(request.data, request.FILES, instance=document)
         if form.is_valid():
             datas = form.instance
             document.reference_name = datas.reference_name
             document.link = datas.link
             document.author = datas.author
+            document.cover = datas.cover
 
-            if document_model.COVER in request.data and request.data.get(document_model.COVER):
-                f = request.data.get(document_model.COVER).read()
-                image_error = image_validate(f)
-                if image_error:
-                    result.set_status(False)
-                    result.set_messages(image_error)
-                    response.data = result.to_json()
-                    return response
-                document.cover = f
+            # if document_model.COVER in request.data and request.data.get(document_model.COVER):
+            #     f = request.data.get(document_model.COVER).read()
+            #     image_error = image_validate(f)
+            #     if image_error:
+            #         result.set_status(False)
+            #         result.set_messages(image_error)
+            #         response.data = result.to_json()
+            #         return response
+            #     document.cover = f
 
             user = get_current_user(request)
             document.last_edit_user = user
