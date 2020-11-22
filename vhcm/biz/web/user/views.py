@@ -1,19 +1,22 @@
 import random
 import string
+import vhcm.models.user as user_model
+import vhcm.models.knowledge_data_review as review_model
+import vhcm.models.knowledge_data as knowledge_data_model
 from django.db import transaction
 from rest_framework.exceptions import APIException
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework import exceptions
 from rest_framework.response import Response
-import vhcm.models.user as user_model
-import vhcm.models.knowledge_data as knowledge_data_model
 from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.user import UserSerializer
 from .forms import UserEditForm, UserAddForm
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
 from vhcm.common.config.config_manager import config_loader, DEFAULT_PASSWORD
+from vhcm.common.dao.native_query import execute_native
+from vhcm.biz.web.user.sql import DEACTIVE_USER_RELATIVES
 
 
 @api_view(['GET', 'POST'])
@@ -211,9 +214,14 @@ def change_status(request):
 
     # Change user's knowledge data status
     if not user.active:
-        knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(edit_user=user)
-        if knowledge_data.exists():
-            knowledge_data.update(status=0)
+        sql = DEACTIVE_USER_RELATIVES.format(
+            review_draft_status=review_model.DRAFT,
+            review_user_id=user_id,
+            kd_done_status=knowledge_data_model.DONE,
+            kd_available_status=knowledge_data_model.AVAILABLE,
+            kd_user_id=user_id
+        )
+        execute_native(sql)
 
     result.set_status(True)
     response.data = result.to_json()

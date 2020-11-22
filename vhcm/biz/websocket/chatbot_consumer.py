@@ -109,7 +109,7 @@ class ChatbotConsumer(WebsocketConsumer):
                 if m.sent_from == chat_message.BOT_SENT:
                     states.append(bot.State(
                         bot.intent_datas[m.intent],
-                        [int(i) for i in m.question_type.split(COMMA)],
+                        [int(i) for i in m.question_type.split(COMMA)] if m.question_type else [],
                         m.action
                     ))
             self.chatbot.state_tracker.extend(states)
@@ -141,7 +141,7 @@ class ChatbotConsumer(WebsocketConsumer):
         if input:
             self.regist_message(chat_message.USER_SENT, input)
             response = self.chatbot.chat(input)
-            self.regist_message(chat_message.BOT_SENT, input, self.chatbot.get_last_state())
+            self.regist_message(chat_message.BOT_SENT, response, self.chatbot.get_last_state())
             self.send_response(CHAT_RESPONSE, response)
 
     # Receive message from room group
@@ -161,7 +161,7 @@ class ChatbotConsumer(WebsocketConsumer):
         )
 
         if bot_state:
-            message_to_regist.intent = bot_state.intent.name
+            message_to_regist.intent = bot_state.intent.intent
             message_to_regist.question_type = COMMA.join(str(t) for t in bot_state.type) if bot_state.type else None
             message_to_regist.action = bot_state.action
 

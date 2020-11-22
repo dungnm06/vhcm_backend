@@ -63,7 +63,7 @@ def init_bot():
         if not train_data_model:
             raise RuntimeError('[startup] Cannot initial bot due to invalid intents data.')
         train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data_model.filename + ZIP_EXTENSION)
-        unzip(train_data_zip)
+        unzip(train_data_zip, output=os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER))
 
         train_data_storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data_model.filename)
 
@@ -81,10 +81,40 @@ def init_bot():
         # Lul
         print(e)
         print(traceback.format_exc())
-        return None, None, None, version
+        intent_classifier_instance = None
+        question_classifier_instance = None
+        idatas = None
+        return intent_classifier_instance, question_classifier_instance, idatas, version
 
 
 intent_classifier, question_type_classifier, intent_datas, system_bot_version = init_bot()
+
+
+# from keras.backend.tensorflow_backend import set_session
+# from keras.backend.tensorflow_backend import clear_session
+# from keras.backend.tensorflow_backend import get_session
+# import tensorflow
+# import gc
+#
+# # Reset Keras Session
+# def reset_keras():
+#     sess = get_session()
+#     clear_session()
+#     sess.close()
+#     sess = get_session()
+#
+#     try:
+#         del classifier # this is from global space - change this as you need
+#     except:
+#         pass
+#
+#     print(gc.collect()) # if it does something you should see a number as output
+#
+#     # use the same config as you used to create the session
+#     config = tensorflow.ConfigProto()
+#     config.gpu_options.per_process_gpu_memory_fraction = 1
+#     config.gpu_options.visible_device_list = "0"
+#     set_session(tensorflow.Session(config=config))
 
 
 def is_bot_ready():

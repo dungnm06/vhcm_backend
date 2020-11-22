@@ -47,7 +47,7 @@ KNOWLEDGE_DATA_GET_SYNONYMS = '''
 
 
 class Intent:
-    def __init__(self, intent_id=0, name='', fullname='',
+    def __init__(self, intent_id=0, intent='', fullname='',
                  raw_data='', base_response='',
                  corresponding_datas=None, subjects=None,
                  sentence_components=None, synonym_sets=None, references=None):
@@ -69,7 +69,7 @@ class Intent:
             references = []
         # Assign attributes
         self.intent_id = intent_id
-        self.name = name
+        self.intent = intent
         self.fullname = fullname
         # self.questions = questions
         self.raw_data = raw_data
@@ -151,7 +151,7 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
             intent.intent = data[INTENT_NAME]
 
             # Intent full name
-            intent.name = data[INTENT_FULL_NAME]
+            intent.fullname = data[INTENT_FULL_NAME]
 
             # # Questions
             # intent.questions = [q.strip() for q in data[INTENT_QUESTIONS].split(HASH)]

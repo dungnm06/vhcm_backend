@@ -31,3 +31,10 @@ def execute_native_query(sql, params=None, return_type='named_tuple'):
             raise Exception('Invaild SQL query return data type')
 
     return result
+
+
+def execute_native(sql, params=None, return_type='named_tuple'):
+    if params is None:
+        params = []
+    with connection.cursor() as cursor:
+        cursor.execute(sql, params)
