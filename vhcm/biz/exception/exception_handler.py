@@ -1,11 +1,10 @@
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse, HttpResponsePermanentRedirect
 from rest_framework.decorators import renderer_classes
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from vhcm.common.response_json import ResponseJSON
-from vhcm.common.utils.CH import is_error_code
 
 
 def raise_exception(exc, context):
@@ -35,8 +34,11 @@ def raise_exception(exc, context):
 
 @renderer_classes([JSONRenderer])
 def exception_cleaner(request, response):
-    if not (hasattr(response, 'data') and response['Content-Type'] in ['application/octet-stream', 'text/plain']
-            or not is_error_code(response.status_code)):
+    if not (hasattr(response, 'data')
+            or response['Content-Type'] in ['application/octet-stream', 'text/plain']
+            or isinstance(response, FileResponse)
+            or isinstance(response, HttpResponsePermanentRedirect)
+            ):
         # raise exceptions.APIException(detail='An error has occured', code=response.status_code)
         result = ResponseJSON()
         result.set_messages(['An error has occured'])

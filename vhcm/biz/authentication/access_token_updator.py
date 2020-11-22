@@ -1,5 +1,6 @@
 import jwt
 # from datetime import datetime
+from django.http import FileResponse, HttpResponsePermanentRedirect
 from rest_framework import exceptions
 from django.conf import settings
 from vhcm.common.utils.CH import is_error_code
@@ -13,15 +14,16 @@ def access_token_updator(request, response):
         access_token = request.COOKIES.get('accesstoken')
         if not access_token \
                 or (
-                'An error has occured' in response.data['messages'] and
+                hasattr(response, 'data') and 'An error has occured' in response.data['messages'] and
                 (
                         (not response.data['status'] and response.data['result_data']['error_detail'] == 'Access token expired')
                         or (not response.data['status'] and is_error_code(response.data['result_data']['status_code']))
                 )
                 ) \
                 or ('auth' in request.path)\
-                or ('logout' in request.path)\
-                or ('media' in request.path):
+                or ('logout' in request.path) \
+                or isinstance(response, FileResponse) \
+                or isinstance(response, HttpResponsePermanentRedirect):
             return response
 
         # Decode the token

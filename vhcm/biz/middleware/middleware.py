@@ -1,5 +1,6 @@
 from vhcm.biz.exception.exception_handler import exception_cleaner
 from vhcm.biz.authentication.access_token_updator import access_token_updator
+from vhcm.common.utils.CH import is_error_code
 
 
 class VhcmMiddleware(object):
@@ -15,7 +16,6 @@ class VhcmMiddleware(object):
 
         # Code to be executed for each request/response after
         # the view is called.
-
         response = exception_cleaner(request, response)
         response = access_token_updator(request, response)
 
