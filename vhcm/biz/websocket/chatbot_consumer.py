@@ -69,6 +69,7 @@ class ChatbotConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         command = text_data_json.get('command')
         if command == 'newsession':
+            self.end_last_session()
             self.start_new_session()
         elif command == 'getlastsession':
             last_session_messages = self.restore_last_session()
@@ -126,8 +127,7 @@ class ChatbotConsumer(WebsocketConsumer):
         if not bot.is_bot_ready():
             self.send_response(CHAT_RESPONSE, bot.BOT_UNAVAILABLE_MESSAGE)
         else:
-            self.regist_message(chat_message.BOT_SENT, bot.BOT_GREATING_MESSAGE, bot.State())
-            self.send_response(CHAT_RESPONSE, bot.BOT_GREATING_MESSAGE)
+            self.send_response(CHAT_RESPONSE, self.chatbot.chat(init=True))
 
     def chat(self, user_input):
         if not bot.is_bot_ready():
@@ -140,9 +140,7 @@ class ChatbotConsumer(WebsocketConsumer):
             return
 
         if user_input:
-            self.regist_message(chat_message.USER_SENT, user_input)
-            response = self.chatbot.chat(input)
-            self.regist_message(chat_message.BOT_SENT, response, self.chatbot.get_last_state())
+            response = self.chatbot.chat(user_input)
             self.send_response(CHAT_RESPONSE, response)
 
     # Receive message from room group
@@ -152,21 +150,6 @@ class ChatbotConsumer(WebsocketConsumer):
             'type': datatype,
             'data': data
         }))
-
-    def regist_message(self, sent_from, message, bot_state=None):
-        message_to_regist = chat_message.Message(
-            user=self.user,
-            sent_from=sent_from,
-            message=message,
-            data_version=self.session_bot_version
-        )
-
-        if bot_state:
-            message_to_regist.intent = bot_state.intent.intent
-            message_to_regist.question_type = COMMA.join(str(t) for t in bot_state.type) if bot_state.type else None
-            message_to_regist.action = bot_state.action
-
-        message_to_regist.save()
 
     def end_last_session(self):
         # Log current session

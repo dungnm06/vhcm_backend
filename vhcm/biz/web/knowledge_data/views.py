@@ -33,24 +33,28 @@ def all(request):
     response = Response()
     result = ResponseJSON()
 
-    query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA)
-    result_data = {
-        'knowledges': []
-    }
-    for data in query_data:
-        knowledge_data = {
-            'id': data.id,
-            'intent': data.intent,
-            'intent_fullname': data.intent_fullname,
-            'status': knowledge_data_model.PROCESS_STATUS_DICT[data.status],
-            'create_user': data.create_user,
-            'create_user_id': data.create_user_id,
-            'edit_user': data.edit_user,
-            'edit_user_id': data.edit_user_id,
-            'cdate': data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
-            'mdate': data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+    user = get_current_user(request)
+    query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA.format(user_id=user.user_id))
+    result_data = []
+    for kd in query_data:
+        kd_display = {
+            'id': kd.knowledge_data_id,
+            'intent': kd.intent,
+            'intent_fullname': kd.intent_fullname,
+            'status': kd.status,
+            'create_user': kd.create_user,
+            'create_user_id': kd.create_user_id,
+            'edit_user': kd.edit_user,
+            'edit_user_id': kd.edit_user_id,
+            'cdate': kd.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'mdate': kd.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'reviews': {
+                'accept': kd.accept_count,
+                'reject': kd.refuse_count
+            },
+            'user_review': kd.user_review
         }
-        result_data['knowledges'].append(knowledge_data)
+        result_data.append(kd_display)
 
     result.set_status(True)
     result.set_result_data(result_data)

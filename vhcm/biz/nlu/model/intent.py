@@ -47,8 +47,8 @@ KNOWLEDGE_DATA_GET_SYNONYMS = '''
 
 
 class Intent:
-    def __init__(self, intent_id=0, intent='', fullname='',
-                 raw_data='', base_response='',
+    def __init__(self, intent_id=0, intent=None, fullname=None,
+                 raw_data=None, base_response=None,
                  corresponding_datas=None, subjects=None,
                  sentence_components=None, synonym_sets=None, references=None):
         # Default argument value is mutable

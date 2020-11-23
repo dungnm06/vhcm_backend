@@ -21,9 +21,11 @@ BOT_GREATING_MESSAGE = 'Đã bắt đầu phiên trò chuyện mới, bạn có 
 
 # Chatbot state
 class State(object):
-    def __init__(self, intent=Intent(), type=None, action=chat_message.INITIAL):
+    def __init__(self, intent=Intent(), question_types=None, action=chat_message.INITIAL):
+        if question_types is None:
+            question_types = []
         self.intent = intent
-        self.type = type
+        self.question_types = question_types
         self.action = action
 
 
@@ -50,7 +52,7 @@ def init_bot():
 
         with open(version_file_path, 'w') as f:
             json.dump(version, f, indent=4)
-        # raise RuntimeError
+        raise RuntimeError
         # Intent classifier
         intent_classifier_instance = IntentClassifier()
         intent_classifier_instance.load()
@@ -132,13 +134,14 @@ def version_check(session_bot_version):
 class VirtualHCMChatbot(object):
     def __init__(self, user):
         # For dialogue states tracking (list of dictionary(intent,types,action))
+        self.user = user
         self.state_tracker = []
         self.state_tracker.append(State())
         # Answer generator
         self.answer_generator = AnswerGenerator()
 
-    def __regis_history(self, intent, types, action):
-        self.state_tracker.append(State(intent, types, action))
+    def __regis_history(self, intent, question_types, action):
+        self.state_tracker.append(State(intent, question_types, action))
 
     def get_last_state(self):
         return self.state_tracker[len(self.state_tracker) - 1]
@@ -158,19 +161,42 @@ class VirtualHCMChatbot(object):
             else:
                 return chat_message.AWAIT_CONFIRMATION
 
-    def chat(self, chat_input):
-        last_state = self.get_last_state()
-        if last_state.action != chat_message.AWAIT_CONFIRMATION:
-            intent_name = intent_classifier.predict(chat_input)
-            types = question_type_classifier.predict(chat_input)
-            intent = intent_datas[intent_name]
+    def chat(self, user_input=None, init=False):
+        if not init:
+            self.regist_message(chat_message.USER_SENT, user_input)
+            last_state = self.get_last_state()
+            if last_state.action != chat_message.AWAIT_CONFIRMATION:
+                intent_name = intent_classifier.predict(user_input)
+                types = question_type_classifier.predict(user_input)
+                intent = intent_datas[intent_name]
+            else:
+                intent = last_state.intent
+                types = last_state.question_types
+            action = self.__decide_action(user_input, intent, types, last_state)
+            # print(action)
+            bot_response = self.answer_generator.get_response(intent, types, action, last_state)
+            self.__regis_history(intent, types, action)
+            self.regist_message(chat_message.BOT_SENT, bot_response, self.get_last_state())
         else:
-            intent = last_state.intent
-            types = last_state.type
-        action = self.__decide_action(chat_input, intent, types, last_state)
-        # print(action)
-        self.__regis_history(intent, types, action)
-        return self.answer_generator.get_response(intent, types, action, last_state)
+            bot_response = BOT_GREATING_MESSAGE
+            self.__regis_history(Intent(), question_types=[], action=chat_message.INITIAL)
+            self.regist_message(chat_message.BOT_SENT, bot_response, self.get_last_state())
+        return bot_response
+
+    def regist_message(self, sent_from, message, bot_state=None):
+        message_to_regist = chat_message.Message(
+            user=self.user,
+            sent_from=sent_from,
+            message=message,
+            data_version=system_bot_version[CURRENT_BOT_VERSION]
+        )
+
+        if bot_state:
+            message_to_regist.intent = bot_state.intent.intent
+            message_to_regist.question_type = COMMA.join(str(t) for t in bot_state.question_types) if bot_state.question_types else None
+            message_to_regist.action = bot_state.action
+
+        message_to_regist.save()
 
 
 class AnswerGenerator:
