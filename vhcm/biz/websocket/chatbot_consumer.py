@@ -126,7 +126,8 @@ class ChatbotConsumer(WebsocketConsumer):
         if not bot.is_bot_ready():
             self.send_response(CHAT_RESPONSE, bot.BOT_UNAVAILABLE_MESSAGE)
         else:
-            self.send_response(CHAT_RESPONSE, 'Chào cháu bác đêy cháu ei')
+            self.regist_message(chat_message.BOT_SENT, bot.BOT_GREATING_MESSAGE, bot.State())
+            self.send_response(CHAT_RESPONSE, bot.BOT_GREATING_MESSAGE)
 
     def chat(self, user_input):
         if not bot.is_bot_ready():

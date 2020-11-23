@@ -669,6 +669,12 @@ def post_comment(request):
     if not knowledge_data:
         raise APIException('Invalid knowledge data id, knowledge data not exists')
 
+    if not comment_message:
+        result.set_status(False)
+        result.set_messages('Comment must not empty!')
+        response.data = result.to_json()
+        return response
+
     comment = comment_model.Comment(
         user=user,
         reply_to=reply_to,
@@ -707,6 +713,12 @@ def edit_comment(request):
         raise APIException('You cannot edit other users comment')
 
     comment_message = request.data.get(comment_model.COMMENT)
+    if not comment_message:
+        result.set_status(False)
+        result.set_messages('Comment must not empty!')
+        response.data = result.to_json()
+        return response
+
     comment.comment = comment_message
     comment.edited = True
     comment.save()

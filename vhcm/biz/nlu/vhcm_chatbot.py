@@ -16,6 +16,7 @@ from vhcm.common.utils.files import unzip, ZIP_EXTENSION
 CURRENT_BOT_VERSION = 'current'
 NEXT_STARTUP_VERSION = 'next_startup'
 BOT_UNAVAILABLE_MESSAGE = 'Bác đi ngủ rồi, quay lại lúc khác!'
+BOT_GREATING_MESSAGE = 'Đã bắt đầu phiên trò chuyện mới, bạn có thể chat ngay với bot'
 
 
 # Chatbot state
@@ -49,7 +50,7 @@ def init_bot():
 
         with open(version_file_path, 'w') as f:
             json.dump(version, f, indent=4)
-        raise RuntimeError
+        # raise RuntimeError
         # Intent classifier
         intent_classifier_instance = IntentClassifier()
         intent_classifier_instance.load()
