@@ -38,7 +38,7 @@ class IntentClassifier(object, metaclass=Singleton):
         model_path = os.path.join(PROJECT_ROOT, MODEL_DATA_FOLDER + INTENT_MODEL_NAME)
         model_folder = os.path.join(PROJECT_ROOT, MODEL_DATA_FOLDER) + 'intent/'
         model_file_to_check = [model_folder + f for f in CLASSIFIER_MODEL_FILES]
-        print(config_path, intent_maps_path, *model_file_to_check)
+        # print(config_path, intent_maps_path, *model_file_to_check)
         if any([not os.path.exists(p) for p in [config_path, intent_maps_path, *model_file_to_check]]):
             raise RuntimeError('[startup] Missing initial data for intent classifier')
 

@@ -32,10 +32,3 @@ class ChatHistory(models.Model):
 
     class Meta:
         db_table = 'chat_history'
-
-
-class LogMessage(object):
-    def __init__(self, sent_from, message, time):
-        self.sent_from = sent_from
-        self.message = message
-        self.time = time

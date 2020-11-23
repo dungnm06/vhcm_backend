@@ -1,5 +1,5 @@
+import os
 import json
-import vhcm.models.chat_message as session_model
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from vhcm.biz.nlu import vhcm_chatbot as bot
@@ -74,8 +74,8 @@ class ChatbotConsumer(WebsocketConsumer):
             last_session_messages = self.restore_last_session()
             self.send_response(LAST_SESSION_MESSAGES, last_session_messages)
         elif command == 'chat':
-            input = text_data_json.get('data')
-            self.chat(input)
+            user_input = text_data_json.get('data')
+            self.chat(user_input)
         elif command == 'report':
             self.report()
         elif command == 'endsession':
@@ -85,7 +85,7 @@ class ChatbotConsumer(WebsocketConsumer):
     def restore_last_session(self):
         last_session_messages = []
 
-        last_session = session_model.Message.objects.filter(user=self.user)
+        last_session = chat_message.Message.objects.filter(user=self.user).order_by(chat_message.RECORDED_TIME)
         if last_session:
             session_bot_version = last_session[0].data_version.id
             train_data_model = train_data.TrainData.objects.filter(id=session_bot_version).first()
@@ -128,7 +128,7 @@ class ChatbotConsumer(WebsocketConsumer):
         else:
             self.send_response(CHAT_RESPONSE, 'Chào cháu bác đêy cháu ei')
 
-    def chat(self, input):
+    def chat(self, user_input):
         if not bot.is_bot_ready():
             self.send_response(CHAT_RESPONSE, bot.BOT_UNAVAILABLE_MESSAGE)
             return
@@ -138,8 +138,8 @@ class ChatbotConsumer(WebsocketConsumer):
             self.send_response(FORCE_NEW_SESSION)
             return
 
-        if input:
-            self.regist_message(chat_message.USER_SENT, input)
+        if user_input:
+            self.regist_message(chat_message.USER_SENT, user_input)
             response = self.chatbot.chat(input)
             self.regist_message(chat_message.BOT_SENT, response, self.chatbot.get_last_state())
             self.send_response(CHAT_RESPONSE, response)
@@ -169,21 +169,21 @@ class ChatbotConsumer(WebsocketConsumer):
 
     def end_last_session(self):
         # Log current session
-        last_session = session_model.Message.objects.filter(user=self.user)
+        last_session = chat_message.Message.objects.filter(user=self.user).order_by(chat_message.RECORDED_TIME)
         if last_session:
             # Messages
             session_messages = []
             for m in last_session:
-                message = chat_history.LogMessage(
-                    m.sent_from,
-                    m.message,
-                    m.recorded_time
-                )
+                message = {
+                    'from': m.sent_from,
+                    'message': m.message,
+                    'time': m.recorded_time.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+                }
                 session_messages.append(message)
-            pickle_file(session_messages, PROJECT_ROOT + '/tmp/chatlog_' + self.user.username)
-            tmp_chatlog_file = open('C:/Users/Tewi/Desktop/test_pickle', 'rb')
+            tmp_log_path = os.path.join(PROJECT_ROOT, 'tmp/chatlog_' + self.user.username)
+            pickle_file(session_messages, tmp_log_path)
+            tmp_chatlog_file = open(tmp_log_path, 'rb')
             chatlog_binary = tmp_chatlog_file.read()
-            tmp_chatlog_file.close()
 
             # Bot data version
             session_bot_version = last_session[0].data_version
@@ -199,6 +199,7 @@ class ChatbotConsumer(WebsocketConsumer):
                 session_start=start_time
             )
             log_model.save()
+            tmp_chatlog_file.close()
             # Clear session messages on DB
             last_session.delete()
 

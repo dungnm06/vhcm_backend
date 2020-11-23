@@ -1,15 +1,17 @@
 from django.db import models
 from .user import User
 from .train_data import TrainData
-from .knowledge_data_question import QUESTION_TYPES
 
 # Fields
-ID = 'chat_log_id'
+ID = 'id'
 USER = 'user'
 SENT_FROM = 'sent_from'
 MESSAGE = 'message'
 INTENT = 'intent'
-CDATE = 'cdate'
+QUESTION_TYPE = 'question_type'
+ACTION = 'action'
+RECORDED_TIME = 'recorded_time'
+DATA_VERSION = 'data_version'
 
 # Chat relative
 USER_SENT = 1
@@ -34,7 +36,7 @@ ACTION_TYPES = [
 
 
 class Message(models.Model):
-    chat_session_id = models.BigAutoField(
+    id = models.BigAutoField(
         primary_key=True, verbose_name='sesion id'
     )
     user = models.ForeignKey(
