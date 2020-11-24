@@ -23,7 +23,7 @@ from vhcm.serializers.comment import CommentSerializer, DeletedCommentSerializer
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.constants import *
 from vhcm.common.utils.CH import isInt
-from .sql import GET_ALL_KNOWLEDGE_DATA, GET_ALL_TRAINABLE_KNOWLEDGE_DATA
+from .sql import GET_ALL_KNOWLEDGE_DATA, GET_ALL_TRAINABLE_KNOWLEDGE_DATA, GET_ALL_REVIEWS
 from vhcm.common.dao.native_query import execute_native_query
 
 
@@ -217,8 +217,7 @@ def get(request):
             comment_model.ID: comment.id,
             comment_model.USER: comment.user.user_id,
             comment_model.REPLY_TO: comment.reply_to_id,
-            comment_model.COMMENT: comment.comment if (
-                        user.admin or comment.status == comment_model.VIEWABLE) else None,
+            comment_model.COMMENT: comment.comment if (user.admin or comment.status == comment_model.VIEWABLE) else None,
             comment_model.VIEWABLE_STATUS: comment.status,
             comment_model.EDITED: comment.edited,
             comment_model.MDATE: comment.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
@@ -358,7 +357,7 @@ def add(request):
     next_subject_id = get_latest_id(subject_model.Subject, subject_model.ID)
 
     for i, sj in enumerate(request.data.get('criticalData')):
-        type = sj['type']
+        word_type = sj['type']
         subject_data = []
         for word in sj['word']:
             subject_data.append((word['type'], word['word']))
@@ -375,7 +374,7 @@ def add(request):
         subjects.append(subject_model.Subject(
             subject_id=(next_subject_id + i),
             knowledge_data=knowledge_data,
-            type=type,
+            type=word_type,
             subject_data=subject_data,
             verbs=verb
         ))
@@ -527,7 +526,7 @@ def edit(request):
     next_subject_id = get_latest_id(subject_model.Subject, subject_model.ID)
 
     for i, sj in enumerate(request.data.get('criticalData')):
-        type = sj['type']
+        word_type = sj['type']
         subject_data = []
         for word in sj['word']:
             subject_data.append((word['type'], word['word']))
@@ -544,7 +543,7 @@ def edit(request):
         subjects.append(subject_model.Subject(
             subject_id=(next_subject_id + i),
             knowledge_data=knowledge_data,
-            type=type,
+            type=word_type,
             subject_data=subject_data,
             verbs=verbs
         ))
@@ -814,15 +813,37 @@ def validate_comment(request):
 
 @api_view(['GET', 'POST'])
 def all_reviews(request):
-    pass
+    response = Response()
+    result = ResponseJSON()
 
+    knowledge_data_id = request.data.get(review_model.KNOWLEDGE_DATA) if request.method == 'POST' \
+        else request.GET.get(review_model.KNOWLEDGE_DATA)
+    if not knowledge_data_id:
+        raise APIException('Missing knowledge data id.')
+
+    reviews = execute_native_query(GET_ALL_REVIEWS.format(knowledge_data_id=knowledge_data_id))
+    reviews_display = []
+    for review in reviews:
+        review_display = {
+            'user_id': review.user_id,
+            'username': review.username,
+            'review': review.review,
+            'status': review.status,
+            'mdate': review.mdate
+        }
+        reviews_display.append(review_display)
+
+    result.set_status(True)
+    result.set_result_data(reviews_display)
+    response.data = result.to_json()
+    return response
 
 @api_view(['POST'])
 def review_data(request):
     response = Response()
     result = ResponseJSON()
 
-    errors = validate_comment(request)
+    errors = validate_review(request)
     if errors:
         result.set_status(False)
         result.set_messages(errors)
@@ -931,12 +952,12 @@ def validate(request, mode):
         err_rd_types = []
         type_check = []
         for i, rd in enumerate(request.data.get('coresponse')):
-            type = rd['type'].lower()
-            if type not in response_data_model.RESPONSE_TYPES_T2IDX:
+            word_type = rd['type'].lower()
+            if word_type not in response_data_model.RESPONSE_TYPES_T2IDX:
                 err_rd_types.append(rd['type'])
             if not rd['answer'].strip():
                 errors.append('Response data #{} is empty'.format(i + 1))
-            type_check.append(type)
+            type_check.append(word_type)
         if err_rd_types:
             errors.append('Invalid response data type: {}'.format(', '.join(err_rd_types)))
         type_check = Counter(type_check)

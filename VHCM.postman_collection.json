@@ -1,0 +1,2408 @@
+{
+	"info": {
+		"_postman_id": "99cd5ff8-c78a-4389-8a26-b40281245f99",
+		"name": "VHCM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"dungnm\",\r\n    \"password\": \"123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/auth",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Authentication",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"dungnm\",\r\n    \"password\": \"123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://127.0.0.1:8000/api/auth",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 29 Oct 2020 13:36:46 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "WSGIServer/0.2 CPython/3.6.9"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Cookie, Origin"
+						},
+						{
+							"key": "Allow",
+							"value": "OPTIONS, POST"
+						},
+						{
+							"key": "Content-Length",
+							"value": "425"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "accesstoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MDM5Nzg5MDYsImlhdCI6MTYwMzk3ODYwNn0.ZRvzOcGlsXHelb8IfFjqPN_eQG6j5EFoOd2E5g9JWvo; HttpOnly; Path=/; SameSite=None; Secure"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "csrftoken=DZ4fQj4MZ4TA3rVKoQbzQPW6I8Ef3jZbpSK8wbmJKFyGkMOUEyxaF9SYNKAMawW1; expires=Thu, 28 Oct 2021 13:36:46 GMT; Max-Age=31449600; Path=/; SameSite=None; Secure"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "sessionid=p9m0g5tt63y324080fde3kcs9srfuexn; expires=Thu, 12 Nov 2020 13:36:46 GMT; HttpOnly; Max-Age=1209600; Path=/; SameSite=None; Secure"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": true,\n    \"messages\": [],\n    \"result_data\": {\n        \"user\": {\n            \"user_id\": 1,\n            \"username\": \"dungnm\",\n            \"avatar\": null,\n            \"email\": null,\n            \"fullname\": \"GOD\",\n            \"gender\": 0,\n            \"nationality\": \"Đông Lào\",\n            \"place_of_birth\": \"Eastern Laos\",\n            \"date_of_birth\": \"01/04/2020\",\n            \"address\": \"Trần Duy Hưng\",\n            \"id_number\": \"1234567890\",\n            \"phone_number\": null,\n            \"cdate\": \"2020-10-26T07:33:00.045419\",\n            \"mdate\": \"2020-10-29T14:45:16.894110\",\n            \"active\": true,\n            \"admin\": true,\n            \"first_login\": false\n        }\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/logout",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Settings/Initial System Settings",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRFTOKEN",
+						"value": "BrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/setting/init",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"setting",
+						"init"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Settings/All",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/setting/all",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"setting",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Settings/Change settings",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"settings\": [\r\n        {\r\n            \"setting_id\": \"login_expiration_limit\",\r\n            \"value\": \"60\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/setting/update",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"setting",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/All",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/all",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/Get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"value": "https://127.0.0.1:3000",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/get?id=1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"get"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/Add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"value": "https://127.0.0.1:3000",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "dummy",
+							"description": "unique field",
+							"type": "text"
+						},
+						{
+							"key": "fullname",
+							"value": "whatsoever",
+							"type": "text"
+						},
+						{
+							"key": "gender",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "nationality",
+							"value": "Đông Lào",
+							"type": "text"
+						},
+						{
+							"key": "place_of_birth",
+							"value": "Đông Lào",
+							"type": "text"
+						},
+						{
+							"key": "date_of_birth",
+							"value": "01/04/2020",
+							"description": "only accpet DD/MM/YYYY",
+							"type": "text"
+						},
+						{
+							"key": "address",
+							"value": "Trần Duy Hưng",
+							"type": "text"
+						},
+						{
+							"key": "id_number",
+							"value": "0987654321",
+							"description": "unique field",
+							"type": "text"
+						},
+						{
+							"key": "phone_number",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "avatar",
+							"type": "file",
+							"src": []
+						}
+					],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/add",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/Edit",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"value": "https://127.0.0.1:3000",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "fullname",
+							"value": "GOD",
+							"type": "text"
+						},
+						{
+							"key": "gender",
+							"value": "0",
+							"description": "0: Men, 1: Women, 2: Unknown",
+							"type": "text"
+						},
+						{
+							"key": "nationality",
+							"value": "Đông Lào",
+							"type": "text"
+						},
+						{
+							"key": "place_of_birth",
+							"value": "Eastern Laos",
+							"type": "text"
+						},
+						{
+							"key": "date_of_birth",
+							"value": "01/04/2020",
+							"description": "only accpet DD/MM/YYYY",
+							"type": "text"
+						},
+						{
+							"key": "address",
+							"value": "Trần Duy Hưng",
+							"type": "text"
+						},
+						{
+							"key": "id_number",
+							"value": "0987654321",
+							"description": "unique field",
+							"type": "text"
+						},
+						{
+							"key": "phone_number",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "avatar",
+							"type": "file",
+							"src": "/C:/Users/Tewi/Downloads/unnamed.jpg"
+						}
+					],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/edit",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/First Login Password Update",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "DZ4fQj4MZ4TA3rVKoQbzQPW6I8Ef3jZbpSK8wbmJKFyGkMOUEyxaF9SYNKAMawW1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\": \"whatsoever\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/update-password-first-login",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"update-password-first-login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/Change password",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"current_password\": \"123\",\r\n    \"new_password\": \"456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/change-password",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"change-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/Change Status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"value": "https://127.0.0.1:3000",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/change-status?id=2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"change-status"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Knowledge Data/All",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/all",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Knowledge Data/All Trainable",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/all-trainable",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"all-trainable"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Knowledge Data/Get",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/get?intent=Coconut",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"get"
+					],
+					"query": [
+						{
+							"key": "intent",
+							"value": "Coconut"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Knowledge Data/Add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \r\n    \"intent\": \"Coconut_test\",\r\n    \"intentFullName\": \"Coconut\",\r\n    \"baseResponse\": \"Coconut is\",\r\n    \"coresponse\": [\r\n        {\r\n            \"type\": \"WHAT\",\r\n            \"answer\": \"a big big nut\"\r\n        }\r\n    ],\r\n    \"criticalData\": [\r\n        {\r\n            \"type\": \"MISC\",\r\n            \"word\": [\r\n                {\r\n                    \"type\": \"N\",\r\n                    \"word\": \"Coconut\"\r\n                }\r\n            ],\r\n            \"verb\": []\r\n        }\r\n    ],\r\n    \"rawData\": \"Cocunut is a big big nut. But this delicous nut is not a nut.\",\r\n    \"documentReference\": [\r\n        {\r\n            \"id\": 4,\r\n            \"page\": \"\",\r\n            \"extra_info\": \"0:35 - 0:42\"\r\n        }\r\n    ],\r\n    \"questions\": [\r\n        { \r\n            \"question\": \"What is a coconut ?\",\r\n            \"generated_questions\": [\r\n                {\r\n                    \"question\": \"What is coconut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is kokonut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is Da_Coconut ?\",\r\n                    \"accept\": 1\r\n                }\r\n            ],\r\n            \"type\": [1]\r\n        }\r\n    ],\r\n    \"synonyms\":[\r\n        {\r\n            \"word\": \"coconut\",\r\n            \"synonyms\": [14]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/add",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Knowledge Data/Edit",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \r\n    \"id\": 18,\r\n    \"intent\": \"Coconut_test\",\r\n    \"intentFullName\": \"Coconut\",\r\n    \"baseResponse\": \"Coconut is\",\r\n    \"coresponse\": [\r\n        {\r\n            \"type\": \"WHAT\",\r\n            \"answer\": \"a giant nut\"\r\n        }\r\n    ],\r\n    \"criticalData\": [\r\n        {\r\n            \"type\": \"PER\",\r\n            \"word\": [\r\n                {\r\n                    \"type\": \"N\",\r\n                    \"word\": \"Coconut\"\r\n                }\r\n            ],\r\n            \"verb\": []\r\n        }\r\n    ],\r\n    \"rawData\": \"Cocunut is a big big nut. But this delicous nut is not a nut. Its a koko fruit\",\r\n    \"documentReference\": [\r\n        {\r\n            \"id\": 4,\r\n            \"page\": \"\",\r\n            \"extra_info\": \"0:35 - 0:42\"\r\n        }\r\n    ],\r\n    \"questions\": [\r\n        { \r\n            \"question\": \"What is a coconut ?\",\r\n            \"generated_questions\": [\r\n                {\r\n                    \"question\": \"What is a coconut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is a kokonut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is a Da_Coconut ?\",\r\n                    \"accept\": 0\r\n                }\r\n            ],\r\n            \"type\": [1]\r\n        }\r\n    ],\r\n    \"synonyms\":[\r\n        {\r\n            \"word\": \"Cocunut\",\r\n            \"synonyms\": [14]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/edit",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Comment/All",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"comment\": \"Cocunut chứ không phải coconut\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/all-comment?knowledge_data=9",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"all-comment"
+					],
+					"query": [
+						{
+							"key": "knowledge_data",
+							"value": "9"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Comment/Post",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"knowledge_data\": 9,\r\n    \"reply_to\": 1,\r\n    \"comment\": \"Đần độn\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/post-comment",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"post-comment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Comment/Edit",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"comment\": \"Cocunut chứ không phải coconut, ahihi\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/edit-comment",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"edit-comment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Review",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"knowledge_data\": 9,\r\n    \"review_detail\": \"Coconut is love, coconut is life\",\r\n    \"status\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/review",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"review"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Review/All",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"knowledge_data\": 9,\r\n    \"review_detail\": \"Coconut is love, coconut is life\",\r\n    \"status\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/all-reviews?knowledge_data=9",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"all-reviews"
+					],
+					"query": [
+						{
+							"key": "knowledge_data",
+							"value": "9"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Comment/Delete",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"comment\": \"Cocunut chứ không phải coconut\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/delete-comment?id=1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"delete-comment"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NLP/Tokenize Sentence",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paragraph\": \"Các đại biểu khai hội bên sân đá banh của người Tàu. Vừa giả xem đá banh, vừa bàn bạc về Đảng. Sau cuộc bàn bạc sôi nổi, và sau lời giải thích rõ ràng của đồng chí Nguyễn Ái Quốc, mọi người đều tán thành thống nhất cả ba nhóm thành một đảng. Đó là ngày lịch sử mùng 6-1-1930.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/nlp/tokenize",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"nlp",
+						"tokenize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NLP/Un-tokenize",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"sentences\": [\r\n        \"Bác_Hồ sinh ngày 19/5/1890\",\r\n        \"Bác_Hồ ra_đời ngày 19/5/1890\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/nlp/untokenize",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"nlp",
+						"untokenize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NLP/Generate Similary Sentences",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"sentences\": [\r\n        {\r\n            \"sentence\": \"Bác_Hồ sinh năm nào ?\",\r\n            \"synonyms\": [1,2]\r\n        },\r\n        {\r\n            \"sentence\": \"Bác_Hồ sinh ở đâu ?\",\r\n            \"synonyms\": [1,2]\r\n        },\r\n        {\r\n            \"sentence\": \"Hồ_Chí_Minh ra_đời ở đâu vào năm nào ?\",\r\n            \"synonyms\": [1,2]\r\n        },\r\n        {\r\n            \"sentence\": \"Khi nào Hồ_Chí_Minh ra_đời và ở đâu ?\",\r\n            \"synonyms\": [1,2]\r\n        },\r\n        {\r\n            \"sentence\": \"What is coconut ?\",\r\n            \"synonyms\": [14]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/nlp/generate-similaries",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"nlp",
+						"generate-similaries"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Synonym/Get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/synonym/get?id=3",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"synonym",
+						"get"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Synonym/Get All",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "4g7riaju5lz9XDBNap3NrHhh0NPeoj4dhvBqZKKf58Kgv1NfeOSvpQaL189LQuGY"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/synonym/all",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"synonym",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Synonym/Add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"meaning\": \"Test_123\",\r\n    \"words\": [\"coconut\", \"kokonut\", \"Da_Coconut\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/synonym/add",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"synonym",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Synonym/Edit",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"meaning\": \"ttees\",\r\n    \"words\": [\"Hoa\", \"hhdskdks\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/synonym/edit",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"synonym",
+						"edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Synonym/Delete",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/synonym/delete?synonym_id=18",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"synonym",
+						"delete"
+					],
+					"query": [
+						{
+							"key": "synonym_id",
+							"value": "18"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Train Data/All",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/train-data/all",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"train-data",
+						"all"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Train Data/All",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Referer",
+								"type": "text",
+								"value": "https://127.0.0.1:3000"
+							},
+							{
+								"key": "X-CSRFTOKEN",
+								"type": "text",
+								"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+							}
+						],
+						"url": {
+							"raw": "https://127.0.0.1:8000/api/train-data/all",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"train-data",
+								"all"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Origin, Cookie"
+						},
+						{
+							"key": "Allow",
+							"value": "OPTIONS, GET, POST"
+						},
+						{
+							"key": "Content-Length",
+							"value": "213"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "accesstoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MDUyMDQyNTgsImlhdCI6MTYwNTIwMDY1OH0.uggcYO6ebW9-dIDuZLZcNTPTn-l4TaTMgMTWktKPnvk; HttpOnly; Path=/; SameSite=None; Secure"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": true,\n    \"messages\": [],\n    \"result_data\": [\n        {\n            \"id\": 2,\n            \"filename\": \"cocunut_11_9_2020\",\n            \"type\": 1,\n            \"description\": \"Cocunut datas only, for test\",\n            \"cdate\": \"2020-11-10T00:27:48.896674\",\n            \"mdate\": \"2020-11-10T02:15:26.038058\"\n        }\n    ]\n}"
+				},
+				{
+					"name": "Train Data/All",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Referer",
+								"type": "text",
+								"value": "https://127.0.0.1:3000"
+							},
+							{
+								"key": "X-CSRFTOKEN",
+								"type": "text",
+								"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+							}
+						],
+						"url": {
+							"raw": "https://127.0.0.1:8000/api/train-data/all",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"train-data",
+								"all"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Origin, Cookie"
+						},
+						{
+							"key": "Allow",
+							"value": "OPTIONS, GET, POST"
+						},
+						{
+							"key": "Content-Length",
+							"value": "213"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "accesstoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MDUyMDQyNTgsImlhdCI6MTYwNTIwMDY1OH0.uggcYO6ebW9-dIDuZLZcNTPTn-l4TaTMgMTWktKPnvk; HttpOnly; Path=/; SameSite=None; Secure"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": true,\n    \"messages\": [],\n    \"result_data\": [\n        {\n            \"id\": 2,\n            \"filename\": \"cocunut_11_9_2020\",\n            \"type\": 1,\n            \"description\": \"Cocunut datas only, for test\",\n            \"cdate\": \"2020-11-10T00:27:48.896674\",\n            \"mdate\": \"2020-11-10T02:15:26.038058\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Train Data/All Trainable",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/train-data/all-trainable",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"train-data",
+						"all-trainable"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Train Data/All Deleted",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/train-data/all-deleted",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"train-data",
+						"all-deleted"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Train Data/Download",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/train-data/download?id=2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"train-data",
+						"download"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Train Data/Toggle status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/train-data/toggle?id=2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"train-data",
+						"toggle"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Train Data/Delete",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"delete_reason\": \"Data were useless\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/train-data/delete",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"train-data",
+						"delete"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Train Data/Change description",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 2,\r\n    \"description\": \"Cocunut datas only, for test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/train-data/change-description",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"train-data",
+						"change-description"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Train Data/Add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"filename\": \"test_19_11_2020_6\",\r\n    \"description\": \"Test data\",\r\n    \"include_data\": [9, 32, 34, 35]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/train-data/add",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"train-data",
+						"add"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Train Data/Add",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Referer",
+								"type": "text",
+								"value": "https://127.0.0.1:3000"
+							},
+							{
+								"key": "X-CSRFTOKEN",
+								"type": "text",
+								"value": "DZ4fQj4MZ4TA3rVKoQbzQPW6I8Ef3jZbpSK8wbmJKFyGkMOUEyxaF9SYNKAMawW1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filename\": \"cocunut_15_9_2020\",\r\n    \"description\": \"Coconut\",\r\n    \"include_data\": [9, 18, 22]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://127.0.0.1:8000/api/train-data/add",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"train-data",
+								"add"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Origin, Cookie"
+						},
+						{
+							"key": "Allow",
+							"value": "POST, OPTIONS"
+						},
+						{
+							"key": "Content-Length",
+							"value": "176"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "accesstoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MDU0NjE1NzcsImlhdCI6MTYwNTQ1Nzk3N30.KTTVg6SBkZigEZUjMpEBVtFBlMowEvBm1pR6lx4tJls; HttpOnly; Path=/; SameSite=None; Secure"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": true,\n    \"messages\": [],\n    \"result_data\": {\n        \"id\": 4,\n        \"filename\": \"cocunut_15_9_2020\",\n        \"type\": 1,\n        \"description\": \"Coconut\",\n        \"cdate\": \"15/11/2020 23:32:56\",\n        \"mdate\": \"15/11/2020 23:32:56\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Reference Document/Get All",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/reference-document/all",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"reference-document",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reference Document/Get By ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"reference_document_id\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/reference-document/get?reference_document_id=1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"reference-document",
+						"get"
+					],
+					"query": [
+						{
+							"key": "reference_document_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reference Document/Edit",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "reference_document_id",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "reference_name",
+							"value": "HỒ CHÍ MINH - BIÊN NIÊN TIỂU SỬ - TẬP 3",
+							"type": "text"
+						},
+						{
+							"key": "link",
+							"value": "https://tulieuvankien.dangcongsan.vn/c-mac-angghen-lenin-ho-chi-minh/book/ho-chi-minh/tieu-su-cuoc-doi-va-su-nghiep/ho-chi-minh-bien-nien-tieu-su-tap-3-91945-121946-23",
+							"type": "text"
+						},
+						{
+							"key": "author",
+							"value": "HỌC VIỆN CHÍNH TRỊ QUỐC GIA HỒ CHÍ MINH - VIỆN HỒ CHÍ MINH",
+							"type": "text"
+						},
+						{
+							"key": "cover",
+							"type": "file",
+							"src": "/C:/Users/Tewi/Desktop/bnts.jpg"
+						}
+					],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/reference-document/edit",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"reference-document",
+						"edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reference Document/Add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "reference_name",
+							"value": "Coconut song",
+							"type": "text"
+						},
+						{
+							"key": "link",
+							"value": "https://www.youtube.com/watch?v=w0AOGeqOnFY",
+							"type": "text"
+						},
+						{
+							"key": "author",
+							"value": "Jeff Lau",
+							"type": "text"
+						},
+						{
+							"key": "cover",
+							"type": "file",
+							"src": "/C:/Users/Tewi/Desktop/chrome_2020-11-01_02-03-49.png"
+						}
+					],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/reference-document/add",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"reference-document",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reference Document/Delete",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/reference-document/delete",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"reference-document",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Chat History/All",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/chat-history/all",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"chat-history",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Chat History/Get",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/chat-history/get?log_id=1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"chat-history",
+						"get"
+					],
+					"query": [
+						{
+							"key": "log_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

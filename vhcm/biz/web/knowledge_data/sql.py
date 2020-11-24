@@ -54,16 +54,30 @@ ORDER BY kd.mdate
 '''
 
 GET_ALL_TRAINABLE_KNOWLEDGE_DATA = '''
-    SELECT 
-        kd.knowledge_data_id as id,
-        kd.intent as intent,
-        kd.intent_fullname as intent_fullname,
-        u.username as edit_user,
-        u.user_id as edit_user_id,
-        kd.cdate as cdate,
-        kd.mdate as mdate
-    FROM vhcm.knowledge_data kd
-    INNER JOIN vhcm.user u
-    ON kd.edit_user_id = u.user_id
-    WHERE kd.status = 2
+SELECT 
+    kd.knowledge_data_id as id,
+    kd.intent as intent,
+    kd.intent_fullname as intent_fullname,
+    u.username as edit_user,
+    u.user_id as edit_user_id,
+    kd.cdate as cdate,
+    kd.mdate as mdate
+FROM vhcm.knowledge_data kd
+INNER JOIN vhcm.user u
+ON kd.edit_user_id = u.user_id
+WHERE kd.status = 2
+'''
+
+GET_ALL_REVIEWS = '''
+SELECT 
+	u.user_id as user_id,
+	u.username as username,
+	kdr.status as status,
+	kdr.review_detail as review,
+	kdr.mdate as mdate
+FROM vhcm.knowledge_data_review kdr
+INNER JOIN vhcm.user u
+ON kdr.review_user_id = u.user_id
+WHERE kdr.status != 3
+AND kdr.knowledge_data_id = {knowledge_data_id}
 '''

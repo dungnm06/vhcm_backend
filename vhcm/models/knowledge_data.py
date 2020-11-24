@@ -41,13 +41,13 @@ class KnowledgeData(models.Model):
     edit_user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='kd_edit_user_id', verbose_name='edit user', db_index=True
     )
-    intent = models.CharField(max_length=50, verbose_name='intent', db_index=True, unique=True)
+    intent = models.CharField(max_length=100, verbose_name='intent', db_index=True, unique=True)
     intent_fullname = models.CharField(max_length=255, verbose_name='intent full name', db_index=True)
     base_response = models.TextField(verbose_name='base response')
-    status = models.SmallIntegerField(verbose_name='status', choices=PROCESS_STATUS, default=1)
+    status = models.SmallIntegerField(verbose_name='status', choices=PROCESS_STATUS, default=1, db_index=True)
     raw_data = models.TextField(verbose_name='raw text data')
     cdate = models.DateTimeField(verbose_name='created date', auto_now_add=True)
-    mdate = models.DateTimeField(verbose_name='modified date', auto_now=True)
+    mdate = models.DateTimeField(verbose_name='modified date', auto_now=True, db_index=True)
     # Many-to-many relationship with other models
     references = models.ManyToManyField(RefercenceDocument, through='KnowledgeDataRefercenceDocumentLink')
     synonym = models.ManyToManyField(Synonym, through='KnowledgeDataSynonymLink')

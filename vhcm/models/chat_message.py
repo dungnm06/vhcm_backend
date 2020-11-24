@@ -16,9 +16,11 @@ DATA_VERSION = 'data_version'
 # Chat relative
 USER_SENT = 1
 BOT_SENT = 2
+SYSTEM_SENT = 3
 SENT_TYPES = [
     (USER_SENT, 'User'),
-    (BOT_SENT, 'Bot')
+    (BOT_SENT, 'Bot'),
+    (SYSTEM_SENT, 'System')
 ]
 
 INITIAL = 0
@@ -44,6 +46,9 @@ class Message(models.Model):
     )
     sent_from = models.SmallIntegerField(
         choices=SENT_TYPES
+    )
+    user_question = models.TextField(
+        verbose_name='user asked question', null=True
     )
     message = models.TextField(
         verbose_name='chat message',
