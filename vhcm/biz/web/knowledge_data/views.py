@@ -34,7 +34,13 @@ def all(request):
 
     user = get_current_user(request)
     query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA.format(user_id=user.user_id))
-    result_data = []
+    result_data = {
+        'knowledge_datas': [],
+        'review_settings': {
+            'minimum_accept': config.config_loader.get_setting_value_int(config.MINIMUM_ACCEPT),
+            'maximum_reject': config.config_loader.get_setting_value_int(config.MAXIMUM_REJECT)
+        }
+    }
     for kd in query_data:
         kd_display = {
             'id': kd.knowledge_data_id,
@@ -53,7 +59,7 @@ def all(request):
             },
             'user_review': kd.user_review
         }
-        result_data.append(kd_display)
+        result_data['knowledge_datas'].append(kd_display)
 
     result.set_status(True)
     result.set_result_data(result_data)
@@ -267,7 +273,11 @@ def get(request):
             'accept': accept_reviews,
             'reject': reject_reviews
         },
-        'user_review': user_review_display
+        'user_review': user_review_display,
+        'review_settings': {
+            'minimum_accept': config.config_loader.get_setting_value_int(config.MINIMUM_ACCEPT),
+            'maximum_reject': config.config_loader.get_setting_value_int(config.MAXIMUM_REJECT)
+        }
     }
 
     result.set_status(True)
