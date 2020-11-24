@@ -1,5 +1,4 @@
 from collections import Counter
-
 from django.db.models import Prefetch
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
@@ -318,7 +317,7 @@ def add(request):
             document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
             if document is None:
                 raise ValueError('')
-            page = int(reference['page']) if reference['page'].strip() else None
+            page = reference['page'] if (reference['page'] and reference['page'] > 0) else None
             extra_info = reference['extra_info'].strip()
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
                 id=(next_reference_id + i),
@@ -437,6 +436,8 @@ def edit(request):
     response = Response()
     result = ResponseJSON()
 
+    user = get_current_user(request)
+
     errors = validate(request, 'edit')
     if errors:
         result.set_status(False)
@@ -449,9 +450,15 @@ def edit(request):
     if not (kd_id and isInt(kd_id)):
         raise APIException('Invalid intent id: ID({})'.format(kd_id))
 
-    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=kd_id).first()
+    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=kd_id).select_related('edit_user').first()
     if knowledge_data is None:
         raise APIException('Intent id not found: ID({})'.format(kd_id))
+
+    if knowledge_data.status != knowledge_data_model.AVAILABLE and knowledge_data.status != knowledge_data_model.PROCESSING:
+        raise APIException('Cannot edit knowledge data thats already closed')
+
+    if user.user_id != knowledge_data.edit_user.user_id and knowledge_data.status != knowledge_data_model.AVAILABLE:
+        raise APIException('You cannot edit other contributors\'s works')
 
     # Intent
     knowledge_data.intent = request.data.get('intent').strip()
@@ -462,7 +469,6 @@ def edit(request):
     # Raw data
     knowledge_data.raw_data = request.data.get('rawData').strip()
     # User
-    user = get_current_user(request)
     knowledge_data.edit_user = user
 
     knowledge_data.save()
@@ -478,7 +484,7 @@ def edit(request):
             document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
             if document is None:
                 raise ValueError('')
-            page = int(reference['page']) if reference['page'].strip() else None
+            page = reference['page'] if (reference['page'] and reference['page'] > 0) else None
             extra_info = reference['extra_info'].strip()
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
                 id=(next_reference_id + i),
@@ -589,6 +595,11 @@ def edit(request):
             ))
         next_synonym_link_id += len(synonym_word_pair['synonyms'])
     kd_synonym_model.KnowledgeDataSynonymLink.objects.bulk_create(kd_synonym_links)
+
+    # Reset all review to draft state
+    reviews = review_model.Review.objects.filter(knowledge_data=knowledge_data)
+    if reviews.exists():
+        reviews.update(status=review_model.DRAFT)
 
     result.set_status(True)
     response.data = result.to_json()
@@ -811,9 +822,13 @@ def review_data(request):
     user = get_current_user(request)
 
     knowledge_data_id = request.data.get(review_model.KNOWLEDGE_DATA)
-    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=knowledge_data_id).first()
+    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=knowledge_data_id).select_related('edit_user').first()
     if not knowledge_data:
         raise APIException('Invalid knowledge data id, knowledge data not exists')
+    if knowledge_data.status != knowledge_data_model.PROCESSING:
+        raise APIException('Knowledge data can only be reviewed in processing state')
+    if knowledge_data.edit_user.user_id == user.user_id:
+        raise APIException('You cannot review yourself works')
 
     all_reviews_query = review_model.Review.objects \
         .select_related('review_user') \
@@ -854,7 +869,7 @@ def review_data(request):
             if all_reviews_query.filter(status=review_model.ACCEPT).count() >= config.config_loader.get_setting_value_int(config.MINIMUM_ACCEPT)\
                     and all_reviews_query.filter(status=review_model.REJECT).count() <= config.config_loader.get_setting_value_int(config.MAXIMUM_REJECT):
                 knowledge_data.status = knowledge_data_model.DONE
-                knowledge_data.save()
+            knowledge_data.save()
 
     result.set_status(True)
     response.data = result.to_json()

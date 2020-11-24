@@ -11,6 +11,8 @@ PLUS = '+'
 MINUS = '-'
 SPACE = ' '
 UNDERSCORE = '_'
+EXCLAMATION = '!'
+NEW_LINE = '\n'
 # Encoding
 UTF8 = 'utf-8'
 UTF16 = 'utf-16'
