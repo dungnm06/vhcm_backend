@@ -48,6 +48,8 @@ urlpatterns = [
     path('report/all-accepted', report_views.all_accepted_report, name='all_accepted_reports'),
     path('report/all-rejected', report_views.all_rejected_report, name='all_rejected_reports'),
     path('report/get-pending', report_views.get_pending_report, name='get_pending_report'),
+    path('report/get-accepted', report_views.get_accepted_report, name='get_pending_report'),
+    path('report/get-rejected', report_views.get_rejected_report, name='get_pending_report'),
     # User
     path('user/all', user_views.all, name='get_all_users'),
     path('user/get', user_views.get, name='get_user'),

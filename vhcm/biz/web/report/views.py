@@ -94,7 +94,7 @@ def get_pending_report(request):
     if not report_id or not isInt(report_id):
         raise APIException('Invalid report id')
 
-    report = report_model.Report.objects.filter(id=report_id)\
+    report = report_model.Report.objects.filter(id=report_id, status=report_model.PENDING)\
         .select_related('reporter', 'bot_version')\
         .first()
     if not report:
@@ -126,6 +126,90 @@ def get_pending_report(request):
         'bot_version_date': report.bot_version.cdate.strftime(DATETIME_DDMMYYYY.regex),
         'cdate': report.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
         'available_knowledge_data': kds
+    }
+
+    result.set_status(True)
+    result.set_result_data(result_data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['GET', 'POST'])
+def get_accepted_report(request):
+    response = Response()
+    result = ResponseJSON()
+
+    user = get_current_user(request)
+
+    report_id = request.data.get(report_model.ID) if request.method == 'POST' else request.GET.get(report_model.ID)
+    if not report_id or not isInt(report_id):
+        raise APIException('Invalid report id')
+
+    report = report_model.Report.objects.filter(id=report_id, status=report_model.ACCEPTED)\
+        .select_related('reporter', 'processor', 'bot_version', 'forward_intent')\
+        .first()
+    if not report:
+        raise APIException('Invalid report id, report not found')
+
+    result_data = {
+        'id': report.id,
+        'report_type': report.type,
+        'reporter_id': report.reporter.user_id,
+        'reporter': report.reporter.username,
+        'reporter_note': report.reporter_note,
+        'reported_intent': report.reported_intent,
+        'report_data': report.report_data,
+        'question': report.question,
+        'bot_answer': report.bot_answer,
+        'bot_version_id': report.bot_version.id,
+        'bot_version_date': report.bot_version.cdate.strftime(DATETIME_DDMMYYYY.regex),
+        'processor_id': report.processor.user_id,
+        'processor': report.processor.username,
+        'processor_note': report.processor_note,
+        'forward_intent_id': report.forward_intent.knowledge_data_id,
+        'forward_intent_name': report.forward_intent.intent_fullname,
+        'mdate': report.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+    }
+
+    result.set_status(True)
+    result.set_result_data(result_data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['GET', 'POST'])
+def get_rejected_report(request):
+    response = Response()
+    result = ResponseJSON()
+
+    user = get_current_user(request)
+
+    report_id = request.data.get(report_model.ID) if request.method == 'POST' else request.GET.get(report_model.ID)
+    if not report_id or not isInt(report_id):
+        raise APIException('Invalid report id')
+
+    report = report_model.Report.objects.filter(id=report_id, status=report_model.REJECTED)\
+        .select_related('reporter', 'processor', 'bot_version', 'forward_intent')\
+        .first()
+    if not report:
+        raise APIException('Invalid report id, report not found')
+
+    result_data = {
+        'id': report.id,
+        'report_type': report.type,
+        'reporter_id': report.reporter.user_id,
+        'reporter': report.reporter.username,
+        'reporter_note': report.reporter_note,
+        'reported_intent': report.reported_intent,
+        'report_data': report.report_data,
+        'question': report.question,
+        'bot_answer': report.bot_answer,
+        'bot_version_id': report.bot_version.id,
+        'bot_version_date': report.bot_version.cdate.strftime(DATETIME_DDMMYYYY.regex),
+        'processor_id': report.processor.user_id,
+        'processor': report.processor.username,
+        'processor_note': report.processor_note,
+        'mdate': report.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
     }
 
     result.set_status(True)
