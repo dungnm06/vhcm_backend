@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "2ac45130-5b5f-4da7-9908-0d8fc7968483",
+		"_postman_id": "75db2f96-eb0c-43c9-a78a-2a3116b4edf6",
 		"name": "VHCM",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -794,7 +794,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{   \r\n    \"intent\": \"Coconut_test\",\r\n    \"intentFullName\": \"Coconut\",\r\n    \"baseResponse\": \"Coconut is\",\r\n    \"coresponse\": [\r\n        {\r\n            \"type\": \"WHAT\",\r\n            \"answer\": \"a big big nut\"\r\n        }\r\n    ],\r\n    \"criticalData\": [\r\n        {\r\n            \"type\": \"MISC\",\r\n            \"word\": [\r\n                {\r\n                    \"type\": \"N\",\r\n                    \"word\": \"Coconut\"\r\n                }\r\n            ],\r\n            \"verb\": []\r\n        }\r\n    ],\r\n    \"rawData\": \"Cocunut is a big big nut. But this delicous nut is not a nut.\",\r\n    \"documentReference\": [\r\n        {\r\n            \"id\": 4,\r\n            \"page\": \"\",\r\n            \"extra_info\": \"0:35 - 0:42\"\r\n        }\r\n    ],\r\n    \"questions\": [\r\n        { \r\n            \"question\": \"What is a coconut ?\",\r\n            \"generated_questions\": [\r\n                {\r\n                    \"question\": \"What is coconut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is kokonut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is Da_Coconut ?\",\r\n                    \"accept\": 1\r\n                }\r\n            ],\r\n            \"type\": [1]\r\n        }\r\n    ],\r\n    \"synonyms\":[\r\n        {\r\n            \"word\": \"coconut\",\r\n            \"synonyms\": [14]\r\n        }\r\n    ]\r\n}",
+					"raw": "{   \r\n    \"intent\": \"Coconut_test\",\r\n    \"intentFullName\": \"Coconut\",\r\n    \"baseResponse\": \"Coconut is\",\r\n    \"coresponse\": [\r\n        {\r\n            \"type\": \"WHAT\",\r\n            \"answer\": \"a big big nut\"\r\n        }\r\n    ],\r\n    \"criticalData\": [\r\n        {\r\n            \"type\": \"MISC\",\r\n            \"word\": [\r\n                {\r\n                    \"type\": \"N\",\r\n                    \"word\": \"Coconut\"\r\n                }\r\n            ],\r\n            \"verb\": []\r\n        }\r\n    ],\r\n    \"rawData\": \"Cocunut is a big big nut. But this delicous nut is not a nut.\",\r\n    \"documentReference\": [\r\n        {\r\n            \"id\": 4,\r\n            \"page\": \"\",\r\n            \"extra_info\": \"0:35 - 0:42\"\r\n        }\r\n    ],\r\n    \"questions\": [\r\n        { \r\n            \"question\": \"What is a coconut ?\",\r\n            \"generated_questions\": [\r\n                {\r\n                    \"question\": \"What is coconut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is kokonut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is Da_Coconut ?\",\r\n                    \"accept\": 1\r\n                }\r\n            ],\r\n            \"type\": [1]\r\n        }\r\n    ],\r\n    \"synonyms\":[\r\n        {\r\n            \"word\": \"coconut\",\r\n            \"synonyms\": [14]\r\n        }\r\n    ],\r\n    \"report_processing\": {\r\n        \"id\": 2,\r\n        \"processor_note\": \"Coconut is from kokoplam family. Added to raw data.\"\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -833,12 +833,12 @@
 					{
 						"key": "X-CSRFTOKEN",
 						"type": "text",
-						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{   \r\n    \"id\": 18,\r\n    \"intent\": \"Coconut_test\",\r\n    \"intentFullName\": \"Coconut\",\r\n    \"baseResponse\": \"Coconut is\",\r\n    \"coresponse\": [\r\n        {\r\n            \"type\": \"WHAT\",\r\n            \"answer\": \"a giant nut\"\r\n        }\r\n    ],\r\n    \"criticalData\": [\r\n        {\r\n            \"type\": \"PER\",\r\n            \"word\": [\r\n                {\r\n                    \"type\": \"N\",\r\n                    \"word\": \"Coconut\"\r\n                }\r\n            ],\r\n            \"verb\": []\r\n        }\r\n    ],\r\n    \"rawData\": \"Cocunut is a big big nut. But this delicous nut is not a nut. Its a koko fruit\",\r\n    \"documentReference\": [\r\n        {\r\n            \"id\": 4,\r\n            \"page\": \"\",\r\n            \"extra_info\": \"0:35 - 0:42\"\r\n        }\r\n    ],\r\n    \"questions\": [\r\n        { \r\n            \"question\": \"What is a coconut ?\",\r\n            \"generated_questions\": [\r\n                {\r\n                    \"question\": \"What is a coconut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is a kokonut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is a Da_Coconut ?\",\r\n                    \"accept\": 0\r\n                }\r\n            ],\r\n            \"type\": [1]\r\n        }\r\n    ],\r\n    \"synonyms\":[\r\n        {\r\n            \"word\": \"Cocunut\",\r\n            \"synonyms\": [14]\r\n        }\r\n    ]\r\n}",
+					"raw": "{   \r\n    \"id\": 9,\r\n    \"intent\": \"Coconut\",\r\n    \"intentFullName\": \"Coconut\",\r\n    \"baseResponse\": \"Coconut is\",\r\n    \"coresponse\": [\r\n        {\r\n            \"type\": \"WHAT\",\r\n            \"answer\": \"a giant nut\"\r\n        }\r\n    ],\r\n    \"criticalData\": [\r\n        {\r\n            \"type\": \"PER\",\r\n            \"word\": [\r\n                {\r\n                    \"type\": \"N\",\r\n                    \"word\": \"Coconut\"\r\n                }\r\n            ],\r\n            \"verb\": []\r\n        }\r\n    ],\r\n    \"rawData\": \"Cocunut is a big big nut. But this delicous nut is not a nut. Its a koko fruit. From the kokoplam family.\",\r\n    \"documentReference\": [\r\n        {\r\n            \"id\": 4,\r\n            \"page\": \"\",\r\n            \"extra_info\": \"0:35 - 0:42\"\r\n        }\r\n    ],\r\n    \"questions\": [\r\n        { \r\n            \"question\": \"What is a coconut ?\",\r\n            \"generated_questions\": [\r\n                {\r\n                    \"question\": \"What is a coconut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is a kokonut ?\",\r\n                    \"accept\": 1\r\n                },\r\n                {\r\n                    \"question\": \"What is a Da_Coconut ?\",\r\n                    \"accept\": 0\r\n                }\r\n            ],\r\n            \"type\": [1]\r\n        }\r\n    ],\r\n    \"synonyms\":[\r\n        {\r\n            \"word\": \"Cocunut\",\r\n            \"synonyms\": [14]\r\n        }\r\n    ],\r\n    \"report_processing\": {\r\n        \"id\": 2,\r\n        \"processor_note\": \"Coconut is from kokoplam family. Added to raw data.\"\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1251,9 +1251,6 @@
 		},
 		{
 			"name": "Report/All Rejected",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"method": "GET",
 				"header": [
@@ -1268,15 +1265,6 @@
 						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"knowledge_data\": 9,\r\n    \"review_detail\": \"Coconut is love, coconut is life\",\r\n    \"status\": 1\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
 					"raw": "https://127.0.0.1:8000/api/report/all-rejected",
 					"protocol": "https",
@@ -1344,6 +1332,144 @@
 							"key": "id",
 							"value": "2"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Report/Get Accepted",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"knowledge_data\": 9,\r\n    \"review_detail\": \"Coconut is love, coconut is life\",\r\n    \"status\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/report/get-accepted?id=2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"report",
+						"get-accepted"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Report/Get Rejected",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/report/get-rejected?id=2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"report",
+						"get-rejected"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Report/Reject",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 2,\r\n    \"processor_note\": \"Coconut is love, coconut is life, whats wrong here ?\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/report/reject-report",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"report",
+						"reject-report"
 					]
 				}
 			},
