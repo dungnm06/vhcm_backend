@@ -337,6 +337,7 @@ def add(request):
     if report:
         report.status = report_model.ACCEPTED
         report.processor_note = processor_note
+        report.processor = user
         report.save()
         # Note a comment of this report processing
         message = 'Report data accepted by {user} at {time}.\nProcessor note: {note}'
@@ -540,6 +541,7 @@ def edit(request):
     if report:
         report.status = report_model.ACCEPTED
         report.processor_note = processor_note
+        report.processor = user
         report.save()
         # Note a comment of this report processing
         message = 'Report data accepted by {user} at {time}.\nProcessor note: {note}'
