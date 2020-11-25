@@ -70,7 +70,7 @@ def init_bot():
 
         with open(version_file_path, 'w') as f:
             json.dump(version, f, indent=4)
-        raise RuntimeError
+        # raise RuntimeError
         # Intent classifier
         intent_classifier_instance = IntentClassifier()
         intent_classifier_instance.load()
@@ -128,13 +128,22 @@ class VirtualHCMChatbot(object):
         # For dialogue states tracking (list of dictionary(intent,types,action))
         self.user = user
         self.state_tracker = []
+        self.report_able_states = []
         # self.state_tracker.append(State())
         # Answer generator
         self.answer_generator = AnswerGenerator()
         self.train_data = train_data_model
 
     def __regis_history(self, intent, question, answer, question_types, action):
-        self.state_tracker.append(State(intent, question, answer, question_types, action))
+        state = State(intent, question, answer, question_types, action)
+        if action == chat_message.ANSWER:
+            self.report_able_states.append(len(self.state_tracker))
+        elif action == chat_message.CONFIRMATION_NG:
+            # out of index exp not gonna happen but who knows
+            bot_answer_idx = len(self.state_tracker) - 1
+            if bot_answer_idx >= 0:
+                self.report_able_states.append(bot_answer_idx)
+        self.state_tracker.append(state)
 
     def get_last_state(self):
         return self.state_tracker[len(self.state_tracker) - 1]
@@ -149,6 +158,24 @@ class VirtualHCMChatbot(object):
                             continue
                 return state
         return None
+
+    def get_last_report_able_state(self):
+        if self.report_able_states:
+            return self.state_tracker[self.report_able_states.pop()]
+        else:
+            return None
+
+    def report_able_states_to_db_data(self):
+        if self.report_able_states:
+            return COMMA.join([str(idx) for idx in self.report_able_states])
+        else:
+            return None
+
+    def extract_reportable_states(self, indexes):
+        if indexes:
+            self.report_able_states = [int(idx) for idx in indexes.split(COMMA)]
+        else:
+            self.report_able_states = []
 
     @staticmethod
     def __decide_action(chat_input, intent, types, last_state):
@@ -178,6 +205,8 @@ class VirtualHCMChatbot(object):
             action = self.__decide_action(user_input, intent, types, last_state)
             # print(action)
             bot_response = self.answer_generator.get_response(intent, types, action, last_state)
+            if action == chat_message.CONFIRMATION_NG:
+                self.report_able_states.append(self.get_last_state())
             self.__regis_history(intent, user_input, bot_response, types, action)
         else:
             bot_response = MESSAGE_BOT_GREATING

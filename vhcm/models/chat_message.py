@@ -75,6 +75,9 @@ class Message(models.Model):
     data_version = models.ForeignKey(
         TrainData, verbose_name='chatbot data version', on_delete=models.CASCADE
     )
+    reportable_bot_states = models.TextField(
+        verbose_name='indexes of reportable bot states', null=True
+    )
 
     class Meta:
         db_table = "chat_messages"

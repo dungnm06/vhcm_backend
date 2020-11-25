@@ -159,7 +159,7 @@ class ChatbotConsumer(WebsocketConsumer):
                         user_input = int(user_input)
                         # Wrong answer report
                         if user_input == 1:
-                            bot_state_to_regist = self.chatbot.get_last_bot_answer_state_correct_answer_excluded()
+                            bot_state_to_regist = self.chatbot.get_last_report_able_state()
                             if not bot_state_to_regist:
                                 self.reset_system_communicate_state()
                                 self.regist_message(chat_message.SYSTEM_SENT, bot.MESSAGE_NO_DATA_TO_REPORT)
@@ -229,7 +229,7 @@ class ChatbotConsumer(WebsocketConsumer):
                             elif self.last_state == CHOOSE_TO_CONTRIBUTE:
                                 if user_input == 'có' or user_input == 'co':
                                     self.answer_ng_user_choosen_to_contribute = True
-                                    self.bot_state_to_regist = self.chatbot.get_last_bot_answer_state_correct_answer_excluded()
+                                    self.bot_state_to_regist = self.chatbot.get_last_report_able_state()
                                     pass
                                 elif user_input == 'không' or user_input == 'khong':
                                     self.answer_ng_user_choosen_to_contribute = False
@@ -299,7 +299,7 @@ class ChatbotConsumer(WebsocketConsumer):
                     else:
                         states.append(bot.State())
             self.chatbot.state_tracker.extend(states)
-
+            self.chatbot.extract_reportable_states(last_session.reverse()[0].reportable_bot_states)
         return last_session_messages
 
     def start_new_session(self):
@@ -410,7 +410,8 @@ class ChatbotConsumer(WebsocketConsumer):
             user=self.user,
             sent_from=sent_from,
             message=message,
-            data_version=self.chatbot.train_data
+            data_version=self.chatbot.train_data,
+            reportable_bot_states=self.chatbot.report_able_states_to_db_data()
         )
 
         if bot_state:
