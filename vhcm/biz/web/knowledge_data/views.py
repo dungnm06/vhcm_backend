@@ -838,6 +838,7 @@ def all_reviews(request):
     response.data = result.to_json()
     return response
 
+
 @api_view(['POST'])
 def review_data(request):
     response = Response()

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "99cd5ff8-c78a-4389-8a26-b40281245f99",
+		"_postman_id": "2ac45130-5b5f-4da7-9908-0d8fc7968483",
 		"name": "VHCM",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1006,6 +1006,59 @@
 			"response": []
 		},
 		{
+			"name": "Comment/Delete",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"comment\": \"Cocunut chứ không phải coconut\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/delete-comment?id=1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"delete-comment"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Review",
 			"request": {
 				"method": "POST",
@@ -1103,7 +1156,7 @@
 			"response": []
 		},
 		{
-			"name": "Comment/Delete",
+			"name": "Report/All Pending",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -1118,12 +1171,12 @@
 					{
 						"key": "X-CSRFTOKEN",
 						"type": "text",
-						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": 1,\r\n    \"comment\": \"Cocunut chứ không phải coconut\"\r\n}",
+					"raw": "{\r\n    \"knowledge_data\": 9,\r\n    \"review_detail\": \"Coconut is love, coconut is life\",\r\n    \"status\": 1\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1131,7 +1184,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:8000/api/knowledge-data/delete-comment?id=1",
+					"raw": "https://127.0.0.1:8000/api/report/all-pending",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -1142,14 +1195,102 @@
 					"port": "8000",
 					"path": [
 						"api",
-						"knowledge-data",
-						"delete-comment"
-					],
-					"query": [
-						{
-							"key": "id",
-							"value": "1"
+						"report",
+						"all-pending"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Report/All Accepted",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"knowledge_data\": 9,\r\n    \"review_detail\": \"Coconut is love, coconut is life\",\r\n    \"status\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
 						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/report/all-accepted",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"report",
+						"all-accepted"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Report/All Rejected",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"knowledge_data\": 9,\r\n    \"review_detail\": \"Coconut is love, coconut is life\",\r\n    \"status\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/report/all-rejected",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"report",
+						"all-rejected"
 					]
 				}
 			},

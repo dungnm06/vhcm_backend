@@ -11,6 +11,7 @@ import vhcm.biz.web.reference_document.views as reference_document_views
 import vhcm.biz.web.user.views as user_views
 import vhcm.biz.web.train_data.views as train_data_views
 import vhcm.biz.web.chat_history.views as chat_history_views
+import vhcm.biz.web.report.views as report_views
 
 
 urlpatterns = [
@@ -42,6 +43,10 @@ urlpatterns = [
     # Knowledge data / Review
     path('knowledge-data/all-reviews', knowledge_data_views.all_reviews, name='all_reviews'),
     path('knowledge-data/review', knowledge_data_views.review_data, name='review'),
+    # Report
+    path('report/all-pending', report_views.all_pending_report, name='all_pending_reports'),
+    path('report/all-accepted', report_views.all_accepted_report, name='all_accepted_reports'),
+    path('report/all-rejected', report_views.all_rejected_report, name='all_rejected_reports'),
     # User
     path('user/all', user_views.all, name='get_all_users'),
     path('user/get', user_views.get, name='get_user'),
