@@ -1,3 +1,4 @@
+from datetime import datetime
 from collections import Counter
 from django.db.models import Prefetch
 from rest_framework.decorators import api_view
@@ -18,6 +19,7 @@ import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
 import vhcm.models.knowledge_data_generated_question as gq_model
 import vhcm.models.knowledge_data_comment as comment_model
 import vhcm.models.knowledge_data_review as review_model
+import vhcm.models.report as report_model
 import vhcm.common.config.config_manager as config
 from vhcm.serializers.comment import CommentSerializer, DeletedCommentSerializer
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
@@ -298,6 +300,21 @@ def add(request):
         response.data = result.to_json()
         return response
 
+    report_process = request.data.get('report_processing')
+    report = None
+    processor_note = None
+    if report_process:
+        try:
+            report_id = int(report_process[report_model.ID])
+            processor_note = report_process[report_model.PROCESSOR_NOTE]
+            if not processor_note or not isinstance(processor_note, str):
+                raise APIException('Report processor must leave a comment')
+            report = report_model.Report.objects.filter(id=report_id, status=report_model.PENDING).first()
+            if not report:
+                raise APIException('Report id is invalid')
+        except (KeyError, ValueError):
+            raise APIException('Report process data is invalid')
+
     # Add new Knowledge data
     knowledge_data = knowledge_data_model.KnowledgeData()
 
@@ -315,6 +332,26 @@ def add(request):
     knowledge_data.edit_user = user
 
     knowledge_data.save()
+
+    # Report process
+    if report:
+        report.status = report_model.ACCEPTED
+        report.processor_note = processor_note
+        report.save()
+        # Note a comment of this report processing
+        message = 'Report data accepted by {user} at {time}.\nProcessor note: {note}'
+        message = message.format(
+            user=user.username,
+            time=datetime.now().strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            note=processor_note
+        )
+        comment = comment_model.Comment(
+            user=user,
+            knowledge_data=knowledge_data,
+            comment=message,
+            status=comment_model.VIEWABLE
+        )
+        comment.save()
 
     # Reference document
     references = []
@@ -469,6 +506,21 @@ def edit(request):
     if user.user_id != knowledge_data.edit_user.user_id and knowledge_data.status != knowledge_data_model.AVAILABLE:
         raise APIException('You cannot edit other contributors\'s works')
 
+    report_process = request.data.get('report_processing')
+    report = None
+    processor_note = None
+    if report_process:
+        try:
+            report_id = int(report_process[report_model.ID])
+            processor_note = report_process[report_model.PROCESSOR_NOTE]
+            if not processor_note or not isinstance(processor_note, str):
+                raise APIException('Report processor must leave a comment')
+            report = report_model.Report.objects.filter(id=report_id, status=report_model.PENDING).first()
+            if not report:
+                raise APIException('Report id is invalid')
+        except (KeyError, ValueError):
+            raise APIException('Report process data is invalid')
+
     # Intent
     knowledge_data.intent = request.data.get('intent').strip()
     # Intent fullname
@@ -479,8 +531,30 @@ def edit(request):
     knowledge_data.raw_data = request.data.get('rawData').strip()
     # User
     knowledge_data.edit_user = user
+    # Status
+    knowledge_data.status = knowledge_data_model.PROCESSING
 
     knowledge_data.save()
+
+    # Report process
+    if report:
+        report.status = report_model.ACCEPTED
+        report.processor_note = processor_note
+        report.save()
+        # Note a comment of this report processing
+        message = 'Report data accepted by {user} at {time}.\nProcessor note: {note}'
+        message = message.format(
+            user=user.username,
+            time=datetime.now().strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            note=processor_note
+        )
+        comment = comment_model.Comment(
+            user=user,
+            knowledge_data=knowledge_data,
+            comment=message,
+            status=comment_model.VIEWABLE
+        )
+        comment.save()
 
     # Reference document
     kd_document_model.KnowledgeDataRefercenceDocumentLink.objects.filter(knowledge_data=knowledge_data).delete()

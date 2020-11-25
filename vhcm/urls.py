@@ -50,6 +50,7 @@ urlpatterns = [
     path('report/get-pending', report_views.get_pending_report, name='get_pending_report'),
     path('report/get-accepted', report_views.get_accepted_report, name='get_pending_report'),
     path('report/get-rejected', report_views.get_rejected_report, name='get_pending_report'),
+    path('report/reject-report', report_views.reject_report, name='reject_report'),
     # User
     path('user/all', user_views.all, name='get_all_users'),
     path('user/get', user_views.get, name='get_user'),

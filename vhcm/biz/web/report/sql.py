@@ -40,6 +40,7 @@ SELECT
 	u.username as reporter,
 	r.reported_intent as reported_intent,
 	u2.username as processor,
+	r.processor_note as reason,
 	td.cdate as bot_version,
 	r.mdate as mdate
 FROM vhcm.report r

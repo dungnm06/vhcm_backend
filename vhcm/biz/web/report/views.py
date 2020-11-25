@@ -73,7 +73,7 @@ def all_rejected_report(request):
             'reporter': report.reporter,
             'reported_intent': report.reported_intent,
             'processor': report.processor,
-            'forward_intent': report.forward_intent,
+            'reject_reason': report.reason,
             'mdate': report.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
         })
 
@@ -139,8 +139,6 @@ def get_accepted_report(request):
     response = Response()
     result = ResponseJSON()
 
-    user = get_current_user(request)
-
     report_id = request.data.get(report_model.ID) if request.method == 'POST' else request.GET.get(report_model.ID)
     if not report_id or not isInt(report_id):
         raise APIException('Invalid report id')
@@ -182,8 +180,6 @@ def get_rejected_report(request):
     response = Response()
     result = ResponseJSON()
 
-    user = get_current_user(request)
-
     report_id = request.data.get(report_model.ID) if request.method == 'POST' else request.GET.get(report_model.ID)
     if not report_id or not isInt(report_id):
         raise APIException('Invalid report id')
@@ -214,5 +210,34 @@ def get_rejected_report(request):
 
     result.set_status(True)
     result.set_result_data(result_data)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['POST'])
+def reject_report(request):
+    response = Response()
+    result = ResponseJSON()
+
+    user = get_current_user(request)
+
+    report_id = request.data.get(report_model.ID) if request.method == 'POST' else request.GET.get(report_model.ID)
+    if not report_id or not isInt(report_id):
+        raise APIException('Invalid report id')
+
+    reject_reason = request.data.get(report_model.PROCESSOR_NOTE)
+    if not reject_reason or not isinstance(reject_reason, str):
+        raise APIException('Processor must fill reject reason')
+
+    report = report_model.Report.objects.filter(id=report_id, status=report_model.PENDING).first()
+    if not report:
+        raise APIException('Invalid report id, report not found')
+
+    report.status = report_model.REJECTED
+    report.processor_note = reject_reason
+    report.processor = user
+    report.save()
+
+    result.set_status(True)
     response.data = result.to_json()
     return response
