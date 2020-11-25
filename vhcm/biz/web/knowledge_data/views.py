@@ -992,11 +992,11 @@ def validate_review(request):
         errors.append('Review detail is not filled correctly')
 
     knowledge_data_id = request.data.get(review_model.KNOWLEDGE_DATA)
-    if not (knowledge_data_id and not isInt(knowledge_data_id)):
+    if not (knowledge_data_id and isInt(knowledge_data_id)):
         errors.append('Knowledge data id is invalid')
 
     status = request.data.get(review_model.STATUS)
-    if not (status and not isinstance(status, int) and review_model.isValidStatus(status)):
+    if not (status and isinstance(status, int) and review_model.isValidStatus(status)):
         errors.append('Review submit type is invalid')
 
     return errors

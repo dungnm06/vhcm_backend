@@ -70,7 +70,7 @@ def init_bot():
 
         with open(version_file_path, 'w') as f:
             json.dump(version, f, indent=4)
-        raise RuntimeError
+        # raise RuntimeError
         # Intent classifier
         intent_classifier_instance = IntentClassifier()
         intent_classifier_instance.load()
@@ -139,9 +139,14 @@ class VirtualHCMChatbot(object):
     def get_last_state(self):
         return self.state_tracker[len(self.state_tracker) - 1]
 
-    def get_last_bot_answer_state(self):
-        for state in reversed(self.state_tracker):
+    def get_last_bot_answer_state_correct_answer_excluded(self):
+        for idx, state in reversed(list(enumerate(self.state_tracker))):
             if state.intent and state.action in [chat_message.ANSWER, chat_message.AWAIT_CONFIRMATION]:
+                if state.action == chat_message.AWAIT_CONFIRMATION:
+                    user_answer_idx = idx + 1
+                    if user_answer_idx < len(self.state_tracker):
+                        if self.state_tracker[user_answer_idx].action == chat_message.CONFIRMATION_OK:
+                            continue
                 return state
         return None
 
@@ -174,7 +179,6 @@ class VirtualHCMChatbot(object):
             # print(action)
             bot_response = self.answer_generator.get_response(intent, types, action, last_state)
             self.__regis_history(intent, user_input, bot_response, types, action)
-
         else:
             bot_response = MESSAGE_BOT_GREATING
             self.__regis_history(Intent(), None, bot_response, [], chat_message.INITIAL)
@@ -202,7 +206,7 @@ class AnswerGenerator:
 
     @staticmethod
     def confirmation_ng():
-        return 'Hiện tại chức năng báo cáo chưa hoàn thiện, mời bạn hỏi lại câu mới!'
+        return MESSAGE_CHOOSE_TO_CONTRIBUTE
 
     def answer(self, intent, types):
         response = intent.base_response
