@@ -2,6 +2,7 @@ import os
 import json
 import random
 import pickle
+import shutil
 import tensorflow as tf
 from sklearn.preprocessing import MultiLabelBinarizer
 from tensorflow.keras.optimizers import Adam
@@ -148,3 +149,8 @@ def train_question_classifier(datapath, output, sentencelength, batch, epoch, le
     }
     with open(output + '/question_type_config.json', 'w') as fp:
         json.dump(config, fp, indent=4)
+
+    # Clear traindata tempfile
+    tempstorepath = os.path.dirname(os.path.abspath(datapath))
+    if os.path.exists(tempstorepath):
+        shutil.rmtree(tempstorepath)

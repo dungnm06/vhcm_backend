@@ -1,5 +1,6 @@
 import random
 import pickle
+import shutil
 import tensorflow as tf
 import os
 import json
@@ -35,10 +36,9 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
     ###################################
     # --------- Import data --------- #
     # Import datas
-    TRAIN_DATA = data
-    data = unpickle_file(TRAIN_DATA)
-    x = data['question']
-    y = data['intent']
+    TRAIN_DATA = unpickle_file(data)
+    x = TRAIN_DATA['question']
+    y = TRAIN_DATA['intent']
     # Intent mapping for future uses
     intents_count = Counter(y)
     INTENT_TO_IDX = {intent: i for i, intent in enumerate(intents_count)}
@@ -143,3 +143,8 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
         }
     with open(bot_version_path, 'w') as f:
         json.dump(version, f, indent=4)
+
+    # Clear traindata tempfile
+    tempstorepath = os.path.dirname(os.path.abspath(data))
+    if os.path.exists(tempstorepath):
+        shutil.rmtree(tempstorepath)

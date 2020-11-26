@@ -304,6 +304,8 @@ class LanguageProcessor(object, metaclass=Singleton):
         tokenized_sentence_list = tokenized_sentence.split()
         for idx, (subject, subject_part_in_sentence) in enumerate(zip(intent_subjects, subjects_in_sentence)):
             verb = [v[1] for v in subject[intent_model.INTENT_SUBJECT_WORDS]]
+            if not verb:
+                continue
             startpos = subject_part_in_sentence[2] + 1
             next_subject_idx = idx + 1
             if next_subject_idx == len(subjects_in_sentence):

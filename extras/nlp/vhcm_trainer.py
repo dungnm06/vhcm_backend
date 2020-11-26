@@ -39,4 +39,4 @@ if __name__ == '__main__':
     if args.type == 2:
         if activation is None:
             activation = 'sigmoid'
-        train_question_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation, version)
+        train_question_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation)

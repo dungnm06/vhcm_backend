@@ -72,7 +72,7 @@ def add(request):
             return response
         storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + filename)
         if not os.path.exists(storepath):
-            os.mkdir(storepath)
+            os.makedirs(storepath)
         filepath = os.path.join(storepath, TRAIN_DATA_FILE_NAME)
         include_datas = request.data.get(train_data_model.INCLUDE_DATA)
         if not (include_datas and isinstance(include_datas, list)):
@@ -110,7 +110,7 @@ def add(request):
         intent_references_for_file_saving = {}
         synonyms_for_file_saving = {}
         with open(intent_data_filepath, 'w', newline='', encoding=UTF8) as file:
-            writer = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)
+            writer = csv.writer(file, quoting=csv.QUOTE_ALL)
             # Titles
             writer.writerow(INTENT_DATA_COLUMNS)
             # Intents

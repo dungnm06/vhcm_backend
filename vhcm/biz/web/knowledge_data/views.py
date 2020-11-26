@@ -502,7 +502,7 @@ def edit(request):
     if knowledge_data is None:
         raise APIException('Intent id not found: ID({})'.format(kd_id))
 
-    if knowledge_data.status != knowledge_data_model.AVAILABLE and knowledge_data.status != knowledge_data_model.PROCESSING:
+    if knowledge_data.status == knowledge_data_model.DISABLE:
         raise APIException('Cannot edit knowledge data thats already closed')
 
     if user.user_id != knowledge_data.edit_user.user_id and knowledge_data.status != knowledge_data_model.AVAILABLE:

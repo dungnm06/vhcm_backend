@@ -3,6 +3,7 @@ import json
 import random
 import traceback
 import shutil
+import tensorflow as tf
 from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.biz.nlu.classifiers.intent_classifier import IntentClassifier
 from vhcm.biz.nlu.classifiers.question_type_classifier import QuestionTypeClassifier
@@ -98,10 +99,11 @@ def init_bot():
             shutil.rmtree(tempstorepath)
 
         return intent_classifier_instance, question_classifier_instance, idatas, current_train_data, version
-    except (RuntimeError, IOError) as e:
+    except Exception as e:
         # Lul
         print(e)
         print(traceback.format_exc())
+        tf.keras.backend.clear_session()
         intent_classifier_instance = None
         question_classifier_instance = None
         idatas = None

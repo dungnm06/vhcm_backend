@@ -7,6 +7,7 @@ import vhcm.common.config.config_manager as config
 from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FILE_NAME, TRAIN_DATA_FOLDER
 from vhcm.models import train_data as train_data_model
 from vhcm.biz.nlu.vhcm_chatbot import intent_classifier, question_type_classifier
+from vhcm.common.utils.files import unzip, ZIP_EXTENSION
 
 # Response types
 SEND_MESSAGE = 'message'
@@ -60,6 +61,8 @@ class ClassifierConsumer(WebsocketConsumer):
             if not train_data:
                 self.send_response(TRAIN_START_FAILED)
                 return
+            train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + ZIP_EXTENSION)
+            unzip(train_data_zip, output=os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER))
             train_data_filepath = os.path.join(
                 PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + '/' + TRAIN_DATA_FILE_NAME
             )
