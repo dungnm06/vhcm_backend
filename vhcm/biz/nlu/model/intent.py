@@ -45,6 +45,12 @@ KNOWLEDGE_DATA_GET_SYNONYMS = '''
     WHERE kd.knowledge_data_id = %d;
 '''
 
+# Constants
+INTENT_SUBJECT_TYPE = 'type'
+INTENT_SUBJECT_WORDS = 'words'
+INTENT_SUBJECT_VERBS = 'verbs'
+INTENT_VERB_EMPTY = 'empty'
+
 
 class Intent:
     def __init__(self, intent_id=0, intent=None, fullname=None,
@@ -176,27 +182,19 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
 
             # Subjects (Critical datas)
             cd = data[INTENT_SUBJECTS]
-            sc = data[INTENT_VERBS]
-            if not pd.isnull(cd) and not pd.isnull(sc):
-                for cdi, sci in zip(cd.split(HASH), sc.split(HASH)):
+            verbs = data[INTENT_VERBS]
+            if not pd.isnull(cd) and not pd.isnull(verbs):
+                for cdi, verb in zip(cd.split(HASH), verbs.split(HASH)):
                     split_idx = cdi.find(COLON)
+                    if verb == INTENT_VERB_EMPTY:
+                        verb = []
+                    else:
+                        verb = [(v.split(COLON)[0], v.split(COLON)[1]) for v in verb.split(PLUS)]
                     intent.subjects.append({
-                        'type': cdi[:split_idx],
-                        'words': cdi[(split_idx + 1):],
-                        'verbs': sci
+                        INTENT_SUBJECT_TYPE: cdi[:split_idx],
+                        INTENT_SUBJECT_WORDS: cdi[(split_idx + 1):],
+                        INTENT_SUBJECT_VERBS: verb
                     })
-            # # Sentence components
-            # if not pd.isnull(sc):
-            #     sc = sc.split(HASH)
-            #     sentence_components = []
-            #     for c in sc:
-            #         if c == 'empty':
-            #             sentence_components.append([])
-            #         else:
-            #             sentence_components.append(
-            #                 [(c1.split(COLON)[0], c1.split(COLON)[1]) for c1 in c.split(PLUS)])
-            #     # print(sentence_components)
-            #     intent.sentence_components = sentence_components
 
             # Reference document
             rdi = references[str(data[INTENT_ID])]

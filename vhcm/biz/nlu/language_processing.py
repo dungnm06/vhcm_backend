@@ -5,6 +5,7 @@ from vhcm.common.constants import *
 from vhcm.common.utils.CV import to_abs_path
 from vhcm.common.singleton import Singleton
 from itertools import product
+from vhcm.biz.nlu.model import intent as intent_model
 
 
 class LanguageProcessor(object, metaclass=Singleton):
@@ -152,41 +153,56 @@ class LanguageProcessor(object, metaclass=Singleton):
 
     def get_synonym_dicts(self, word, synonym_dicts):
         # TODO:
-        #  Use word embedding for sentilast_statement analyze for more accurate in getting right synonym set
+        #  Use word embedding for sentiment analyze for more accurate in getting right synonym set
         #  in case of multiple meaning word may belong to multiple synonym set
         #  Currently get all synonym sets thats have the word
         return [synonym_dicts[sid] for sid in synonym_dicts if word in synonym_dicts[sid].words]
 
-    def find_phrase_in_sentence(self, content, sentence, synonyms):
-        corresponse_part = None
-        sentence = [w.lower() for w in sentence]
+    def find_phrase_in_sentence(self, content, sentence, synonyms, start=None, end=None):
         content = [c.lower() for c in content]
+        if not start:
+            start = 0
+        if not end:
+            end = len(sentence) - 1
+        sentence_lower = [w.lower() for w in sentence]
+        split_sentence = sentence_lower[start:(end + 1)]
+        full_sentence = SPACE.join(split_sentence)
         similaries = self.generate_similary_sentences(
             (content, synonyms),
             word_segemented=True,
             segemented_output=True)
-        # print(similaries)
+        possibilities = []
+        word_ranges = []
         for sim in similaries:
             # Should i search for words in sentence by order in array (1)
             # or just ok by having all words exist in sentence ? (2)
             # Using method 2 for now
             exist_arr = []
             idx_arr = []
-            for word in sim:
-                if word.lower() in sentence:
+            for w_idx, word in enumerate(sim):
+                if word in full_sentence:
                     exist_arr.append(True)
-                    idx_arr.append(sentence.index(word.lower()))
+                    words = word.split()
+                    words_len = len(words)
+                    if w_idx + 1 == len(sim):
+                        word_to_append = words[(words_len - 1)]
+                    else:
+                        word_to_append = words[0]
+                    idx_arr.append(sentence_lower.index(word_to_append))
                 else:
                     exist_arr.append(False)
                     break
             if all(exist_arr):
-                # print('Found critical data', content)
                 idx_arr.sort()
                 start_idx = idx_arr[0]
                 end_idx = idx_arr[len(idx_arr) - 1]
-                corresponse_part = (' '.join(sim), start_idx, end_idx)
-                break
-        return corresponse_part
+                corresponse_part = (SPACE.join(sim), start_idx, end_idx)
+                sim_length = len((SPACE.join(sim)).split())
+                word_range = end_idx - start_idx + 1
+                if sim_length == word_range:
+                    possibilities.append(corresponse_part)
+                    word_ranges.append(end_idx - start_idx)
+        return possibilities[word_ranges.index(max(word_ranges))] if word_ranges else None
 
     def grammar_struct_analyze(self, sentence_pos, ng_patterns, critical_data_infos):
         sentence_struct = [w[1] for w in sentence_pos]
@@ -243,50 +259,33 @@ class LanguageProcessor(object, metaclass=Singleton):
                     break
         return struct_ok
 
-    def analyze_critical_parts(self, intent, sentence):
-        # Word POS tagging
-        # Can only handle simple sentence for now
-        pos_tag = self.pos_tagging(sentence)[0]
-        # Obtain named entity in the sentence
-        ner = self.named_entity_reconize(sentence)
+    def analyze_critical_parts(self, pos_tag, ner, intent, tokenized_sentence):
         # Data for the process
         intent_critical_datas = intent.subjects
-        tokenized_sentence = self.word_segmentation(sentence)
         tokenized_sentence_list = tokenized_sentence.split()
 
         # Nothing to analyze
         if len(ner) == 0 and len(intent_critical_datas) == 0:
             return True
-        # User mentions more than intent critical datas number
-        # elif len(ner) > len(intent_critical_datas):
-        #     return False
 
         # Compare named entities in sentence with entities in intent
+        corresponse_parts = []
         check_flag = True
         for typ in self.ner_types:
             if not check_flag:
                 break
-            entities_in_intent = []
+            subjects_in_intent = []
             for c in intent_critical_datas:
-                if c['type'] == typ:
-                    entities_in_intent.append(c)
-
-            # if len(entities_in_intent) > 0:
-            #     print(entities_in_intent)
-            # else:
-            #     print('No', typ, 'entity in intent')
+                if c[intent_model.INTENT_SUBJECT_TYPE] == typ:
+                    subjects_in_intent.append(c)
 
             # Find in the sentence for intent critical datas
-            eit_1 = entities_in_intent[:]
-            for eit in eit_1:
-                # # get components structure
-                # struct = [c[0] for c in eit]
-                # # get main component index
-                # main_pos = struct.index(typ)
-                # find entity existence in the sentence
+            sit_1 = subjects_in_intent[:]
+            for sit in sit_1:
+                # find subject existence in the sentence
                 # corresponse_part: (phrase, entity start pos, entity end pos)
-                content = [part.split(':')[1] for part in eit['words'].split('+') if
-                           part.split(':')[0] not in self.exclude_pos_tag]
+                content = [part.split(COLON)[1] for part in sit[intent_model.INTENT_SUBJECT_WORDS].split(PLUS) if
+                           part.split(COLON)[0] not in self.exclude_pos_tag]
                 content = [c.lower() for c in content if c not in self.exclude_words]
                 # print(content)
                 corresponse_part = self.find_phrase_in_sentence(content, tokenized_sentence_list, intent.synonym_sets)
@@ -294,28 +293,42 @@ class LanguageProcessor(object, metaclass=Singleton):
                 if not corresponse_part:
                     check_flag = False
                     break
+                corresponse_parts.append(corresponse_part)
                 # Critical data existing, but need to check grammar structure too
                 check_flag = self.grammar_struct_analyze(pos_tag, self.critical_data_ng_patterns, corresponse_part)
 
-        return check_flag
+        return check_flag, corresponse_parts
 
-    def analyze_verb_components(self, intent, sentence):
+    def analyze_verb_components(self, intent, subjects_in_sentence, tokenized_sentence):
+        intent_subjects = intent.subjects
+        tokenized_sentence_list = tokenized_sentence.split()
+        for idx, (subject, subject_part_in_sentence) in enumerate(zip(intent_subjects, subjects_in_sentence)):
+            verb = [v[1] for v in subject[intent_model.INTENT_SUBJECT_WORDS]]
+            startpos = subject_part_in_sentence[2] + 1
+            next_subject_idx = idx + 1
+            if next_subject_idx == len(subjects_in_sentence):
+                endpos = len(tokenized_sentence_list) - 1
+            else:
+                endpos = subjects_in_sentence[next_subject_idx][1]
+            verb_found_in_sentence = self.find_phrase_in_sentence(verb, tokenized_sentence_list, intent.synonym_sets, start=startpos, end=endpos)
+            if not verb_found_in_sentence:
+                return False
+
         return True
 
-    def analyze_sentence_components(self, intent, sentence):
+    def analyze_sentence_components(self, intent, subjects, sentence):
         # Word POS tagging
+        # Can only handle simple sentence for now
         pos_tag = self.pos_tagging(sentence)[0]
         # Obtain named entity in the sentence
         ner = self.named_entity_reconize(sentence)
         # Data for the process
-        # intent_critical_datas = intent.critical_datas
         tokenized_sentence = self.word_segmentation(sentence)
-        tokenized_sentence_list = tokenized_sentence.split()
 
-        flag = self.analyze_critical_parts(intent, sentence)
+        flag, subjects = self.analyze_critical_parts(pos_tag, ner, intent, tokenized_sentence)
         if not flag:
             return flag
-        flag = self.analyze_verb_components(intent, sentence)
+        flag = self.analyze_verb_components(intent, subjects, tokenized_sentence)
         return flag
 
 
