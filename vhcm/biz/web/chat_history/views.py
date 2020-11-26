@@ -3,9 +3,9 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from vhcm.common.response_json import ResponseJSON
-from vhcm.common.constants import MINUS
-from vhcm.common.utils.files import pickle_file, unpickle_file
-from vhcm.serializers.chat_history import ChatHistorySerializer
+from vhcm.common.constants import DATETIME_DDMMYYYY_HHMMSS
+from vhcm.common.dao.native_query import execute_native_query
+from vhcm.biz.web.chat_history.sql import GET_ALL_CHATLOG
 import vhcm.models.chat_history as chat_history_model
 
 
@@ -14,11 +14,19 @@ def all(request):
     response = Response()
     result = ResponseJSON()
 
-    all_logs = chat_history_model.ChatHistory.objects.all().order_by(MINUS + chat_history_model.SESSION_END)
-    serialized_data = ChatHistorySerializer(all_logs, many=True)
+    all_logs = execute_native_query(GET_ALL_CHATLOG)
+    display_results = []
+    for log in all_logs:
+        display_results.append({
+            'log_id': log.log_id,
+            'username': log.username,
+            'session_start': log.session_start.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'session_end': log.session_end.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'bot_version': log.bot_version
+        })
 
     result.set_status(True)
-    result.set_result_data(serialized_data.data)
+    result.set_result_data(display_results)
     response.data = result.to_json()
     return response
 
