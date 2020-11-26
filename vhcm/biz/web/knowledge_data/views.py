@@ -340,8 +340,9 @@ def add(request):
         report.processor = user
         report.save()
         # Note a comment of this report processing
-        message = 'Report data accepted by {user} at {time}.\nProcessor note: {note}'
+        message = 'Report data ID:{report_id} accepted by {user} at {time}.\nProcessor note: {note}'
         message = message.format(
+            report_id=report.id,
             user=user.username,
             time=datetime.now().strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
             note=processor_note
@@ -544,8 +545,9 @@ def edit(request):
         report.processor = user
         report.save()
         # Note a comment of this report processing
-        message = 'Report data accepted by {user} at {time}.\nProcessor note: {note}'
+        message = 'Report data ID:{report_id} accepted by {user} at {time}.\nProcessor note: {note}'
         message = message.format(
+            report_id=report.id,
             user=user.username,
             time=datetime.now().strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
             note=processor_note
