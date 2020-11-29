@@ -447,7 +447,75 @@
 					},
 					{
 						"key": "X-CSRFTOKEN",
-						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address",
+							"value": "Unknown",
+							"type": "text"
+						},
+						{
+							"key": "phone_number",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "dungnmse06067@fpt.edu.vn",
+							"type": "text"
+						},
+						{
+							"key": "avatar",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "avatar_edit",
+							"value": "1",
+							"type": "text"
+						}
+					],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/edit",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/AdminEdit",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"value": "https://127.0.0.1:3000",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX",
 						"type": "text"
 					}
 				],
@@ -510,7 +578,12 @@
 						{
 							"key": "avatar",
 							"type": "file",
-							"src": "/C:/Users/Tewi/Downloads/unnamed.jpg"
+							"src": []
+						},
+						{
+							"key": "avatar_edit",
+							"value": "1",
+							"type": "text"
 						}
 					],
 					"options": {
@@ -518,7 +591,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:8000/api/user/edit",
+					"raw": "https://127.0.0.1:8000/api/user/admin-edit",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -530,7 +603,7 @@
 					"path": [
 						"api",
 						"user",
-						"edit"
+						"admin-edit"
 					]
 				}
 			},
@@ -2273,12 +2346,12 @@
 					{
 						"key": "X-CSRFTOKEN",
 						"type": "text",
-						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"filename\": \"test_19_11_2020_6\",\r\n    \"description\": \"Test data\",\r\n    \"include_data\": [9, 32, 34, 35]\r\n}",
+					"raw": "{\r\n    \"filename\": \"test_19_11_2020_6\",\r\n    \"description\": \"Test data\",\r\n    \"include_data\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
