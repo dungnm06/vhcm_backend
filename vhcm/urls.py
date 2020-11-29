@@ -52,9 +52,10 @@ urlpatterns = [
     path('report/get-rejected', report_views.get_rejected_report, name='get_pending_report'),
     path('report/reject-report', report_views.reject_report, name='reject_report'),
     # User
-    path('user/all', user_views.all, name='get_all_users'),
+    path('user/all', user_views.all_user, name='get_all_users'),
     path('user/get', user_views.get, name='get_user'),
     path('user/add', user_views.AddUser.as_view(), name='add_user'),
+    path('user/admin-edit', user_views.AdminEditUser.as_view(), name='admin_edit_user'),
     path('user/edit', user_views.EditUser.as_view(), name='edit_user'),
     path('user/change-status', user_views.change_status, name='change_user_status'),
     path('user/update-password-first-login', user_views.update_password_first_login, name='first_time_login_update_password'),

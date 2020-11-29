@@ -20,7 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--activation', help='Activation function')
     args = parser.parse_args()
 
-    type = args.type
+    classifier_type = args.type
     data = args.data
     version = args.version
     output = args.output
@@ -32,11 +32,13 @@ if __name__ == '__main__':
     epsilon = args.epsilon
     activation = args.activation
 
-    if args.type == 1:
+    if classifier_type == 1:
         if activation is None:
             activation = 'softmax'
-        train_intent_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation, version)
-    if args.type == 2:
+        train_intent_classifier(data, output, sentence_length, batch, epoch,
+                                learning_rate, epsilon, activation, version)
+    if classifier_type == 2:
         if activation is None:
             activation = 'sigmoid'
-        train_question_classifier(data, output, sentence_length, batch, epoch, learning_rate, epsilon, activation)
+        train_question_classifier(data, output, sentence_length, batch, epoch,
+                                  learning_rate, epsilon, activation)

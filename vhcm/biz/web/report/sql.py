@@ -2,6 +2,7 @@ ALL_PENDING_REPORT = '''
 SELECT 
 	r.id as report_id,
 	r.type as report_type,
+	r.reporter_id as reporter_id,
 	u.username as reporter,
 	r.reported_intent as reported_intent,
 	td.cdate as bot_version,
@@ -18,8 +19,10 @@ ALL_ACCEPTED_REPORT = '''
 SELECT 
 	r.id as report_id,
 	r.type as report_type,
+	r.reporter_id as reporter_id,
 	u.username as reporter,
 	r.reported_intent as reported_intent,
+	r.processor_id as processor_id,
 	u2.username as processor,
 	kd.intent as forward_intent,
 	r.mdate as mdate
@@ -37,8 +40,10 @@ ALL_REJECTED_REPORT = '''
 SELECT 
 	r.id as report_id,
 	r.type as report_type,
+	r.reporter_id as reporter_id,
 	u.username as reporter,
 	r.reported_intent as reported_intent,
+	r.processor_id as processor_id,
 	u2.username as processor,
 	r.processor_note as reason,
 	td.cdate as bot_version,

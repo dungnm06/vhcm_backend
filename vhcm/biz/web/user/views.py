@@ -11,7 +11,7 @@ from rest_framework import exceptions
 from rest_framework.response import Response
 from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.user import UserSerializer
-from .forms import UserEditForm, UserAddForm
+from .forms import AdminEditUserForm, UserAddForm, EditUserForm, AVATAR_EDIT_FLAG
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
 from vhcm.common.config.config_manager import config_loader, DEFAULT_PASSWORD
@@ -20,7 +20,7 @@ from vhcm.biz.web.user.sql import DEACTIVE_USER_RELATIVES
 
 
 @api_view(['GET', 'POST'])
-def all(request):
+def all_user(request):
     response = Response()
     result = ResponseJSON()
 
@@ -73,6 +73,7 @@ class AddUser(APIView):
     parser_class = (ImageUploadParser,)
 
     def add_user(self, request):
+        ensure_admin(request)
         response = Response()
         result = ResponseJSON()
         ensure_admin(request)
@@ -94,16 +95,6 @@ class AddUser(APIView):
             user.phone_number = datas.phone_number
             user.avatar = datas.avatar
 
-            # if user_model.AVATAR in request.data and request.data.get(user_model.AVATAR):
-            #     f = request.data.get(user_model.AVATAR).read()
-            #     image_error = image_validate(f)
-            #     if image_error:
-            #         result.set_status(False)
-            #         result.set_messages(image_error)
-            #         response.data = result.to_json()
-            #         return response
-            #     user.avatar = f
-
             user.save()
             serialized_user = UserSerializer(user)
             result.set_result_data(serialized_user.data)
@@ -117,20 +108,20 @@ class AddUser(APIView):
         response.data = result.to_json()
         return response
 
-    def post(self, request, format=None):
+    def post(self, request):
         return self.add_user(request)
 
-    def put(self, request, format=None):
+    def put(self, request):
         return self.add_user(request)
 
 
-class EditUser(APIView):
+class AdminEditUser(APIView):
     parser_class = (ImageUploadParser,)
 
     def edit_user(self, request):
+        ensure_admin(request)
         response = Response()
         result = ResponseJSON()
-        current_user = get_current_user(request)
 
         try:
             user_id = int(request.data.get('id'))
@@ -142,13 +133,7 @@ class EditUser(APIView):
         except KeyError:
             raise Exception('Missing user id')
 
-        if not current_user.admin and user.admin:
-            raise exceptions.PermissionDenied('Only superuser can edit this user infomations')
-
-        if current_user.user_id != user.user_id and not current_user.admin:
-            raise exceptions.PermissionDenied('You dont have right to edit this user infomations')
-
-        form = UserEditForm(request.data, request.FILES, instance=user)
+        form = AdminEditUserForm(request.data, request.FILES, instance=user)
         if form.is_valid():
             datas = form.instance
             user.fullname = datas.fullname
@@ -160,19 +145,9 @@ class EditUser(APIView):
             user.email = datas.email
             user.id_number = datas.id_number
             user.phone_number = datas.phone_number
-            if datas.avatar:
+            avatar_edit_flag = form.cleaned_data.get(AVATAR_EDIT_FLAG)
+            if avatar_edit_flag == '1':
                 user.avatar = datas.avatar
-
-            # # BinaryField is non-editable so it cant be added to validation form
-            # if user_model.AVATAR in request.data and request.data.get(user_model.AVATAR):
-            #     f = request.data.get(user_model.AVATAR).read()
-            #     image_error = image_validate(f)
-            #     if image_error:
-            #         result.set_status(False)
-            #         result.set_messages(image_error)
-            #         response.data = result.to_json()
-            #         return response
-            #     user.avatar = f
 
             user.save()
             serialized_user = UserSerializer(user)
@@ -187,10 +162,48 @@ class EditUser(APIView):
         response.data = result.to_json()
         return response
 
-    def post(self, request, format=None):
+    def post(self, request):
         return self.edit_user(request)
 
-    def put(self, request, format=None):
+    def put(self, request):
+        return self.edit_user(request)
+
+
+class EditUser(APIView):
+    parser_class = (ImageUploadParser,)
+
+    def edit_user(self, request):
+        response = Response()
+        result = ResponseJSON()
+        user = get_current_user(request)
+
+        form = EditUserForm(request.data, request.FILES, instance=user)
+        if form.is_valid():
+            datas = form.instance
+            user.address = datas.address
+            user.email = datas.email
+            user.phone_number = datas.phone_number
+            avatar_edit_flag = form.cleaned_data.get(AVATAR_EDIT_FLAG)
+            if avatar_edit_flag == '1':
+                user.avatar = datas.avatar
+
+            user.save()
+            serialized_user = UserSerializer(user)
+            result.set_result_data(serialized_user.data)
+        else:
+            result.set_status(False)
+            result.set_messages(extract_validation_messages(form, user_model.FIELDS))
+            response.data = result.to_json()
+            return response
+
+        result.set_status(True)
+        response.data = result.to_json()
+        return response
+
+    def post(self, request):
+        return self.edit_user(request)
+
+    def put(self, request):
         return self.edit_user(request)
 
 

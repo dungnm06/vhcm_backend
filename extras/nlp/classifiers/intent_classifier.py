@@ -4,7 +4,6 @@ import shutil
 import tensorflow as tf
 import os
 import json
-from pathlib import Path
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy

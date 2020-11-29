@@ -23,6 +23,7 @@ def all_pending_report(request):
         reports_display.append({
             'report_id': report.report_id,
             'report_type': report.report_type,
+            'reporter_id': report.reporter_id,
             'reporter': report.reporter,
             'reported_intent': report.reported_intent,
             'bot_version': report.bot_version.strftime(DATETIME_DDMMYYYY.regex),
@@ -46,8 +47,10 @@ def all_accepted_report(request):
         reports_display.append({
             'report_id': report.report_id,
             'report_type': report.report_type,
+            'reporter_id': report.reporter_id,
             'reporter': report.reporter,
             'reported_intent': report.reported_intent,
+            'processor_id': report.processor_id,
             'processor': report.processor,
             'forward_intent': report.forward_intent,
             'mdate': report.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
@@ -70,8 +73,10 @@ def all_rejected_report(request):
         reports_display.append({
             'report_id': report.report_id,
             'report_type': report.report_type,
+            'reporter_id': report.reporter_id,
             'reporter': report.reporter,
             'reported_intent': report.reported_intent,
+            'processor_id': report.processor_id,
             'processor': report.processor,
             'reject_reason': report.reason,
             'mdate': report.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)

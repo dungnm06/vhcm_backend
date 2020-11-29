@@ -132,7 +132,7 @@ def train_question_classifier(datapath, output, sentencelength, batch, epoch, le
     save_path = os.path.join(output, 'question_type/model_weights')
     model.save_weights(save_path)
 
-    # Save intent map
+    # Save question type map
     map_datas = {
         'obj2idx': type2id_map,
         'idx2obj': id2type_map
