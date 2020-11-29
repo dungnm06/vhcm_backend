@@ -479,7 +479,7 @@ class ChatbotConsumer(WebsocketConsumer):
             bot_version=self.chatbot.train_data
         )
         if self.processing_report_type in REGIST_BOT_STATE_TYPES and bot_state:
-            report.intent = bot_state.intent.intent
+            report.reported_intent = bot_state.intent.intent
             report.question = bot_state.question
             report.bot_answer = bot_state.answer
         report.save()

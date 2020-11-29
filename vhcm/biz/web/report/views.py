@@ -25,6 +25,7 @@ def all_pending_report(request):
             'report_type': report.report_type,
             'reporter_id': report.reporter_id,
             'reporter': report.reporter,
+            'report_data': report.report_data,
             'reported_intent': report.reported_intent,
             'bot_version': report.bot_version.strftime(DATETIME_DDMMYYYY.regex),
             'cdate': report.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
@@ -49,6 +50,7 @@ def all_accepted_report(request):
             'report_type': report.report_type,
             'reporter_id': report.reporter_id,
             'reporter': report.reporter,
+            'report_data': report.report_data,
             'reported_intent': report.reported_intent,
             'processor_id': report.processor_id,
             'processor': report.processor,
@@ -75,6 +77,7 @@ def all_rejected_report(request):
             'report_type': report.report_type,
             'reporter_id': report.reporter_id,
             'reporter': report.reporter,
+            'report_data': report.report_data,
             'reported_intent': report.reported_intent,
             'processor_id': report.processor_id,
             'processor': report.processor,

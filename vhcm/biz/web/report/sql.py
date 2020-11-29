@@ -5,6 +5,7 @@ SELECT
 	r.reporter_id as reporter_id,
 	u.username as reporter,
 	r.reported_intent as reported_intent,
+	r.report_data as report_data,
 	td.cdate as bot_version,
 	r.cdate as cdate
 FROM vhcm.report r
@@ -22,6 +23,7 @@ SELECT
 	r.reporter_id as reporter_id,
 	u.username as reporter,
 	r.reported_intent as reported_intent,
+	r.report_data as report_data,
 	r.processor_id as processor_id,
 	u2.username as processor,
 	kd.intent as forward_intent,
@@ -43,6 +45,7 @@ SELECT
 	r.reporter_id as reporter_id,
 	u.username as reporter,
 	r.reported_intent as reported_intent,
+	r.report_data as report_data,
 	r.processor_id as processor_id,
 	u2.username as processor,
 	r.processor_note as reason,
