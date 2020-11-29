@@ -144,7 +144,7 @@ def load_from_db(models):
 def load_from_data_file(intents_data_path, references_path, synonyms_path):
     with open(synonyms_path, encoding=UTF8) as synonym_file, open(references_path, encoding=UTF8) as references_file:
         intent_maps = {}
-        intent_datas = pd.read_csv(intents_data_path)
+        intent_datas = pd.read_csv(intents_data_path, dtype=str)
         references = json.load(references_file)
         synonyms = json.load(synonym_file)
 
@@ -203,7 +203,7 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
 
             # Synonym words dictionary
             synonym_ids = data[INTENT_SYNONYM_IDS]
-            if synonym_ids:
+            if not pd.isnull(synonym_ids):
                 synonym_ids = synonym_ids.split(COMMA)
                 for s in synonym_ids:
                     synonym_set = SynonymSet()

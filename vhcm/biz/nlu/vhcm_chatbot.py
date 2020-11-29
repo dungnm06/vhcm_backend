@@ -142,9 +142,10 @@ class VirtualHCMChatbot(object):
             self.report_able_states.append(len(self.state_tracker))
         elif action == chat_message.CONFIRMATION_NG:
             # out of index exp not gonna happen but who knows
-            bot_answer_idx = len(self.state_tracker) - 1
+            bot_answer_idx = (len(self.state_tracker)-1)
             if bot_answer_idx >= 0:
                 self.report_able_states.append(bot_answer_idx)
+
         self.state_tracker.append(state)
 
     def get_last_state(self):
@@ -200,6 +201,7 @@ class VirtualHCMChatbot(object):
             if last_state.action != chat_message.AWAIT_CONFIRMATION:
                 intent_name = intent_classifier.predict(user_input)
                 types = question_type_classifier.predict(user_input)
+                types = [int(t) for t in types]
                 intent = intent_datas[intent_name]
             else:
                 intent = last_state.intent
@@ -207,8 +209,6 @@ class VirtualHCMChatbot(object):
             action = self.__decide_action(user_input, intent, types, last_state)
             # print(action)
             bot_response = self.answer_generator.get_response(intent, types, action, last_state)
-            if action == chat_message.CONFIRMATION_NG:
-                self.report_able_states.append(self.get_last_state())
             self.__regis_history(intent, user_input, bot_response, types, action)
         else:
             bot_response = MESSAGE_BOT_GREATING
@@ -242,8 +242,7 @@ class AnswerGenerator:
     def answer(self, intent, types):
         response = intent.base_response
         # Get type data exists in intent
-        existing_types = [int(self.question_type2id[t]) for t in types if
-                          int(self.question_id2type[t]) in intent.corresponding_datas]
+        existing_types = [t for t in types if t in intent.corresponding_datas]
         # If any of user asking data types not exist in intent so just print all intent data
         if not existing_types:
             response += (SPACE + SPACE.join(random.choice(intent.corresponding_datas[key]) for key in intent.corresponding_datas))

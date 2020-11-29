@@ -180,15 +180,16 @@ class LanguageProcessor(object, metaclass=Singleton):
             exist_arr = []
             idx_arr = []
             for w_idx, word in enumerate(sim):
-                if word in full_sentence:
+                w_lower = word.lower()
+                if w_lower in split_sentence:
                     exist_arr.append(True)
-                    words = word.split()
+                    words = w_lower.split()
                     words_len = len(words)
                     if w_idx + 1 == len(sim):
                         word_to_append = words[(words_len - 1)]
                     else:
                         word_to_append = words[0]
-                    idx_arr.append(sentence_lower.index(word_to_append))
+                    idx_arr.append(split_sentence.index(word_to_append))
                 else:
                     exist_arr.append(False)
                     break
@@ -303,7 +304,7 @@ class LanguageProcessor(object, metaclass=Singleton):
         intent_subjects = intent.subjects
         tokenized_sentence_list = tokenized_sentence.split()
         for idx, (subject, subject_part_in_sentence) in enumerate(zip(intent_subjects, subjects_in_sentence)):
-            verb = [v[1] for v in subject[intent_model.INTENT_SUBJECT_WORDS]]
+            verb = [v[1] for v in subject[intent_model.INTENT_SUBJECT_VERBS]]
             if not verb:
                 continue
             startpos = subject_part_in_sentence[2] + 1
@@ -318,7 +319,7 @@ class LanguageProcessor(object, metaclass=Singleton):
 
         return True
 
-    def analyze_sentence_components(self, intent, subjects, sentence):
+    def analyze_sentence_components(self, intent, sentence):
         # Word POS tagging
         # Can only handle simple sentence for now
         pos_tag = self.pos_tagging(sentence)[0]
