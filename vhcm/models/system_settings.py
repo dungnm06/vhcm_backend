@@ -5,6 +5,7 @@ from django.db import models
 ID = 'setting_id'
 NAME = 'setting_name'
 DESCRIPTION = 'description'
+TYPE = 'type'
 VALUE = 'value'
 DEFAULT = 'default'
 CDATE = 'cdate'

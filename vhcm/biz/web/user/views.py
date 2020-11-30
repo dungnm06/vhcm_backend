@@ -55,12 +55,6 @@ def get(request):
     except KeyError:
         raise Exception('Missing user id')
 
-    if not current_user.admin and user.admin:
-        raise exceptions.PermissionDenied('Only superuser can view this user infomations')
-
-    if current_user.user_id != user.user_id and not current_user.admin:
-        raise exceptions.PermissionDenied('You dont have right to view this user infomations')
-
     serialized_user = UserSerializer(user).data
 
     result.set_status(True)
@@ -146,8 +140,8 @@ class AdminEditUser(APIView):
             user.id_number = datas.id_number
             user.phone_number = datas.phone_number
             avatar_edit_flag = form.cleaned_data.get(AVATAR_EDIT_FLAG)
-            if avatar_edit_flag == '1':
-                user.avatar = datas.avatar
+            if avatar_edit_flag == 1:
+                user.avatar = datas.avatar if form.data.get(user_model.AVATAR) else None
 
             user.save()
             serialized_user = UserSerializer(user)
@@ -184,8 +178,8 @@ class EditUser(APIView):
             user.email = datas.email
             user.phone_number = datas.phone_number
             avatar_edit_flag = form.cleaned_data.get(AVATAR_EDIT_FLAG)
-            if avatar_edit_flag == '1':
-                user.avatar = datas.avatar
+            if avatar_edit_flag == 1:
+                user.avatar = datas.avatar if form.data.get(user_model.AVATAR) else None
 
             user.save()
             serialized_user = UserSerializer(user)

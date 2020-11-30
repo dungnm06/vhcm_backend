@@ -3,7 +3,7 @@ import vhcm.views as root_view
 import vhcm.biz.web.login.views as login_views
 import vhcm.biz.web.logout.views as logout_views
 from vhcm.common.config.config_manager import add_system_settings
-import vhcm.biz.web.setting.views as setting_views
+import vhcm.biz.web.settings.views as setting_views
 import vhcm.biz.web.nlp.views as nlp_views
 import vhcm.biz.web.knowledge_data.views as knowledge_data_views
 import vhcm.biz.web.synonym.views as synonym_views
@@ -23,8 +23,8 @@ urlpatterns = [
     # path('refresh-token', login_views.request_refresh_token, name='refresh_token'),
     # System settings
     path('setting/init', add_system_settings, name='add_base_system_settings'),
-    path('setting/all', setting_views.all, name='get_all_system_settings'),
-    path('setting/update', setting_views.update, name='update_system_settings'),
+    path('setting/all', setting_views.all_settings, name='get_all_system_settings'),
+    path('setting/update', setting_views.edit, name='update_system_settings'),
     # NLP
     path('nlp/tokenize', nlp_views.tokenize_sentences, name='tokenize_sentence'),
     path('nlp/untokenize', nlp_views.untokenize_sentences, name='tokenize_sentence'),
