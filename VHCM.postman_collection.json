@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "75db2f96-eb0c-43c9-a78a-2a3116b4edf6",
+		"_postman_id": "2d9bbb46-feaa-40f9-8032-3c719bc8b7b6",
 		"name": "VHCM",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"dungnm\",\r\n    \"password\": \"123\"\r\n}",
+					"raw": "{\r\n    \"username\": \"dunglt\",\r\n    \"password\": \"1234\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -226,12 +226,12 @@
 					{
 						"key": "X-CSRFTOKEN",
 						"type": "text",
-						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"settings\": [\r\n        {\r\n            \"setting_id\": \"login_expiration_limit\",\r\n            \"value\": \"60\"\r\n        }\r\n    ]\r\n}",
+					"raw": "{\r\n    \"setting_id\": \"login_expiration_limit\",\r\n    \"value\": \"45\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -447,7 +447,7 @@
 					},
 					{
 						"key": "X-CSRFTOKEN",
-						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX",
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet",
 						"type": "text"
 					}
 				],
@@ -466,7 +466,7 @@
 						},
 						{
 							"key": "email",
-							"value": "dungnmse06067@fpt.edu.vn",
+							"value": "retard@fpt.edu.vn",
 							"type": "text"
 						},
 						{
