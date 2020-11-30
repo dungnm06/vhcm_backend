@@ -1,7 +1,8 @@
 import argparse
 import os
-from classifiers.intent_classifier import train_intent_classifier
-from classifiers.question_classifier import train_question_classifier
+from classifiers.hcm_intent_classifier import train_intent_classifier
+from classifiers.hcm_question_type_classifier import train_question_classifier
+from classifiers.dialogue_intent_recognizer import train_dialogue_intent_recognizer
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 
@@ -42,3 +43,6 @@ if __name__ == '__main__':
             activation = 'sigmoid'
         train_question_classifier(data, output, sentence_length, batch, epoch,
                                   learning_rate, epsilon, activation)
+
+    if classifier_type == 3:
+        train_dialogue_intent_recognizer('C:/Users/Tewi/Desktop/vhcm_backend/extras/nlp/data/train_data/test_26_11_2020', output)

@@ -81,6 +81,7 @@ ACCEPT_IMAGE_FORMAT = 'accept_image_format'
 DEFAULT_PASSWORD = 'default_password'
 # NLP
 VNCORENLP = 'vncorenlp'
+STOPWORDS = 'stopwords'
 CLASSIFIER_TRAINER_SCRIPT = 'classifier_train_script'
 NAMED_ENTITY_TYPES = 'named_entity_types'
 CRITICAL_DATA_NG_PATTERNS = 'subject_data_ng_pattern'
@@ -96,8 +97,6 @@ config_loader = ConfigLoader()
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
-@authentication_classes([])
 def add_system_settings(request):
     response = Response()
     result = ResponseJSON()
@@ -140,6 +139,12 @@ def add_system_settings(request):
          SETTING_TYPES[NLP],
          'bị,được,giữa,và,là',
          ''),
+        (STOPWORDS,
+         'Language processing: Stopwords',
+         'Words will be excluded from sentence during text preprocessing (absolute/relative path OK)',
+         SETTING_TYPES[NLP],
+         '',
+         'extras/nlp/data/stopwords.txt'),
         (LOGIN_EXPIRATION_LIMIT,
          'System: Login expiration time',
          'Specify login expiration time threshold (in minutes)',

@@ -34,6 +34,8 @@ MESSAGE_THANK_FOR_CONTRIBUTE = 'Cảm ơn bạn đã báo cáo, dữ liệu đã
 MESSAGE_CONTINUE_TO_CHAT = 'Bạn có thể chat tiếp.'
 MESSAGE_NO_DATA_TO_REPORT = 'Bot chưa ghi nhận có dữ liệu sai để tiếp nhận'
 MESSAGE_INVALID_COMMAND = 'Câu lệnh không hợp lệ.'
+MESSAGE_INPUT_REFERENCE = 'Xin bạn hãy cho biết nguồn của thông tin:'
+MESSAGE_CHOOSE_TO_INPUT_NOTE = 'Bạn có note thêm gì không (có/không) ?'
 
 
 # Chatbot state

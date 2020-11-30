@@ -40,3 +40,16 @@ def zipdir(output, path):
 def unzip(path, output='.'):
     with zipfile.ZipFile(path, 'r') as zip_ref:
         zip_ref.extractall(output)
+
+
+def load_text_data(txt_file):
+    try:
+        texts = []
+        with open(txt_file, 'r', encoding='utf8') as fp:
+            for line in fp:
+                texts.append(line.strip())
+        return texts
+    except Exception as e:
+        print(e)
+        print('Failed to load file: ', txt_file)
+        return []

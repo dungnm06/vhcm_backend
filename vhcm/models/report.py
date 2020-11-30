@@ -80,6 +80,9 @@ class Report(models.Model):
     report_data = models.TextField(
         verbose_name='report data', null=True
     )
+    report_reference = models.TextField(
+        verbose_name='report data reference', null=True
+    )
     reporter_note = models.TextField(
         verbose_name='reporter note', null=True
     )

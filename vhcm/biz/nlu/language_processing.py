@@ -1,11 +1,45 @@
 import os
+import re
 from vncorenlp import VnCoreNLP
 import vhcm.common.config.config_manager as config
 from vhcm.common.constants import *
 from vhcm.common.utils.CV import to_abs_path
+from vhcm.common.utils.files import load_text_data
 from vhcm.common.singleton import Singleton
 from itertools import product
 from vhcm.biz.nlu.model import intent as intent_model
+
+
+def loaddicchar():
+    dic = {}
+    char1252 = 'à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ'.split(
+        '|')
+    charutf8 = "à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ".split(
+        '|')
+    for idx in range(len(char1252)):
+        dic[char1252[idx]] = charutf8[idx]
+    return dic
+
+
+dicchar = loaddicchar()
+
+bang_nguyen_am = [['a', 'à', 'á', 'ả', 'ã', 'ạ', 'a'],
+                  ['ă', 'ằ', 'ắ', 'ẳ', 'ẵ', 'ặ', 'aw'],
+                  ['â', 'ầ', 'ấ', 'ẩ', 'ẫ', 'ậ', 'aa'],
+                  ['e', 'è', 'é', 'ẻ', 'ẽ', 'ẹ', 'e'],
+                  ['ê', 'ề', 'ế', 'ể', 'ễ', 'ệ', 'ee'],
+                  ['i', 'ì', 'í', 'ỉ', 'ĩ', 'ị', 'i'],
+                  ['o', 'ò', 'ó', 'ỏ', 'õ', 'ọ', 'o'],
+                  ['ô', 'ồ', 'ố', 'ổ', 'ỗ', 'ộ', 'oo'],
+                  ['ơ', 'ờ', 'ớ', 'ở', 'ỡ', 'ợ', 'ow'],
+                  ['u', 'ù', 'ú', 'ủ', 'ũ', 'ụ', 'u'],
+                  ['ư', 'ừ', 'ứ', 'ử', 'ữ', 'ự', 'uw'],
+                  ['y', 'ỳ', 'ý', 'ỷ', 'ỹ', 'ỵ', 'y']]
+bang_ky_tu_dau = ['', 'f', 's', 'r', 'x', 'j']
+nguyen_am_to_ids = {}
+for i in range(len(bang_nguyen_am)):
+    for i2 in range(len(bang_nguyen_am[i]) - 1):
+        nguyen_am_to_ids[bang_nguyen_am[i][i2]] = (i, i2)
 
 
 class LanguageProcessor(object, metaclass=Singleton):
@@ -13,12 +47,15 @@ class LanguageProcessor(object, metaclass=Singleton):
         # Variables for language understanding tasks
         self.config = config.config_loader
         self.rdrsegmenter = VnCoreNLP(
-            os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.VNCORENLP))))
-
+            os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.VNCORENLP)))
+        )
         self.ner_types = self.config.get_setting_value_array(config.NAMED_ENTITY_TYPES, COMMA)
         self.critical_data_ng_patterns = self.config.get_setting_value_array(config.CRITICAL_DATA_NG_PATTERNS, COMMA)
         self.exclude_pos_tag = self.config.get_setting_value_array(config.EXCLUDE_POS_TAG, COMMA)
         self.exclude_words = self.config.get_setting_value_array(config.EXCLUDE_WORDS, COMMA)
+
+        stopwords_path = os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.STOPWORDS)))
+        self.stopwords = set(load_text_data(stopwords_path))
 
     def word_segmentation_no_join(self, text):
         return self.rdrsegmenter.tokenize(text)
@@ -60,7 +97,7 @@ class LanguageProcessor(object, metaclass=Singleton):
         idx = 0
         for ner in ners:
             tmp_list = []
-            for i, o in enumerate(ner):
+            for widx, o in enumerate(ner):
                 word, tag = o
                 if tag != 'O':
                     pos, typ = tag.split('-')
@@ -69,7 +106,7 @@ class LanguageProcessor(object, metaclass=Singleton):
                         continue
                     # Begin of entity
                     if pos == 'B' and not current_type:
-                        idx = i
+                        idx = widx
                         tmp_word += word + ' '
                         current_type = typ
                     # Inside of entity
@@ -81,30 +118,30 @@ class LanguageProcessor(object, metaclass=Singleton):
                             'type': current_type,
                             'word': tmp_word.strip(),
                             'start_idx': idx,
-                            'end_idx': i - 1
+                            'end_idx': widx - 1
                         }
                         tmp_list.append(named_entity)
                         tmp_word = word + ' '
                         current_type = typ
-                        idx = i
+                        idx = widx
                 # Outside of entity
                 elif tag == 'O' and current_type:
                     named_entity = {
                         'type': current_type,
                         'word': tmp_word.strip(),
                         'start_idx': idx,
-                        'end_idx': i - 1
+                        'end_idx': widx - 1
                     }
                     tmp_list.append(named_entity)
                     tmp_word = ''
                     current_type = ''
                 # End of sentence
-                if i + 1 == len(ner) and current_type:
+                if widx + 1 == len(ner) and current_type:
                     named_entity = {
                         'type': current_type,
                         'word': tmp_word.strip(),
                         'start_idx': idx,
-                        'end_idx': i
+                        'end_idx': widx
                     }
                     tmp_list.append(named_entity)
             named_entities_list.append(tmp_list)
@@ -123,15 +160,15 @@ class LanguageProcessor(object, metaclass=Singleton):
             # synonym_replaceable_pos: [(0,2), (1,1)]
             synonym_replaceable_pos = self.get_synonym_replaceable_pos(words_segmented_sentence, synonym_dicts)
             # [2, 1]
-            using_dicts = [srp[1] for i, srp in enumerate(synonym_replaceable_pos)]
+            using_dicts = [srp[1] for srp in synonym_replaceable_pos]
             # Generate all posible combinations
             # eg: [('Bác', 'sinh'), ('Bác', 'ra đời'), ('Hồ_Chí_Minh', 'sinh'), ('Hồ_Chí_Minh', 'ra đời')]
-            combinations = list(product(*(synonym_dicts[i].words for i in using_dicts)))
+            combinations = list(product(*(synonym_dicts[idx].words for idx in using_dicts)))
             # Create similary sentences
             for c in combinations:
                 sentence = words_segmented_sentence[:]
-                for i, srp in enumerate(synonym_replaceable_pos):
-                    sentence[srp[0]] = c[i]
+                for idx, srp in enumerate(synonym_replaceable_pos):
+                    sentence[srp[0]] = c[idx]
                 return_val.append(' '.join(sentence) if not segemented_output else sentence)
 
         return return_val
@@ -141,11 +178,11 @@ class LanguageProcessor(object, metaclass=Singleton):
         # ['Bác', 'sinh', 'năm', '1890']
         # return [(0,2), (1,1)] - tuple of (word_pos_in_sentence, synonym_id)
         synonyms_replaceable_pos = []
-        for i, word in enumerate(org_sentence):
+        for idx, word in enumerate(org_sentence):
             for dictionary_id in synonym_dicts:
                 synonyms_words = [w.lower() for w in synonym_dicts[dictionary_id].words]
                 if word.lower() in synonyms_words:
-                    synonyms_replaceable_pos.append((i, dictionary_id))
+                    synonyms_replaceable_pos.append((idx, dictionary_id))
         return synonyms_replaceable_pos
 
     def batch_generate_similary_sentences(self, sentence_synonym_dict_pairs):
@@ -219,43 +256,43 @@ class LanguageProcessor(object, metaclass=Singleton):
             tmp = end_pos + (rel_pos_end - rel_pos_main)
             right_pos = tmp if tmp <= (len(sentence_struct) - 1) else (len(sentence_struct) - 1)
             # walk to left
-            for i in range(start_pos - left_pos):
+            for idx in range(start_pos - left_pos):
                 # If Preposition so skip
-                if pattern_struct[rel_pos_main - (i + 1)] == 'E' and sentence_struct[start_pos - (i + 1)] == 'E':
+                if pattern_struct[rel_pos_main - (idx + 1)] == 'E' and sentence_struct[start_pos - (idx + 1)] == 'E':
                     continue
                 # Out of sentence, grammar error
-                elif sentence_struct[rel_pos_main - i] == 'E' and (start_pos - (i + 1)) < 0:
+                elif sentence_struct[rel_pos_main - idx] == 'E' and (start_pos - (idx + 1)) < 0:
                     struct_ok = False
                     break
                 # NG pattern matching, change flag to False but keep walking to the end
-                elif ((pattern_struct[rel_pos_main - (i + 1)] != 'any' and pattern_struct[rel_pos_main - (i + 1)] ==
-                       sentence_struct[start_pos - (i + 1)])
-                      or (pattern_struct[rel_pos_main - (i + 1)] == 'any')):
+                elif ((pattern_struct[rel_pos_main - (idx + 1)] != 'any' and pattern_struct[rel_pos_main - (idx + 1)] ==
+                       sentence_struct[start_pos - (idx + 1)])
+                      or (pattern_struct[rel_pos_main - (idx + 1)] == 'any')):
                     struct_ok = False
                 # NG pattern not match, sentence is ok
-                elif pattern_struct[rel_pos_main - (i + 1)] != 'any' and pattern_struct[rel_pos_main - (i + 1)] != \
-                        sentence_struct[start_pos - (i + 1)]:
+                elif pattern_struct[rel_pos_main - (idx + 1)] != 'any' and pattern_struct[rel_pos_main - (idx + 1)] != \
+                        sentence_struct[start_pos - (idx + 1)]:
                     struct_ok = True
                     break
             if not struct_ok:
                 break
             # walk to right
-            for i in range(right_pos - end_pos):
+            for idx in range(right_pos - end_pos):
                 # If Preposition so skip
-                if pattern_struct[rel_pos_main + (i + 1)] == 'E' and sentence_struct[end_pos + (i + 1)] == 'E':
+                if pattern_struct[rel_pos_main + (idx + 1)] == 'E' and sentence_struct[end_pos + (idx + 1)] == 'E':
                     continue
                 # Out of sentence, grammar error
-                elif sentence_struct[start_pos + i] == 'E' and (end_pos + (i + i)) > (len(sentence_struct) - 1):
+                elif sentence_struct[start_pos + idx] == 'E' and (end_pos + (idx + 1)) > (len(sentence_struct) - 1):
                     struct_ok = False
                     break
                 # NG pattern matching, change flag to False but keep walking to the end
-                elif ((pattern_struct[rel_pos_main + (i + 1)] != 'any' and pattern_struct[rel_pos_main + (i + 1)] ==
-                       sentence_struct[end_pos + (i + 1)])
-                      or (pattern_struct[rel_pos_main + (i + 1)] == 'any')):
+                elif ((pattern_struct[rel_pos_main + (idx + 1)] != 'any' and pattern_struct[rel_pos_main + (idx + 1)] ==
+                       sentence_struct[end_pos + (idx + 1)])
+                      or (pattern_struct[rel_pos_main + (idx + 1)] == 'any')):
                     struct_ok = False
                 # NG pattern not match, sentence is ok
-                elif pattern_struct[rel_pos_main + (i + 1)] != 'any' and pattern_struct[rel_pos_main + (i + 1)] != \
-                        sentence_struct[end_pos + (i + 1)]:
+                elif pattern_struct[rel_pos_main + (idx + 1)] != 'any' and pattern_struct[rel_pos_main + (idx + 1)] != \
+                        sentence_struct[end_pos + (idx + 1)]:
                     struct_ok = True
                     break
         return struct_ok
@@ -334,6 +371,119 @@ class LanguageProcessor(object, metaclass=Singleton):
         flag = self.analyze_verb_components(intent, subjects, tokenized_sentence)
         return flag
 
+    # BELOW IS CODE COPIED FROM https://gist.github.com/nguyenvanhieuvn/72ccf3ddf7d179b281fdae6c0b84942b
+    def remove_stopwords(self, line):
+        words = []
+        for word in line.strip().split():
+            if word not in self.stopwords:
+                words.append(word)
+        return ' '.join(words)
+
+    def chuan_hoa_dau_tu_tieng_viet(self, word):
+        if not self.is_valid_vietnam_word(word):
+            return word
+
+        chars = list(word)
+        dau_cau = 0
+        nguyen_am_index = []
+        qu_or_gi = False
+        for index, char in enumerate(chars):
+            x, y = nguyen_am_to_ids.get(char, (-1, -1))
+            if x == -1:
+                continue
+            elif x == 9:  # check qu
+                if index != 0 and chars[index - 1] == 'q':
+                    chars[index] = 'u'
+                    qu_or_gi = True
+            elif x == 5:  # check gi
+                if index != 0 and chars[index - 1] == 'g':
+                    chars[index] = 'i'
+                    qu_or_gi = True
+            if y != 0:
+                dau_cau = y
+                chars[index] = bang_nguyen_am[x][0]
+            if not qu_or_gi or index != 1:
+                nguyen_am_index.append(index)
+        if len(nguyen_am_index) < 2:
+            if qu_or_gi:
+                if len(chars) == 2:
+                    x, y = nguyen_am_to_ids.get(chars[1])
+                    chars[1] = bang_nguyen_am[x][dau_cau]
+                else:
+                    x, y = nguyen_am_to_ids.get(chars[2], (-1, -1))
+                    if x != -1:
+                        chars[2] = bang_nguyen_am[x][dau_cau]
+                    else:
+                        chars[1] = bang_nguyen_am[5][dau_cau] if chars[1] == 'i' else bang_nguyen_am[9][dau_cau]
+                return ''.join(chars)
+            return word
+
+        for index in nguyen_am_index:
+            x, y = nguyen_am_to_ids[chars[index]]
+            if x == 4 or x == 8:  # ê, ơ
+                chars[index] = bang_nguyen_am[x][dau_cau]
+                # for index2 in nguyen_am_index:
+                #     if index2 != index:
+                #         x, y = nguyen_am_to_ids[chars[index]]
+                #         chars[index2] = bang_nguyen_am[x][0]
+                return ''.join(chars)
+
+        if len(nguyen_am_index) == 2:
+            if nguyen_am_index[-1] == len(chars) - 1:
+                x, y = nguyen_am_to_ids[chars[nguyen_am_index[0]]]
+                chars[nguyen_am_index[0]] = bang_nguyen_am[x][dau_cau]
+                # x, y = nguyen_am_to_ids[chars[nguyen_am_index[1]]]
+                # chars[nguyen_am_index[1]] = bang_nguyen_am[x][0]
+            else:
+                # x, y = nguyen_am_to_ids[chars[nguyen_am_index[0]]]
+                # chars[nguyen_am_index[0]] = bang_nguyen_am[x][0]
+                x, y = nguyen_am_to_ids[chars[nguyen_am_index[1]]]
+                chars[nguyen_am_index[1]] = bang_nguyen_am[x][dau_cau]
+        else:
+            # x, y = nguyen_am_to_ids[chars[nguyen_am_index[0]]]
+            # chars[nguyen_am_index[0]] = bang_nguyen_am[x][0]
+            x, y = nguyen_am_to_ids[chars[nguyen_am_index[1]]]
+            chars[nguyen_am_index[1]] = bang_nguyen_am[x][dau_cau]
+            # x, y = nguyen_am_to_ids[chars[nguyen_am_index[2]]]
+            # chars[nguyen_am_index[2]] = bang_nguyen_am[x][0]
+        return ''.join(chars)
+
+    @staticmethod
+    def is_valid_vietnam_word(word):
+        chars = list(word)
+        nguyen_am_index = -1
+        for index, char in enumerate(chars):
+            x, y = nguyen_am_to_ids.get(char, (-1, -1))
+            if x != -1:
+                if nguyen_am_index == -1:
+                    nguyen_am_index = index
+                else:
+                    if index - nguyen_am_index != 1:
+                        return False
+                    nguyen_am_index = index
+        return True
+
+    def chuan_hoa_dau_cau_tieng_viet(self, sentence):
+        """
+            Chuyển câu tiếng việt về chuẩn gõ dấu kiểu cũ.
+            :param sentence:
+            :return:
+            """
+        sentence = sentence.lower()
+        words = sentence.split()
+        for index, word in enumerate(words):
+            cw = re.sub(r'(^\p{P}*)([p{L}.]*\p{L}+)(\p{P}*$)', r'\1/\2/\3', word).split('/')
+            # print(cw)
+            if len(cw) == 3:
+                cw[1] = self.chuan_hoa_dau_tu_tieng_viet(cw[1])
+            words[index] = ''.join(cw)
+        return ' '.join(words)
+
+    @staticmethod
+    def convert_unicode(txt):
+        return re.sub(
+            r'à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ',
+            lambda x: dicchar[x.group()], txt)
 
 language_processor = LanguageProcessor()
 # language_processor = None
