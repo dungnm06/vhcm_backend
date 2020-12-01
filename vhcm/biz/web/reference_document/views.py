@@ -9,7 +9,6 @@ from vhcm.serializers.reference_document import ReferenceDocumentSerializer
 from vhcm.common.utils.CV import ImageUploadParser, extract_validation_messages
 from vhcm.biz.authentication.user_session import get_current_user
 from .forms import DocumentAddForm, DocumentEditForm
-# from vhcm.biz.validation.image import image_validate
 from vhcm.common.constants import COMMA, SPACE
 
 
@@ -70,17 +69,8 @@ class AddNewReferenceDocument(APIView):
             document.reference_name = datas.reference_name
             document.link = datas.link
             document.author = datas.author
-            document.cover = datas.cover
-
-            # if document_model.COVER in request.data and request.data.get(document_model.COVER):
-            #     f = request.data.get(document_model.COVER).read()
-            #     image_error = image_validate(f)
-            #     if image_error:
-            #         result.set_status(False)
-            #         result.set_messages(image_error)
-            #         response.data = result.to_json()
-            #         return response
-            #     document.cover = f
+            if form.data.get(document_model.COVER):
+                document.cover = datas.cover
 
             document.create_user = user
             document.last_edit_user = user
@@ -127,17 +117,8 @@ class EditReferenceDocument(APIView):
             document.reference_name = datas.reference_name
             document.link = datas.link
             document.author = datas.author
-            document.cover = datas.cover
-
-            # if document_model.COVER in request.data and request.data.get(document_model.COVER):
-            #     f = request.data.get(document_model.COVER).read()
-            #     image_error = image_validate(f)
-            #     if image_error:
-            #         result.set_status(False)
-            #         result.set_messages(image_error)
-            #         response.data = result.to_json()
-            #         return response
-            #     document.cover = f
+            if form.data.get(document_model.COVER):
+                document.cover = datas.cover
 
             user = get_current_user(request)
             document.last_edit_user = user
