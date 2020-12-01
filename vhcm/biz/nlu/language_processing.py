@@ -8,6 +8,7 @@ from vhcm.common.utils.files import load_text_data
 from vhcm.common.singleton import Singleton
 from itertools import product
 from vhcm.biz.nlu.model import intent as intent_model
+from vhcm.common.dao.model_query import is_table_exists
 
 
 def loaddicchar():
@@ -44,18 +45,20 @@ for i in range(len(bang_nguyen_am)):
 
 class LanguageProcessor(object, metaclass=Singleton):
     def __init__(self):
-        # Variables for language understanding tasks
-        self.config = config.config_loader
-        self.rdrsegmenter = VnCoreNLP(
-            os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.VNCORENLP)))
-        )
-        self.ner_types = self.config.get_setting_value_array(config.NAMED_ENTITY_TYPES, COMMA)
-        self.critical_data_ng_patterns = self.config.get_setting_value_array(config.CRITICAL_DATA_NG_PATTERNS, COMMA)
-        self.exclude_pos_tag = self.config.get_setting_value_array(config.EXCLUDE_POS_TAG, COMMA)
-        self.exclude_words = self.config.get_setting_value_array(config.EXCLUDE_WORDS, COMMA)
+        # Only load setting when project did its first migration
+        if is_table_exists('system_settings'):
+            # Variables for language understanding tasks
+            self.config = config.config_loader
+            self.rdrsegmenter = VnCoreNLP(
+                os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.VNCORENLP)))
+            )
+            self.ner_types = self.config.get_setting_value_array(config.NAMED_ENTITY_TYPES, COMMA)
+            self.critical_data_ng_patterns = self.config.get_setting_value_array(config.CRITICAL_DATA_NG_PATTERNS, COMMA)
+            self.exclude_pos_tag = self.config.get_setting_value_array(config.EXCLUDE_POS_TAG, COMMA)
+            self.exclude_words = self.config.get_setting_value_array(config.EXCLUDE_WORDS, COMMA)
 
-        stopwords_path = os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.STOPWORDS)))
-        self.stopwords = set(load_text_data(stopwords_path))
+            stopwords_path = os.path.join(PROJECT_ROOT, to_abs_path(self.config.get_setting_value(config.STOPWORDS)))
+            self.stopwords = set(load_text_data(stopwords_path))
 
     def word_segmentation_no_join(self, text):
         return self.rdrsegmenter.tokenize(text)
@@ -203,7 +206,7 @@ class LanguageProcessor(object, metaclass=Singleton):
             end = len(sentence) - 1
         sentence_lower = [w.lower() for w in sentence]
         split_sentence = sentence_lower[start:(end + 1)]
-        full_sentence = SPACE.join(split_sentence)
+        # full_sentence = SPACE.join(split_sentence)
         similaries = self.generate_similary_sentences(
             (content, synonyms),
             word_segemented=True,
@@ -484,6 +487,7 @@ class LanguageProcessor(object, metaclass=Singleton):
         return re.sub(
             r'à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ',
             lambda x: dicchar[x.group()], txt)
+
 
 language_processor = LanguageProcessor()
 # language_processor = None
