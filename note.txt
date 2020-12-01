@@ -38,6 +38,7 @@ Install environment:
 	
 Deploy local:
 + conda activate django
++ (On linux) export DJANGO_SETTINGS_MODULE=restapi_core.settings
 + Deploy command: daphne -e ssl:<port>:privateKey=server_cert/key.pem:certKey=server_cert/cert.pem restapi_core.asgi:application
 Default port 8000
 daphne -e ssl:8000:privateKey=server_cert/key.pem:certKey=server_cert/cert.pem restapi_core.asgi:application

@@ -89,7 +89,7 @@ EXCLUDE_WORDS = 'exclude_word'
 PREDICT_THRESHOLD = 'predict_threshold'
 # Data review process
 MAXIMUM_REJECT = 'maximum_reject'
-MINIMUM_ACCEPT = 'minumum_accept'
+MINIMUM_ACCEPT = 'minimum_accept'
 
 # Instance
 config_loader = ConfigLoader()
