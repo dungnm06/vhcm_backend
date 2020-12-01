@@ -14,7 +14,7 @@ def all_settings(request):
     result = ResponseJSON()
 
     settings_display = []
-    for setting in config_loader.settings:
+    for setting in setting_model.SystemSetting.objects.all():
         settings_display.append({
             'setting_id': setting.setting_id,
             'setting_name': setting.setting_name,
@@ -48,6 +48,9 @@ def edit(request):
     value = request.data.get(setting_model.VALUE)
     setting.value = value
     setting.save()
+
+    # Update in-memory setting
+    config_loader.settings[setting_id][setting_model.VALUE] = value
 
     result.set_status(True)
     response.data = result.to_json()

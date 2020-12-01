@@ -41,7 +41,7 @@ class RefercenceDocument(models.Model):
     )
     link = models.TextField(null=True, blank=True, verbose_name='reference urls')
     # cover = models.BinaryField(null=True, blank=True, verbose_name='document cover')
-    cover = models.ImageField(null=True, blank=True, verbose_name='document cover')
+    cover = models.ImageField(null=True, blank=True, upload_to='reference_document/', verbose_name='document cover')
     author = models.TextField(blank=False, default='', verbose_name='document author', db_index=True)
     cdate = models.DateTimeField(verbose_name='created date', auto_now_add=True)
     mdate = models.DateTimeField(verbose_name='modified date', auto_now=True)

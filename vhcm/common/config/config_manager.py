@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from vhcm.models.system_settings import SystemSetting
+import vhcm.models.system_settings as setting_model
 from vhcm.common.response_json import ResponseJSON
 from vhcm.common.singleton import Singleton
 from vhcm.common.dao.model_query import is_table_exists
@@ -12,56 +12,61 @@ class ConfigLoader(object, metaclass=Singleton):
         self.settings = None
         # Only load setting when project did its first migration
         if is_table_exists('system_settings'):
-            self.settings = SystemSetting.objects.all()
+            self.settings = {}
+            for setting in setting_model.SystemSetting.objects.all():
+                self.settings[setting.setting_id] = {
+                    setting_model.VALUE: setting.value,
+                    setting_model.DEFAULT: setting.default
+                }
 
     def get_setting_value(self, key):
-        setting = self.settings.filter(setting_id=key).first()
+        setting = self.settings.get(key)
         if setting is None:
             raise KeyError('Setting not found: ', key)
 
-        if setting.value:
-            return setting.value
+        if setting[setting_model.VALUE]:
+            return setting[setting_model.VALUE]
         else:
-            return setting.default
+            return setting[setting_model.DEFAULT]
 
     def get_setting_value_array(self, key, separator):
-        setting = self.settings.filter(setting_id=key).first()
+        setting = self.settings.get(key)
         if setting is None:
             raise KeyError('Setting not found: ', key)
         value = None
-        if setting.value:
-            value = setting.value
+        if setting[setting_model.VALUE]:
+            value = setting[setting_model.VALUE]
         else:
-            value = setting.default
+            value = setting[setting_model.DEFAULT]
 
         return [v.strip() for v in value.split(separator)]
 
     def get_setting_value_int(self, key):
-        setting = self.settings.filter(setting_id=key).first()
+        setting = self.settings.get(key)
         if setting is None:
             raise KeyError('Setting not found: ', key)
-        value = setting.value
+        value = setting[setting_model.VALUE]
         if value and isInt(value):
             value = int(value)
         else:
-            value = int(setting.default)
+            value = int(setting[setting_model.DEFAULT])
 
         return value
 
     def get_setting_value_float(self, key):
-        setting = self.settings.filter(setting_id=key).first()
+        setting = self.settings.get(key)
         if setting is None:
             raise KeyError('Setting not found: ', key)
-        value = setting.value
+        value = setting[setting_model.VALUE]
         if value and isFloat(value):
             value = float(value)
         else:
-            value = float(setting.default)
+            value = float(setting[setting_model.DEFAULT])
 
         return value
 
     def get_setting(self, key):
-        return self.settings.filter(setting_id=key).first()
+        return setting_model.SystemSetting.objects.filter(setting_id=key).first()
 
 
 # ALL CONFIGS

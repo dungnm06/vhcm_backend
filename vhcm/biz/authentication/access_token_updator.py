@@ -10,33 +10,23 @@ from vhcm.common.constants import ACCESS_TOKEN
 
 
 def access_token_updator(request, response):
-    if not response.get('Content-Type') in ['application/octet-stream', 'text/plain']:
-        access_token = request.COOKIES.get('accesstoken')
-        if not access_token \
-                or (
-                hasattr(response, 'data') and 'An error has occured' in response.data['messages'] and
-                (
-                        (not response.data['status'] and response.data['result_data']['error_detail'] == 'Access token expired')
-                        or (not response.data['status'] and is_error_code(response.data['result_data']['status_code']))
-                )
-                ) \
-                or ('auth' in request.path)\
-                or ('logout' in request.path) \
-                or isinstance(response, FileResponse) \
-                or isinstance(response, HttpResponsePermanentRedirect):
-            return response
+    access_token = request.COOKIES.get('accesstoken')
+    if not access_token:
+        return response
+    # Decode the token
+    try:
+        payload = jwt.decode(
+            access_token, settings.SECRET_KEY, algorithms=['HS256'])
+    except jwt.ExpiredSignatureError:
+        return response
 
-        # Decode the token
-        try:
-            payload = jwt.decode(
-                access_token, settings.SECRET_KEY, algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise exceptions.AuthenticationFailed('Something wrong with access-token, do login again')
+    # Push old token to blacklist, prevent suspicious uses
+    # (currently not using this due to frontend cannot handle api call synchronously)
+    # bl_token = BlacklistedToken(token=access_token, expire=datetime.fromtimestamp(payload.get(jwt_utils.EXPIRE_TIME)))
+    # bl_token.save()
 
-        # bl_token = BlacklistedToken(token=access_token, expire=datetime.fromtimestamp(payload.get(jwt_utils.EXPIRE_TIME)))
-        # bl_token.save()
-        # Create new access token with new expire time
-        new_access_token = jwt_utils.generate_access_token(payload.get(jwt_utils.USER_ID))
-        response.set_cookie(key=ACCESS_TOKEN, value=new_access_token, httponly=True, secure=True, samesite='None')
+    # Create new access token with new expire time
+    new_access_token = jwt_utils.generate_access_token(payload.get(jwt_utils.USER_ID))
+    response.set_cookie(key=ACCESS_TOKEN, value=new_access_token, httponly=True, secure=True, samesite='None')
 
     return response

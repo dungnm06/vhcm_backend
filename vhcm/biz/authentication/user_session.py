@@ -28,12 +28,15 @@ def get_current_user(request):
     user = sessions_data.get(user_id)
     if not user:
         user = user_model.User.objects.filter(user_id=user_id).first()
-        sessions_data[user_id] = user
+        if user:
+            sessions_data[user_id] = user
 
     return user
 
 
 def ensure_admin(request):
     current_user = get_current_user(request)
-    if not current_user.admin:
+    if not current_user:
+        raise exceptions.AuthenticationFailed('Authentication credentials not provided')
+    if current_user and not current_user.admin:
         raise exceptions.PermissionDenied('Only superuser can use this API')
