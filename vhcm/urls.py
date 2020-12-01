@@ -12,6 +12,7 @@ import vhcm.biz.web.user.views as user_views
 import vhcm.biz.web.train_data.views as train_data_views
 import vhcm.biz.web.chat_history.views as chat_history_views
 import vhcm.biz.web.report.views as report_views
+import vhcm.biz.web.dashboard.views as dashboard_views
 
 
 urlpatterns = [
@@ -81,8 +82,10 @@ urlpatterns = [
     path('train-data/delete', train_data_views.delete, name='delete training data'),
     path('train-data/download', train_data_views.download, name='download training data'),
     # Chat history
-    path('chat-history/all', chat_history_views.all, name='view all logged chat session'),
-    path('chat-history/get', chat_history_views.get, name='get chat log details'),
+    path('chat-history/all', chat_history_views.all, name='view_all_logged_chat_session'),
+    path('chat-history/get', chat_history_views.get, name='get_chat_log_details'),
+    # Dashboard
+    path('dashboard', dashboard_views.dashboard_stats, name='dashboard_stats'),
     # Classifier training service
     # path('trainer/is-running', trainer_views.is_process_running, name='check_trainning_process'),
 ]
