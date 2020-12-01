@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"dunglt\",\r\n    \"password\": \"1234\"\r\n}",
+					"raw": "{\r\n    \"username\": \"dungnm\",\r\n    \"password\": \"123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -733,6 +733,40 @@
 							"key": "id",
 							"value": "2"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dashboard",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/dashboard",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"dashboard"
 					]
 				}
 			},
@@ -2561,7 +2595,7 @@
 					{
 						"key": "X-CSRFTOKEN",
 						"type": "text",
-						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
 					},
 					{
 						"key": "",
@@ -2596,7 +2630,7 @@
 						{
 							"key": "cover",
 							"type": "file",
-							"src": "/C:/Users/Tewi/Desktop/bnts.jpg"
+							"src": "/C:/Users/Tewi/Desktop/pics/39685749_2045375328815185_5136269978181304320_o.png"
 						}
 					],
 					"options": {
