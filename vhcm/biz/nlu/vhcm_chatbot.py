@@ -73,6 +73,9 @@ def init_bot():
 
         with open(version_file_path, 'w') as f:
             json.dump(version, f, indent=4)
+        if version[CURRENT_BOT_VERSION] == 0:
+            raise RuntimeError('[startup] Could not initial chatbot (Bot version: 0)')
+
         # raise RuntimeError
         # Intent classifier
         intent_classifier_instance = IntentClassifier()
@@ -104,7 +107,7 @@ def init_bot():
     except Exception as e:
         # Lul
         print(e)
-        print(traceback.format_exc())
+        # print(traceback.format_exc())
         tf.keras.backend.clear_session()
         intent_classifier_instance = None
         question_classifier_instance = None

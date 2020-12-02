@@ -35,7 +35,7 @@ Install environment:
 + Redis >= 5.0.9 (https://github.com/tporadowski/redis/releases)
 + conda create -n django python=3.6.9
 + pip install -r requirements.txt
-	
+
 Deploy local:
 + conda activate django
 + (On linux) export DJANGO_SETTINGS_MODULE=restapi_core.settings

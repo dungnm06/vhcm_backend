@@ -482,6 +482,7 @@ class ChatbotConsumer(WebsocketConsumer):
             )
             log_model.save()
             tmp_chatlog_file.close()
+            os.remove(tmp_log_path)
             # Clear session messages on DB
             last_session.delete()
 
