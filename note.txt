@@ -41,7 +41,7 @@ Deploy local:
 + (On linux) export DJANGO_SETTINGS_MODULE=restapi_core.settings
 + Deploy command: daphne -e ssl:<port>:privateKey=server_cert/key.pem:certKey=server_cert/cert.pem restapi_core.asgi:application
 Default port 8000
-daphne -e ssl:8000:privateKey=server_cert/key.pem:certKey=server_cert/cert.pem restapi_core.asgi:application
+daphne -e ssl:8000:privateKey=server_cert/vhcm.key:certKey=server_cert/vhcm.crt restapi_core.asgi:application
 
 * When have a "could not connect to server: Operation timed out" error:
     ask dungnm for DB access permission

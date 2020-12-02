@@ -51,7 +51,9 @@ CSRF_TRUSTED_ORIGINS = [
     '127.0.0.1',
     'localhost',
     '127.0.0.1:3000',
-    'localhost:3000'
+    'localhost:3000',
+    'vhcm.org',
+    'vhcm.org:3000'
 ]
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
@@ -172,14 +174,10 @@ if DATABASE_PROVIDER == 'postgresql':
                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
                 'NAME': 'vhcm-production',
                 'USER': 'postgres',
-                'PASSWORD': 'uN9pEGKv14yMJB0a',
-                'HOST': '35.224.128.36',
+                'PASSWORD': '31080606@',
+                'HOST': 'localhost',
                 'PORT': '5432',
                 'OPTIONS': {
-                    'sslmode': 'verify-ca',
-                    'sslrootcert': os.path.join(BASE_DIR, 'db_cert/server-ca.pem'),
-                    'sslcert': os.path.join(BASE_DIR, 'db_cert/client-cert.pem'),
-                    'sslkey': os.path.join(BASE_DIR, 'db_cert/client-key.pem'),
                     'options': '-c search_path=vhcm,public'
                 }
             }
