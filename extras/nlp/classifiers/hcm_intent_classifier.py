@@ -3,19 +3,23 @@ import shutil
 import tensorflow as tf
 import os
 import json
+from pathlib import Path
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
 from collections import Counter
 from bert.PhoBERT import build_PhoBERT_classifier_model
-from utils import unpickle_file
+from utils import unpickle_file, unzip
 
 
-def train_intent_classifier(data, output, sentencelength, batch, epoch, learning_rate, epsilon, activation, bot_version):
+def train_intent_classifier(datapath, output, sentencelength, batch, epoch, learning_rate, epsilon, activation, bot_version):
     ###################################
     # --------- Import data --------- #
     # Import datas
-    TRAIN_DATA = unpickle_file(data)
+    datafile_folder = Path(datapath).resolve().parent
+    unzip(datapath, output=datafile_folder)
+    train_data_filepath = os.path.join(os.path.splitext(datapath)[0], 'train_data.pickle')
+    TRAIN_DATA = unpickle_file(train_data_filepath)
     x = TRAIN_DATA['question']
     y = TRAIN_DATA['intent']
     # Intent mapping for future uses
@@ -124,6 +128,6 @@ def train_intent_classifier(data, output, sentencelength, batch, epoch, learning
         json.dump(version, f, indent=4)
 
     # Clear traindata tempfile
-    tempstorepath = os.path.dirname(os.path.abspath(data))
+    tempstorepath = os.path.dirname(os.path.abspath(datapath))
     if os.path.exists(tempstorepath):
         shutil.rmtree(tempstorepath)

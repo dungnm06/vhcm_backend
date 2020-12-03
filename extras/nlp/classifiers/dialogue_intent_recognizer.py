@@ -9,12 +9,12 @@ from sklearn.metrics import accuracy_score
 from pathlib import Path
 
 
-def train_dialogue_intent_recognizer(datafile, output):
+def train_dialogue_intent_recognizer(datafile):
     """------------ HCM relative sentence and normal sentence recognition ------------"""
     # Load HCM relative data
     datafile_folder = Path(datafile).resolve().parent
-    unzip(datafile + '.zip', output=datafile_folder)
-    train_data_filepath = os.path.join(datafile, 'train_data.pickle')
+    unzip(datafile, output=datafile_folder)
+    train_data_filepath = os.path.join(os.path.splitext(datafile)[0], 'train_data.pickle')
     hcm_data = unpickle_file(train_data_filepath)
     hcm_data = hcm_data['question']
     sample_size = len(hcm_data)
@@ -43,8 +43,7 @@ def train_dialogue_intent_recognizer(datafile, output):
     X_train_tfidf, X_test_tfidf, tfidf_vectorizer = tfidf_features(X_train, X_test, 'classifiers/trained/dialogue_tfidf_vectorizer.pickle')
 
     # Train the **intent recognizer** using LogisticRegression on the train set
-    # with the following parameters: *penalty='l2'*, *C=10*, *random_state=0*.
-    intent_recognizer = LogisticRegression(penalty='l2', C=10, random_state=0, verbose=1, n_jobs=4, max_iter=5000)
+    intent_recognizer = LogisticRegression(penalty='l2', C=10, random_state=0, verbose=1, n_jobs=2, max_iter=2000)
     intent_recognizer.fit(X_train_tfidf, y_train)
 
     # Check test accuracy.

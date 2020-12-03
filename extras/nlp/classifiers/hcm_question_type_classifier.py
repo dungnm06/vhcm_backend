@@ -3,12 +3,13 @@ import json
 import random
 import shutil
 import tensorflow as tf
+from pathlib import Path
 from sklearn.preprocessing import MultiLabelBinarizer
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import CategoricalAccuracy
 from bert.PhoBERT import build_PhoBERT_classifier_model
-from utils import unpickle_file
+from utils import unpickle_file, unzip
 
 
 def types_map_generate(types):
@@ -26,7 +27,10 @@ def train_question_classifier(datapath, output, sentencelength, batch, epoch, le
     # --------- Import data --------- #
     # Import data from csv
     # Import datas
-    data = unpickle_file(datapath)
+    datafile_folder = Path(datapath).resolve().parent
+    unzip(datapath, output=datafile_folder)
+    train_data_filepath = os.path.join(os.path.splitext(datapath)[0], 'train_data.pickle')
+    data = unpickle_file(train_data_filepath)
     x = data['question']
     y = data['type']
     # Ready output data for the model

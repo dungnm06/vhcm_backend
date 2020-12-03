@@ -45,4 +45,4 @@ if __name__ == '__main__':
                                   learning_rate, epsilon, activation)
 
     if classifier_type == 3:
-        train_dialogue_intent_recognizer('C:/Users/Tewi/Desktop/vhcm_backend/extras/nlp/data/train_data/test_26_11_2020', output)
+        train_dialogue_intent_recognizer(data)

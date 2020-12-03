@@ -4,10 +4,10 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from vhcm.biz.nlu.classifier_trainer import ClassifierTrainer
 import vhcm.common.config.config_manager as config
-from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FILE_NAME, TRAIN_DATA_FOLDER
+from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FOLDER, NEW_LINE
 from vhcm.models import train_data as train_data_model
-from vhcm.biz.nlu.vhcm_chatbot import intent_classifier, question_type_classifier, is_bot_ready
-from vhcm.common.utils.files import unzip, ZIP_EXTENSION
+from vhcm.biz.nlu.vhcm_chatbot import is_bot_ready
+from vhcm.common.utils.files import ZIP_EXTENSION
 
 # Response types
 SEND_MESSAGE = 'message'
@@ -57,18 +57,24 @@ class ClassifierConsumer(WebsocketConsumer):
 
         if command == 'start':
             if is_bot_ready():
-                self.send_response(TRAIN_START_FAILED)
+                self.send_response(
+                    TRAIN_START_FAILED,
+                    NEW_LINE.join(['Chatbot is running, for training first send a turnoff chatbot signal then restart server.',
+                                   'Or use the separate training script provided.',
+                                   'TRAINING PROCESS NOT STARTED.'])
+                )
             else:
                 data_id = text_data_json['data']
                 train_data = train_data_model.TrainData.objects.filter(id=data_id).first()
                 if not train_data:
-                    self.send_response(TRAIN_START_FAILED)
+                    self.send_response(TRAIN_START_FAILED, 'Train data not existed')
                     return
-                train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + ZIP_EXTENSION)
-                unzip(train_data_zip, output=os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER))
-                train_data_filepath = os.path.join(
-                    PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + '/' + TRAIN_DATA_FILE_NAME
-                )
+                # train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + ZIP_EXTENSION)
+                # unzip(train_data_zip, output=os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER))
+                train_data_filepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + ZIP_EXTENSION)
+                if not os.path.exists(train_data_filepath):
+                    self.send_response(TRAIN_START_FAILED, 'Train data not existed')
+                    return
                 train_type = text_data_json['type']
                 sentence_length = text_data_json['sentence_length']
                 batch = text_data_json['batch']
@@ -106,15 +112,3 @@ class ClassifierConsumer(WebsocketConsumer):
     # Check if train process running
     def is_process_running(self):
         return self.trainer.is_running()
-
-    def reload_model(self, type):
-        if type == 1:
-            self.send_response(SEND_MESSAGE, 'Reloading model... This can take up to 5 minutes....')
-            intent_classifier.load()
-            self.send_response(SEND_MESSAGE, 'Intent classifier model reloaded.')
-        elif type == 2:
-            self.send_response(SEND_MESSAGE, 'Reloading model... This can take up to 5 minutes....')
-            question_type_classifier.load()
-            self.send_response(SEND_MESSAGE, 'Question type classifier model reloaded.')
-        else:
-            self.send_response(SEND_MESSAGE, 'Invalid classifier type')

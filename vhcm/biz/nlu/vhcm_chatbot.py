@@ -75,6 +75,15 @@ def init_bot():
         if version[CURRENT_BOT_VERSION] == 0:
             raise RuntimeError('[startup] Could not initial chatbot (Bot version: 0)')
 
+        # Intents data
+        current_train_data = train_data.TrainData.objects.filter(id=version[CURRENT_BOT_VERSION]).first()
+        if not current_train_data:
+            raise RuntimeError('[startup] Cannot initial bot due to invalid intents data.')
+        train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + current_train_data.filename + ZIP_EXTENSION)
+        if not os.path.exists(train_data_zip):
+            raise RuntimeError('[startup] Cannot initial bot due to missing intents data.')
+        unzip(train_data_zip, output=os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER))
+
         # raise RuntimeError
         # Intent classifier
         intent_classifier_instance = IntentClassifier()
@@ -83,13 +92,6 @@ def init_bot():
         # Question classifier
         question_classifier_instance = QuestionTypeClassifier()
         question_classifier_instance.load()
-
-        # Intents data
-        current_train_data = train_data.TrainData.objects.filter(id=version[CURRENT_BOT_VERSION]).first()
-        if not current_train_data:
-            raise RuntimeError('[startup] Cannot initial bot due to invalid intents data.')
-        train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + current_train_data.filename + ZIP_EXTENSION)
-        unzip(train_data_zip, output=os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER))
 
         train_data_storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + current_train_data.filename)
 
