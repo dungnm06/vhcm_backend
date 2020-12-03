@@ -1,5 +1,5 @@
 from .chat_history import ChatHistory
-from .chat_message import Message
+from .chat_state import ChatState
 from .knowledge_data import KnowledgeData
 from .knowledge_data_generated_question import GeneratedQuestion
 from .knowledge_data_question import Question

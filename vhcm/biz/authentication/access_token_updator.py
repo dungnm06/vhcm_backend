@@ -1,9 +1,5 @@
 import jwt
-# from datetime import datetime
-from django.http import FileResponse, HttpResponsePermanentRedirect
-from rest_framework import exceptions
 from django.conf import settings
-from vhcm.common.utils.CH import is_error_code
 from vhcm.biz.authentication.jwt import jwt_utils
 # from vhcm.models.blacklisted_token import BlacklistedToken
 from vhcm.common.constants import ACCESS_TOKEN

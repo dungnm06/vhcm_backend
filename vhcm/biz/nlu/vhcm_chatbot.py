@@ -8,7 +8,7 @@ from vhcm.biz.nlu.classifiers.intent_classifier import IntentClassifier
 from vhcm.biz.nlu.classifiers.question_type_classifier import QuestionTypeClassifier
 from vhcm.biz.nlu.model.intent import Intent, load_from_data_file
 from vhcm.models.knowledge_data_question import QUESTION_TYPES_IDX2T, QUESTION_TYPES_T2IDX
-from vhcm.models import chat_message, train_data
+from vhcm.models import chat_state, train_data
 from vhcm.common.constants import *
 from vhcm.common.utils.files import unzip, ZIP_EXTENSION
 
@@ -39,7 +39,7 @@ MESSAGE_CHOOSE_TO_INPUT_NOTE = 'Bạn có note thêm gì không (có/không) ?'
 
 # Chatbot state
 class State(object):
-    def __init__(self, intent=Intent(), question=None, answer=None, question_types=None, action=chat_message.INITIAL):
+    def __init__(self, intent=Intent(), question=None, answer=None, question_types=None, action=chat_state.INITIAL):
         if question_types is None:
             question_types = []
         self.intent = intent
@@ -142,9 +142,9 @@ class VirtualHCMChatbot(object):
 
     def __regis_history(self, intent, question, answer, question_types, action):
         state = State(intent, question, answer, question_types, action)
-        if action == chat_message.ANSWER:
+        if action == chat_state.ANSWER:
             self.report_able_states.append(len(self.state_tracker))
-        elif action == chat_message.CONFIRMATION_NG:
+        elif action == chat_state.CONFIRMATION_NG:
             # out of index exp not gonna happen but who knows
             bot_answer_idx = (len(self.state_tracker)-1)
             if bot_answer_idx >= 0:
@@ -157,20 +157,21 @@ class VirtualHCMChatbot(object):
 
     def get_last_bot_answer_state_correct_answer_excluded(self):
         for idx, state in reversed(list(enumerate(self.state_tracker))):
-            if state.intent and state.action in [chat_message.ANSWER, chat_message.AWAIT_CONFIRMATION]:
-                if state.action == chat_message.AWAIT_CONFIRMATION:
+            if state.intent and state.action in [chat_state.ANSWER, chat_state.AWAIT_CONFIRMATION]:
+                if state.action == chat_state.AWAIT_CONFIRMATION:
                     user_answer_idx = idx + 1
                     if user_answer_idx < len(self.state_tracker):
-                        if self.state_tracker[user_answer_idx].action == chat_message.CONFIRMATION_OK:
+                        if self.state_tracker[user_answer_idx].action == chat_state.CONFIRMATION_OK:
                             continue
                 return state
         return None
 
     def get_last_report_able_state(self):
         if self.report_able_states:
-            return self.state_tracker[self.report_able_states.pop()]
+            idx = self.report_able_states.pop()
+            return self.state_tracker[idx], idx
         else:
-            return None
+            return None, None
 
     def report_able_states_to_db_data(self):
         if self.report_able_states:
@@ -188,21 +189,21 @@ class VirtualHCMChatbot(object):
     def __decide_action(chat_input, intent, types, last_state):
         """Combines intent and question type recognition to decide bot action"""
         # print(last_state)
-        if intent.intent_id == last_state.intent.intent_id and last_state.action == chat_message.AWAIT_CONFIRMATION:
+        if intent.intent_id == last_state.intent.intent_id and last_state.action == chat_state.AWAIT_CONFIRMATION:
             if chat_input.lower() == 'đúng':
-                return chat_message.CONFIRMATION_OK
+                return chat_state.CONFIRMATION_OK
             else:
-                return chat_message.CONFIRMATION_NG
+                return chat_state.CONFIRMATION_NG
         else:
             if language_processor.analyze_sentence_components(intent, chat_input):
-                return chat_message.ANSWER
+                return chat_state.ANSWER
             else:
-                return chat_message.AWAIT_CONFIRMATION
+                return chat_state.AWAIT_CONFIRMATION
 
     def chat(self, user_input=None, init=False):
         if not init:
             last_state = self.get_last_state()
-            if last_state.action != chat_message.AWAIT_CONFIRMATION:
+            if last_state.action != chat_state.AWAIT_CONFIRMATION:
                 intent_name = intent_classifier.predict(user_input)
                 types = question_type_classifier.predict(user_input)
                 types = [int(t) for t in types]
@@ -216,7 +217,7 @@ class VirtualHCMChatbot(object):
             self.__regis_history(intent, user_input, bot_response, types, action)
         else:
             bot_response = MESSAGE_BOT_GREATING
-            self.__regis_history(Intent(), None, bot_response, [], chat_message.INITIAL)
+            self.__regis_history(Intent(), None, bot_response, [], chat_state.INITIAL)
         return bot_response
 
 
@@ -226,13 +227,13 @@ class AnswerGenerator:
         self.question_type2id = QUESTION_TYPES_T2IDX
 
     def get_response(self, intent, types, action, last_state):
-        if action == chat_message.ANSWER:
+        if action == chat_state.ANSWER:
             return self.answer(intent, types)
-        elif action == chat_message.AWAIT_CONFIRMATION:
+        elif action == chat_state.AWAIT_CONFIRMATION:
             return self.confirmation(intent)
-        elif action == chat_message.CONFIRMATION_OK:
+        elif action == chat_state.CONFIRMATION_OK:
             return self.answer(last_state.intent, last_state.question_types)
-        elif action == chat_message.CONFIRMATION_NG:
+        elif action == chat_state.CONFIRMATION_NG:
             return self.confirmation_ng()
 
     @staticmethod
