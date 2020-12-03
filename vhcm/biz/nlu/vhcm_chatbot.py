@@ -1,7 +1,6 @@
 import os
 import json
 import random
-import traceback
 import shutil
 import tensorflow as tf
 from vhcm.biz.nlu.language_processing import language_processor
@@ -18,7 +17,7 @@ CURRENT_BOT_VERSION = 'current'
 NEXT_STARTUP_VERSION = 'next_startup'
 
 # Messages
-MESSAGE_UNAVAILABLE = 'Bác đi ngủ rồi, quay lại lúc khác!'
+MESSAGE_UNAVAILABLE = 'Chatbot hiện tại không khả dụng, mời bạn quay lại lúc khác!'
 MESSAGE_BOT_GREATING = 'Đã bắt đầu phiên trò chuyện mới, bạn có thể chat ngay với bot'
 MESSAGE_BOT_END_SESSION_SUCCESS = 'Phiên trò chuyện của bạn đã kết thúc'
 MESSAGE_BOT_END_SESSION_FAILED = 'Đã có sự cố khi kết thúc phiên trò chuyện, hãy liên lạc với admin'
@@ -30,7 +29,7 @@ MESSAGE_INVALID_REPORT_TYPE = 'Dữ liệu không hợp lệ, hủy báo cáo.'
 MESSAGE_CANCEL_REPORT = 'Hủy báo cáo, bạn có thể chat tiếp.'
 MESSAGE_CHOOSE_TO_CONTRIBUTE = 'Bạn có sẵn lòng đóng góp dữ liệu cho phần này không (có/không) ?'
 MESSAGE_INPUT_DATA = 'Hãy nhập vào dữ liệu: '
-MESSAGE_THANK_FOR_CONTRIBUTE = 'Cảm ơn bạn đã báo cáo, dữ liệu đã được tiếp nhận. \nBạn có thể chat tiếp.'
+MESSAGE_THANK_FOR_CONTRIBUTE = 'Cảm ơn bạn báo cáo, dữ liệu đã được tiếp nhận. \nBạn có thể chat tiếp.'
 MESSAGE_CONTINUE_TO_CHAT = 'Bạn có thể chat tiếp.'
 MESSAGE_NO_DATA_TO_REPORT = 'Bot chưa ghi nhận có dữ liệu sai để tiếp nhận'
 MESSAGE_INVALID_COMMAND = 'Câu lệnh không hợp lệ.'

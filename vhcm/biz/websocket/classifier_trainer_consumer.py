@@ -6,7 +6,7 @@ from vhcm.biz.nlu.classifier_trainer import ClassifierTrainer
 import vhcm.common.config.config_manager as config
 from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FILE_NAME, TRAIN_DATA_FOLDER
 from vhcm.models import train_data as train_data_model
-from vhcm.biz.nlu.vhcm_chatbot import intent_classifier, question_type_classifier
+from vhcm.biz.nlu.vhcm_chatbot import intent_classifier, question_type_classifier, is_bot_ready
 from vhcm.common.utils.files import unzip, ZIP_EXTENSION
 
 # Response types
@@ -56,26 +56,29 @@ class ClassifierConsumer(WebsocketConsumer):
         command = text_data_json['command']
 
         if command == 'start':
-            data_id = text_data_json['data']
-            train_data = train_data_model.TrainData.objects.filter(id=data_id).first()
-            if not train_data:
+            if is_bot_ready():
                 self.send_response(TRAIN_START_FAILED)
-                return
-            train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + ZIP_EXTENSION)
-            unzip(train_data_zip, output=os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER))
-            train_data_filepath = os.path.join(
-                PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + '/' + TRAIN_DATA_FILE_NAME
-            )
-            train_type = text_data_json['type']
-            sentence_length = text_data_json['sentence_length']
-            batch = text_data_json['batch']
-            epoch = text_data_json['epoch']
-            learning_rate = text_data_json['learning_rate']
-            epsilon = text_data_json['epsilon']
-            activation = text_data_json['activation']
-            version = train_data.id
+            else:
+                data_id = text_data_json['data']
+                train_data = train_data_model.TrainData.objects.filter(id=data_id).first()
+                if not train_data:
+                    self.send_response(TRAIN_START_FAILED)
+                    return
+                train_data_zip = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + ZIP_EXTENSION)
+                unzip(train_data_zip, output=os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER))
+                train_data_filepath = os.path.join(
+                    PROJECT_ROOT, TRAIN_DATA_FOLDER + train_data.filename + '/' + TRAIN_DATA_FILE_NAME
+                )
+                train_type = text_data_json['type']
+                sentence_length = text_data_json['sentence_length']
+                batch = text_data_json['batch']
+                epoch = text_data_json['epoch']
+                learning_rate = text_data_json['learning_rate']
+                epsilon = text_data_json['epsilon']
+                activation = text_data_json['activation']
+                version = train_data.id
 
-            self.trainer.start(train_type, train_data_filepath, sentence_length, batch, epoch, learning_rate, epsilon, activation, version)
+                self.trainer.start(train_type, train_data_filepath, sentence_length, batch, epoch, learning_rate, epsilon, activation, version)
         elif command == 'stop':
             status = self.trainer.stop()
             # Send status to WebSocket
