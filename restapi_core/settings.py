@@ -185,18 +185,6 @@ if DATABASE_PROVIDER == 'postgresql':
                     'options': '-c search_path=vhcm,public'
                 }
             }
-            # For local uses if cant connect to cloud DB
-            # 'default': {
-            #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            #     'NAME': 'postgres',
-            #     'USER': 'postgres',
-            #     'PASSWORD': '123456',
-            #     'HOST': 'localhost',
-            #     'PORT': '5432',
-            #     'OPTIONS': {
-            #         'options': '-c search_path=vhcm-local,public'
-            #     },
-            # }
         }
 
 elif DATABASE_PROVIDER == 'sqlite' or DATABASE_PROVIDER == 'sqlite3':

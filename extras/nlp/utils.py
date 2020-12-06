@@ -17,17 +17,19 @@ def load_text_data(txt_file):
         return []
 
 
+# stopwords_set = set(load_text_data('data/stopwords.txt'))
+
+
 def text_prepare(text):
     """Performs tokenization and simple preprocessing."""
     replace_by_space_re = re.compile(r'[/(){}\[\]|@,;!?]')
     # good_symbols_re = re.compile('[^0-9a-z #+_]')
-    stopwords_set = set(load_text_data('data/stopwords.txt'))
 
     text = text.lower()
     text = replace_by_space_re.sub(' ', text)
     text = re.sub(r'\s+', ' ', text).strip()
     # text = good_symbols_re.sub('', text)
-    text = ' '.join([x for x in text.split() if x and x not in stopwords_set])
+    # text = ' '.join([x for x in text.split() if x and x not in stopwords_set])
 
     return text.strip()
 

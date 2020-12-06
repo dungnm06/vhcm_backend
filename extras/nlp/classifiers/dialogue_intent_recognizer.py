@@ -35,7 +35,7 @@ def train_dialogue_intent_recognizer(datafile):
     #    split it into train and test in proportion 9:1, use random_state=0 for reproducibility
     #    transform it into TF-IDF features
     X = np.concatenate([hcm_data, dialogue_data])
-    y = ['hcm'] * len(hcm_data) + ['dialogue'] * len(dialogue_data)
+    y = ['hcm_question'] * len(hcm_data) + ['oos_dialogue'] * len(dialogue_data)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
     print('Train size = {}, test size = {}'.format(len(X_train), len(X_test)))

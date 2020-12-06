@@ -73,12 +73,11 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
         )
         self.model.load_weights(model_path)
 
-    def predict(self, input_query):
+    def predict(self, x):
         if not (self.model or self.label_binarizer or self.tokenizer or self.config or self.threshold):
             return None
         else:
             print('Predict:')
-            x = language_processor.word_segmentation(input_query)
             print(x)
             x = self.tokenizer(
                 text=x,

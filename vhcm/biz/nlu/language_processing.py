@@ -150,7 +150,7 @@ class LanguageProcessor(object, metaclass=Singleton):
             named_entities_list.append(tmp_list)
         return named_entities_list
 
-    def generate_similary_sentences(self, sentence_synonym_dict_pair, word_segemented=False, segemented_output=False):
+    def generate_similary_sentences(self, sentence_synonym_dict_pair, word_segemented=False, segemented_output=False, lower=False):
         org_sentence, synonym_dicts = sentence_synonym_dict_pair
         return_val = []
         # synonym_dicts: eg: 1: 'sinh', 2: 'TenBac' (each dict is instance of SynonymSet obj)
@@ -163,29 +163,66 @@ class LanguageProcessor(object, metaclass=Singleton):
             # synonym_replaceable_pos: [(0,2), (1,1)]
             synonym_replaceable_pos = self.get_synonym_replaceable_pos(words_segmented_sentence, synonym_dicts)
             # [2, 1]
-            using_dicts = [srp[1] for srp in synonym_replaceable_pos]
+            using_dicts = [srp['sid'] for srp in synonym_replaceable_pos]
             # Generate all posible combinations
             # eg: [('Bác', 'sinh'), ('Bác', 'ra đời'), ('Hồ_Chí_Minh', 'sinh'), ('Hồ_Chí_Minh', 'ra đời')]
-            combinations = list(product(*(synonym_dicts[idx].words for idx in using_dicts)))
+            combinations = list(product(*(synonym_dicts[idx]['words'] for idx in using_dicts)))
             # Create similary sentences
             for c in combinations:
                 sentence = words_segmented_sentence[:]
                 for idx, srp in enumerate(synonym_replaceable_pos):
-                    sentence[srp[0]] = c[idx]
-                return_val.append(' '.join(sentence) if not segemented_output else sentence)
+                    sentence[srp['start_idx']:srp['end_idx']+1] = c[idx].split()
+                if lower:
+                    sentence = [w.lower() for w in sentence]
+                return_val.append(' '.join(sentence).capitalize() if not segemented_output else sentence)
 
         return return_val
 
     def get_synonym_replaceable_pos(self, org_sentence, synonym_dicts):
-        # synonym_dicts: eg: 1: 'sinh', 2: 'TenBac' (each dict is instance of SynonymSet obj)
-        # ['Bác', 'sinh', 'năm', '1890']
-        # return [(0,2), (1,1)] - tuple of (word_pos_in_sentence, synonym_id)
+        """
+        synonym_dicts: eg: 1: 'TenBac' (each dict is instance of SynonymSet obj)
+        ['Bác', 'sinh', 'năm', '1890']
+        return [{
+            'word': 'Bác',
+            'start_idx': 0,
+            'end_idx': 0,
+            'sid': 1
+        }] - list of replaceable position
+        """
         synonyms_replaceable_pos = []
-        for idx, word in enumerate(org_sentence):
-            for dictionary_id in synonym_dicts:
-                synonyms_words = [w.lower() for w in synonym_dicts[dictionary_id].words]
-                if word.lower() in synonyms_words:
-                    synonyms_replaceable_pos.append((idx, dictionary_id))
+        sentence_lower = [w.lower() for w in org_sentence]
+        sentence_lower_joined = SPACE.join(sentence_lower)
+        for dictionary_id in synonym_dicts:
+            synonyms_words = [w.lower() for w in synonym_dicts[dictionary_id]['words']]
+            for sw in synonyms_words:
+                if sw in sentence_lower_joined:
+                    sw_splited = sw.split()
+                    start_idxs = [idx for idx, w in enumerate(sentence_lower) if w == sw_splited[0]]
+                    for start_idx in start_idxs:
+                        if start_idx + len(sw_splited) > len(sentence_lower):
+                            continue
+                        ok_flag = True
+                        for sw_idx, sentence_idx in enumerate(range(start_idx, start_idx+len(sw_splited))):
+                            if sw_splited[sw_idx] != sentence_lower[sentence_idx]:
+                                ok_flag = False
+                                break
+                        if not ok_flag:
+                            continue
+                        end_idx = start_idx + len(sw_splited) - 1
+                        # Recheck if adding synonym is subset of added synonym (eg: 'thư' is subset of 'bức thư')
+                        for srp in synonyms_replaceable_pos:
+                            if sw in srp['word'] and sw != srp['word'] and dictionary_id == srp['sid']:
+                                ok_flag = False
+                                break
+                        if ok_flag:
+                            # Push to result list
+                            synonyms_replaceable_pos.append({
+                                'word': sw,
+                                'start_idx': start_idx,
+                                'end_idx': end_idx,
+                                'sid': dictionary_id
+                            })
+
         return synonyms_replaceable_pos
 
     def batch_generate_similary_sentences(self, sentence_synonym_dict_pairs):
@@ -198,52 +235,94 @@ class LanguageProcessor(object, metaclass=Singleton):
         #  Currently get all synonym sets thats have the word
         return [synonym_dicts[sid] for sid in synonym_dicts if word in synonym_dicts[sid].words]
 
-    def find_phrase_in_sentence(self, content, sentence, synonyms, start=None, end=None):
+    def find_phrase_in_sentence(self, content, sentence, raw_sentence, synonyms, raw_start=None, raw_end=None):
         content = [c.lower() for c in content]
-        if not start:
-            start = 0
-        if not end:
-            end = len(sentence) - 1
+        if not raw_start:
+            raw_start = 0
+        if not raw_end:
+            raw_end = len(raw_sentence) - 1
+
+        start = 0
+        for raw_sen_idx in range(raw_start, raw_end + 1):
+            try:
+                start = sentence.index(raw_sentence[raw_sen_idx])
+                break
+            except ValueError:
+                continue
+        end = len(sentence) - 1
+        sentence_length = len(sentence)
+        for raw_sen_idx in range(raw_end, raw_start - 1, -1):
+            try:
+                end = sentence_length - 1 - sentence[::-1].index(raw_sentence[raw_sen_idx])
+                break
+            except ValueError:
+                continue
         sentence_lower = [w.lower() for w in sentence]
+        raw_sentence_lower = [w.lower() for w in raw_sentence]
         split_sentence = sentence_lower[start:(end + 1)]
-        # full_sentence = SPACE.join(split_sentence)
+        raw_split_sentence = raw_sentence_lower[raw_start:(raw_end + 1)]
         similaries = self.generate_similary_sentences(
             (content, synonyms),
             word_segemented=True,
-            segemented_output=True)
+            segemented_output=True,
+            lower=True)
+        print(similaries)
         possibilities = []
         word_ranges = []
         for sim in similaries:
-            # Should i search for words in sentence by order in array (1)
-            # or just ok by having all words exist in sentence ? (2)
-            # Using method 2 for now
             exist_arr = []
             idx_arr = []
-            for w_idx, word in enumerate(sim):
-                w_lower = word.lower()
-                if w_lower in split_sentence:
+            raw_idx_arr = []
+            if sim:
+                possibilities_starts_pos = [idx for idx, w in enumerate(split_sentence) if w == sim[0].lower()]
+                raw_possibilities_starts_pos = [idx for idx, w in enumerate(raw_split_sentence) if w == sim[0].lower()]
+                print(possibilities_starts_pos)
+                if not possibilities_starts_pos:
+                    continue
+
+                for (i1, idx), idx2 in zip(enumerate(possibilities_starts_pos), raw_possibilities_starts_pos):
                     exist_arr.append(True)
-                    words = w_lower.split()
-                    words_len = len(words)
-                    if w_idx + 1 == len(sim):
-                        word_to_append = words[(words_len - 1)]
-                    else:
-                        word_to_append = words[0]
-                    idx_arr.append(split_sentence.index(word_to_append))
-                else:
-                    exist_arr.append(False)
-                    break
-            if all(exist_arr):
-                idx_arr.sort()
-                start_idx = idx_arr[0]
-                end_idx = idx_arr[len(idx_arr) - 1]
-                corresponse_part = (SPACE.join(sim), start_idx, end_idx)
-                sim_length = len((SPACE.join(sim)).split())
-                word_range = end_idx - start_idx + 1
-                if sim_length == word_range:
-                    possibilities.append(corresponse_part)
-                    word_ranges.append(end_idx - start_idx)
-        return possibilities[word_ranges.index(max(word_ranges))] if word_ranges else None
+                    # For cleaned sentence
+                    idx_arr.append(idx)
+                    start_idx = idx
+                    next_pos = i1 + 1
+                    end_idx = possibilities_starts_pos[next_pos] if next_pos < len(possibilities_starts_pos) else (
+                                len(split_sentence) - 1)
+                    # For raw sentence
+                    raw_idx_arr.append(idx2)
+                    if len(sim) > (end_idx - start_idx + 1):
+                        break
+                    tmp_search_part = split_sentence[start_idx:(end_idx + 1)]
+                    for w_idx, word in enumerate(sim[1:]):
+                        w_lower = word.lower()
+                        if w_lower in tmp_search_part:
+                            exist_arr.append(True)
+                            words = w_lower.split()
+                            words_len = len(words)
+                            if w_idx + 1 == len(sim):
+                                word_to_append = words[(words_len - 1)]
+                            else:
+                                word_to_append = words[0]
+                            idx_arr.append(split_sentence.index(word_to_append))
+                            raw_idx_arr.append(raw_split_sentence.index(word_to_append))
+                        else:
+                            exist_arr.append(False)
+                            break
+                    if all(exist_arr):
+                        idx_arr.sort()
+                        raw_idx_arr.sort()
+                        content_start_idx = idx_arr[0]
+                        content_end_idx = idx_arr[len(idx_arr) - 1]
+                        corresponse_part = (SPACE.join(sim), raw_start + raw_idx_arr[0], raw_start + raw_idx_arr[len(raw_idx_arr) - 1])
+                        sim_length = len((SPACE.join(sim)).split())
+                        word_range = content_end_idx - content_start_idx + 1
+                        if sim_length == word_range:
+                            possibilities.append(corresponse_part)
+                            word_ranges.append(content_end_idx - content_start_idx)
+                    exist_arr = []
+                    idx_arr = []
+
+        return possibilities
 
     def grammar_struct_analyze(self, sentence_pos, ng_patterns, critical_data_infos):
         sentence_struct = [w[1] for w in sentence_pos]
@@ -300,10 +379,9 @@ class LanguageProcessor(object, metaclass=Singleton):
                     break
         return struct_ok
 
-    def analyze_critical_parts(self, pos_tag, ner, intent, tokenized_sentence):
+    def analyze_critical_parts(self, pos_tag, raw_pos_tag, ner, intent, tokenized_sentence, raw_tokenized_sentence):
         # Data for the process
         intent_critical_datas = intent.subjects
-        tokenized_sentence_list = tokenized_sentence.split()
 
         # Nothing to analyze
         if len(ner) == 0 and len(intent_critical_datas) == 0:
@@ -327,34 +405,36 @@ class LanguageProcessor(object, metaclass=Singleton):
                 # corresponse_part: (phrase, entity start pos, entity end pos)
                 content = [part.split(COLON)[1] for part in sit[intent_model.INTENT_SUBJECT_WORDS].split(PLUS) if
                            part.split(COLON)[0] not in self.exclude_pos_tag]
-                content = [c.lower() for c in content if c not in self.exclude_words]
+                content = [c.lower() for c in content if c.lower() not in self.exclude_words]
                 # print(content)
-                corresponse_part = self.find_phrase_in_sentence(content, tokenized_sentence_list, intent.synonym_sets)
+                corresponse_part = self.find_phrase_in_sentence(content, tokenized_sentence, raw_tokenized_sentence,
+                                                                intent.synonym_sets)
                 # Critical part still not found -> not same intent
                 if not corresponse_part:
                     check_flag = False
                     break
                 corresponse_parts.append(corresponse_part)
                 # Critical data existing, but need to check grammar structure too
-                check_flag = self.grammar_struct_analyze(pos_tag, self.critical_data_ng_patterns, corresponse_part)
+                check_arr = [self.grammar_struct_analyze(raw_pos_tag, self.critical_data_ng_patterns, cp) for cp in
+                             corresponse_part]
+                check_flag = any(check_arr)
 
         return check_flag, corresponse_parts
 
-    def analyze_verb_components(self, intent, subjects_in_sentence, tokenized_sentence):
+    def analyze_verb_components(self, intent, subjects_in_sentence, tokenized_sentence, raw_tokenized_sentence):
         intent_subjects = intent.subjects
-        tokenized_sentence_list = tokenized_sentence.split()
-        for idx, (subject, subject_part_in_sentence) in enumerate(zip(intent_subjects, subjects_in_sentence)):
-            verb = [v[1] for v in subject[intent_model.INTENT_SUBJECT_VERBS]]
-            if not verb:
-                continue
-            startpos = subject_part_in_sentence[2] + 1
-            next_subject_idx = idx + 1
-            if next_subject_idx == len(subjects_in_sentence):
-                endpos = len(tokenized_sentence_list) - 1
-            else:
-                endpos = subjects_in_sentence[next_subject_idx][1]
-            verb_found_in_sentence = self.find_phrase_in_sentence(verb, tokenized_sentence_list, intent.synonym_sets, start=startpos, end=endpos)
-            if not verb_found_in_sentence:
+        # for s in subjects_in_sentence:
+        for subject, subject_part_in_sentence in zip(intent_subjects, subjects_in_sentence):
+            check_arr = []
+            for s in subject_part_in_sentence:
+                verb = [v[1] for v in subject[intent_model.INTENT_SUBJECT_VERBS]]
+                if not verb:
+                    check_arr.append(True)
+                    continue
+                startpos = s[2] + 1
+                verb_found_in_sentence = self.find_phrase_in_sentence(verb, tokenized_sentence, raw_tokenized_sentence, intent.synonym_sets, raw_start=startpos)
+                check_arr.append(True if verb_found_in_sentence else False)
+            if not any(check_arr):
                 return False
 
         return True
@@ -362,17 +442,43 @@ class LanguageProcessor(object, metaclass=Singleton):
     def analyze_sentence_components(self, intent, sentence):
         # Word POS tagging
         # Can only handle simple sentence for now
-        pos_tag = self.pos_tagging(sentence)[0]
+        raw_pos_tag = self.pos_tagging(sentence)
+        temp_arr = []
+        pos_tag = []
+        for arr in raw_pos_tag:
+            pos_tag.extend([word for word in arr if (word[0].lower() not in self.exclude_words and word[1] not in self.exclude_pos_tag)])
+        for arr in raw_pos_tag:
+            temp_arr.extend([word for word in arr])
+        raw_pos_tag = temp_arr
+
         # Obtain named entity in the sentence
         ner = self.named_entity_reconize(sentence)
         # Data for the process
-        tokenized_sentence = self.word_segmentation(sentence)
+        raw_tokenized_sentence = [word[0] for word in raw_pos_tag]
+        tokenized_sentence = [word[0] for word in pos_tag]
 
-        flag, subjects = self.analyze_critical_parts(pos_tag, ner, intent, tokenized_sentence)
+        flag, subjects = self.analyze_critical_parts(pos_tag, raw_pos_tag, ner, intent, tokenized_sentence, raw_tokenized_sentence)
         if not flag:
             return flag
-        flag = self.analyze_verb_components(intent, subjects, tokenized_sentence)
+        flag = self.analyze_verb_components(intent, subjects, tokenized_sentence, raw_tokenized_sentence)
         return flag
+
+    def text_prepare(self, text, lower=False):
+        """Performs tokenization and simple preprocessing."""
+        replace_by_space_re = re.compile(r'[/(){}\[\]|@,;!?]')
+
+        if lower:
+            text = text.lower()
+        text = replace_by_space_re.sub(' ', text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        text = self.word_segmentation(text).strip()
+        # text = ' '.join([x for x in text.split() if x and x not in stopwords_set])
+
+        return text
+
+    def remove_redundant_part(self, text):
+        text = SPACE.join(w for w in text.split() if w.lower() not in self.exclude_words)
+        return text
 
     # BELOW IS CODE COPIED FROM https://gist.github.com/nguyenvanhieuvn/72ccf3ddf7d179b281fdae6c0b84942b
     def remove_stopwords(self, line):

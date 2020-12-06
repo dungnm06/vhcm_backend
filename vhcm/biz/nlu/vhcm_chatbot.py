@@ -10,11 +10,13 @@ from vhcm.biz.nlu.model.intent import Intent, load_from_data_file
 from vhcm.models.knowledge_data_question import QUESTION_TYPES_IDX2T, QUESTION_TYPES_T2IDX
 from vhcm.models import chat_state, train_data
 from vhcm.common.constants import *
-from vhcm.common.utils.files import unzip, ZIP_EXTENSION
+from vhcm.common.utils.files import unzip, unpickle_file, ZIP_EXTENSION
 
 # Constants
 CURRENT_BOT_VERSION = 'current'
 NEXT_STARTUP_VERSION = 'next_startup'
+HCM_QUESTION = 'hcm_question'
+OUT_OF_SCOPE_DIALOGUE = 'oos_dialogue'
 
 # Messages
 MESSAGE_UNAVAILABLE = 'Chatbot hiện tại không khả dụng, mời bạn quay lại lúc khác!'
@@ -89,9 +91,13 @@ def init_bot():
         intent_classifier_instance = IntentClassifier()
         intent_classifier_instance.load()
 
-        # Question classifier
+        # Question type classifier
         question_classifier_instance = QuestionTypeClassifier()
         question_classifier_instance.load()
+
+        # Dialogue intent recognizer
+        hcm_chatchit_intent_recognizer = unpickle_file(os.path.join(PROJECT_ROOT, DIALOGUE_INTENT_RECOGNIZER_FILE_PATH))
+        hcm_chatchit_tfidf_vectorizer = unpickle_file(os.path.join(PROJECT_ROOT, DIALOGUE_TFIDF_VECTORIZER_FILE_PATH))
 
         train_data_storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + current_train_data.filename)
 
@@ -104,7 +110,7 @@ def init_bot():
         if os.path.exists(tempstorepath):
             shutil.rmtree(tempstorepath)
 
-        return intent_classifier_instance, question_classifier_instance, idatas, current_train_data, version
+        return intent_classifier_instance, question_classifier_instance, idatas, hcm_chatchit_intent_recognizer, hcm_chatchit_tfidf_vectorizer, current_train_data, version
     except Exception as e:
         # Lul
         print(e)
@@ -114,10 +120,12 @@ def init_bot():
         question_classifier_instance = None
         idatas = None
         current_train_data = None
-        return intent_classifier_instance, question_classifier_instance, idatas, current_train_data, version
+        hcm_chatchit_intent_recognizer = None
+        hcm_chatchit_tfidf_vectorizer = None
+        return intent_classifier_instance, question_classifier_instance, idatas, hcm_chatchit_intent_recognizer, hcm_chatchit_tfidf_vectorizer, current_train_data, version
 
 
-intent_classifier, question_type_classifier, intent_datas, train_data_model, system_bot_version = init_bot()
+intent_classifier, question_type_classifier, intent_datas, dialogue_intent_recognizer, dialogue_tfidf_vectorizer, train_data_model, system_bot_version = init_bot()
 
 
 def is_bot_ready():
@@ -147,7 +155,7 @@ class VirtualHCMChatbot(object):
         if action == chat_state.ANSWER:
             self.report_able_states.append(len(self.state_tracker))
         elif action == chat_state.CONFIRMATION_NG:
-            # out of index exp not gonna happen but who knows
+            # out of index exception not gonna happen but who knows
             bot_answer_idx = (len(self.state_tracker)-1)
             if bot_answer_idx >= 0:
                 self.report_able_states.append(bot_answer_idx)
@@ -156,17 +164,6 @@ class VirtualHCMChatbot(object):
 
     def get_last_state(self):
         return self.state_tracker[len(self.state_tracker) - 1]
-
-    def get_last_bot_answer_state_correct_answer_excluded(self):
-        for idx, state in reversed(list(enumerate(self.state_tracker))):
-            if state.intent and state.action in [chat_state.ANSWER, chat_state.AWAIT_CONFIRMATION]:
-                if state.action == chat_state.AWAIT_CONFIRMATION:
-                    user_answer_idx = idx + 1
-                    if user_answer_idx < len(self.state_tracker):
-                        if self.state_tracker[user_answer_idx].action == chat_state.CONFIRMATION_OK:
-                            continue
-                return state
-        return None
 
     def get_last_report_able_state(self):
         if self.report_able_states:
@@ -188,7 +185,7 @@ class VirtualHCMChatbot(object):
             self.report_able_states = []
 
     @staticmethod
-    def __decide_action(chat_input, intent, types, last_state):
+    def __decide_action(chat_input, chat_type, intent, types, last_state):
         """Combines intent and question type recognition to decide bot action"""
         # print(last_state)
         if intent.intent_id == last_state.intent.intent_id and last_state.action == chat_state.AWAIT_CONFIRMATION:
@@ -197,7 +194,7 @@ class VirtualHCMChatbot(object):
             else:
                 return chat_state.CONFIRMATION_NG
         else:
-            if language_processor.analyze_sentence_components(intent, chat_input):
+            if language_processor.analyze_sentence_components(intent, chat_input) or chat_type == OUT_OF_SCOPE_DIALOGUE:
                 return chat_state.ANSWER
             else:
                 return chat_state.AWAIT_CONFIRMATION
@@ -206,16 +203,28 @@ class VirtualHCMChatbot(object):
         if not init:
             last_state = self.get_last_state()
             if last_state.action != chat_state.AWAIT_CONFIRMATION:
-                intent_name = intent_classifier.predict(user_input)
-                types = question_type_classifier.predict(user_input)
-                types = [int(t) for t in types]
-                intent = intent_datas[intent_name]
+                # Input preprocesing
+                segmented_input = language_processor.text_prepare(user_input)
+                # Predict
+                tfidf_vectorized_input = dialogue_tfidf_vectorizer.transform([segmented_input.lower()])
+                chat_type = dialogue_intent_recognizer.predict(tfidf_vectorized_input)[0]
+                if chat_type == HCM_QUESTION:
+                    intent_name = intent_classifier.predict(segmented_input)
+                    types = question_type_classifier.predict(segmented_input)
+                    types = [int(t) for t in types]
+                    intent = intent_datas[intent_name]
+                else:
+                    # User asking out of scope question
+                    intent = Intent()
+                    types = []
             else:
+                # If bot awaiting user confirmation so no need to predict
+                chat_type = HCM_QUESTION
                 intent = last_state.intent
                 types = last_state.question_types
-            action = self.__decide_action(user_input, intent, types, last_state)
-            # print(action)
-            bot_response = self.answer_generator.get_response(intent, types, action, last_state)
+            # Decide what to do base on predicted data
+            action = self.__decide_action(user_input, chat_type, intent, types, last_state)
+            bot_response = self.answer_generator.get_response(chat_type, intent, types, action, last_state)
             self.__regis_history(intent, user_input, bot_response, types, action)
         else:
             bot_response = MESSAGE_BOT_GREATING
@@ -228,25 +237,29 @@ class AnswerGenerator:
         self.question_id2type = QUESTION_TYPES_IDX2T
         self.question_type2id = QUESTION_TYPES_T2IDX
 
-    def get_response(self, intent, types, action, last_state):
-        if action == chat_state.ANSWER:
-            return self.answer(intent, types)
-        elif action == chat_state.AWAIT_CONFIRMATION:
-            return self.confirmation(intent)
-        elif action == chat_state.CONFIRMATION_OK:
-            return self.answer(last_state.intent, last_state.question_types)
-        elif action == chat_state.CONFIRMATION_NG:
-            return self.confirmation_ng()
+    def get_response(self, chat_type, intent, types, action, last_state):
+        if chat_type == HCM_QUESTION:
+            if action == chat_state.ANSWER:
+                return self.__answer(intent, types)
+            elif action == chat_state.AWAIT_CONFIRMATION:
+                return self.__confirmation(intent)
+            elif action == chat_state.CONFIRMATION_OK:
+                return self.__answer(last_state.intent, last_state.question_types)
+            elif action == chat_state.CONFIRMATION_NG:
+                return self.__confirmation_ng()
+        else:
+            return self.__out_of_scope_response()
 
     @staticmethod
-    def confirmation(intent):
+    def __confirmation(intent):
         return 'Có phải bạn đang hỏi về: ' + intent.fullname + '? (đúng, sai)'
 
     @staticmethod
-    def confirmation_ng():
+    def __confirmation_ng():
         return MESSAGE_CHOOSE_TO_CONTRIBUTE
 
-    def answer(self, intent, types):
+    @staticmethod
+    def __answer(intent, types):
         response = intent.base_response
         # Get type data exists in intent
         existing_types = [t for t in types if t in intent.corresponding_datas]
@@ -256,6 +269,14 @@ class AnswerGenerator:
         else:
             response += (SPACE + SPACE.join(random.choice(intent.corresponding_datas[key]) for key in existing_types))
         return response
+
+    @staticmethod
+    def __out_of_scope_response():
+        return 'Xin lỗi hình như vấn đề này bot không có thông tin nên không thể trả lời bạn được, mời bạn hỏi câu khác.'
+
+
+# For clearing GPU memory in case of load models failed
+# but this is not working with tensorflow 2 anymore
 
 # from keras.backend.tensorflow_backend import set_session
 # from keras.backend.tensorflow_backend import clear_session

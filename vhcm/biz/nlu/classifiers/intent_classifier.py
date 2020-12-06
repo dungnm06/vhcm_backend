@@ -62,12 +62,11 @@ class IntentClassifier(object, metaclass=Singleton):
         )
         self.model.load_weights(model_path)
 
-    def predict(self, input_query):
+    def predict(self, x):
         if not (self.model or self.idx_to_intent or self.tokenizer or self.config):
             return None
         else:
             print('Predict:')
-            x = language_processor.word_segmentation(input_query)
             print(x)
             x = self.tokenizer(
                 text=x,
