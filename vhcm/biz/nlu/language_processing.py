@@ -166,12 +166,15 @@ class LanguageProcessor(object, metaclass=Singleton):
             using_dicts = [srp['sid'] for srp in synonym_replaceable_pos]
             # Generate all posible combinations
             # eg: [('Bác', 'sinh'), ('Bác', 'ra đời'), ('Hồ_Chí_Minh', 'sinh'), ('Hồ_Chí_Minh', 'ra đời')]
-            combinations = list(product(*(synonym_dicts[idx]['words'] for idx in using_dicts)))
+            combinations = list(product(*(synonym_dicts[idx].words for idx in using_dicts)))
             # Create similary sentences
             for c in combinations:
                 sentence = words_segmented_sentence[:]
+                padding = 0
                 for idx, srp in enumerate(synonym_replaceable_pos):
-                    sentence[srp['start_idx']:srp['end_idx']+1] = c[idx].split()
+                    replace_part = c[idx].split()
+                    sentence[srp['start_idx'] + padding:srp['end_idx'] + 1 + padding] = replace_part
+                    padding += len(replace_part) - (srp['end_idx'] - srp['start_idx'] + 1)
                 if lower:
                     sentence = [w.lower() for w in sentence]
                 return_val.append(' '.join(sentence).capitalize() if not segemented_output else sentence)
@@ -193,7 +196,7 @@ class LanguageProcessor(object, metaclass=Singleton):
         sentence_lower = [w.lower() for w in org_sentence]
         sentence_lower_joined = SPACE.join(sentence_lower)
         for dictionary_id in synonym_dicts:
-            synonyms_words = [w.lower() for w in synonym_dicts[dictionary_id]['words']]
+            synonyms_words = [w.lower() for w in synonym_dicts[dictionary_id].words]
             for sw in synonyms_words:
                 if sw in sentence_lower_joined:
                     sw_splited = sw.split()
