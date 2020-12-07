@@ -217,6 +217,9 @@ class LanguageProcessor(object, metaclass=Singleton):
                             if sw in srp['word'] and sw != srp['word'] and dictionary_id == srp['sid']:
                                 ok_flag = False
                                 break
+                            if srp['word'] in sw and sw != srp['word'] and dictionary_id == srp['sid']:
+                                synonyms_replaceable_pos.remove(srp)
+                                break
                         if ok_flag:
                             # Push to result list
                             synonyms_replaceable_pos.append({
@@ -225,7 +228,7 @@ class LanguageProcessor(object, metaclass=Singleton):
                                 'end_idx': end_idx,
                                 'sid': dictionary_id
                             })
-
+        synonyms_replaceable_pos.sort(key=lambda x: x['start_idx'])
         return synonyms_replaceable_pos
 
     def batch_generate_similary_sentences(self, sentence_synonym_dict_pairs):
