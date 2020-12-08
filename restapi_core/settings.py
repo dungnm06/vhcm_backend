@@ -14,7 +14,8 @@ import os
 from pathlib import Path
 import datetime
 
-LOCAL_TIMEZONE = datetime.datetime.now(datetime.timezone(datetime.timedelta(0))).astimezone().tzinfo
+USE_TZ = True
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'g7^5)*q^=^#+fib)i$fpiwfzhfso10iqb4#!u@zv8x$j2x-0xi'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 USE_DEBUG_TOOLBAR = False
 
 # SECURITY WARNING: App Engine's security features ensure that it is safe to
@@ -220,8 +221,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'GMT'
-
 USE_I18N = True
 
 USE_L10N = False
@@ -232,13 +231,8 @@ DATE_INPUT_FORMATS = ['%d/%m/%Y']
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
-STATIC_ROOT = 'static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 USE_LOCAL_MEDIA = True
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-
-from django.utils import timezone
-import pytz
-timezone.activate(pytz.timezone("Asia/Ho_Chi_Minh"))

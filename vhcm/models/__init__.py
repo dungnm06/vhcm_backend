@@ -17,3 +17,4 @@ from .user import User
 from .train_data import TrainData
 from .knowledge_data_review import Review
 from .knowledge_data_comment import Comment
+from .knowledge_data_train_data_link import KnowledgeDataTrainDataLink
