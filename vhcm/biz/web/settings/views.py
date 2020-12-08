@@ -2,8 +2,9 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from vhcm.common.response_json import ResponseJSON
-from vhcm.common.config.config_manager import config_loader
+from vhcm.common.config.config_manager import config_loader, ENCRYPT_SETTING
 from vhcm.biz.authentication.user_session import ensure_admin
+from vhcm.common.utils.cryptographic import encrypt, decrypt
 import vhcm.models.system_settings as setting_model
 
 
@@ -15,13 +16,24 @@ def all_settings(request):
 
     settings_display = []
     for setting in setting_model.SystemSetting.objects.all():
+        value = None
+        hidden = False
+        if setting.setting_id in ENCRYPT_SETTING:
+            if setting.setting_id in ENCRYPT_SETTING:
+                hidden = True
+                if setting.value:
+                    value = decrypt(setting.value)
+            else:
+                value = setting.value
+
         settings_display.append({
             'setting_id': setting.setting_id,
             'setting_name': setting.setting_name,
             'description': setting.description,
             'type': setting.type,
-            'value': setting.value,
+            'value': value,
             'default': setting.default,
+            'hidden': hidden,
             'mdate': setting.mdate
         })
 
@@ -46,7 +58,11 @@ def edit(request):
         raise APIException('Setting id is invalid, setting not found')
 
     value = request.data.get(setting_model.VALUE)
-    setting.value = value
+
+    value_to_db = value
+    if setting_id in ENCRYPT_SETTING:
+        value_to_db = encrypt(value_to_db)
+    setting.value = value_to_db
     setting.save()
 
     # Update in-memory setting

@@ -318,11 +318,9 @@ def request_reset_password(request):
         response.data = result.to_json()
         return response
     reset_password_uid = get_random_string(30)
-    print(datetime.datetime.now())
     expire_time = datetime.datetime.now() + datetime.timedelta(
         minutes=config_loader.get_setting_value_int(RESET_PASSWORD_EXPIRE_TIME)
     )
-    print(expire_time)
     user.reset_password_uid = reset_password_uid
     user.reset_password_uid_expire = expire_time
     user.save()

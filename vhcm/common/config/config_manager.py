@@ -5,6 +5,7 @@ from vhcm.common.response_json import ResponseJSON
 from vhcm.common.singleton import Singleton
 from vhcm.common.dao.model_query import is_table_exists
 from vhcm.common.utils.CH import isInt, isFloat
+from vhcm.common.utils.cryptographic import decrypt
 
 
 class ConfigLoader(object, metaclass=Singleton):
@@ -14,8 +15,15 @@ class ConfigLoader(object, metaclass=Singleton):
         if is_table_exists('system_settings'):
             self.settings = {}
             for setting in setting_model.SystemSetting.objects.all():
+                if setting.setting_id in ENCRYPT_SETTING:
+                    if setting.value:
+                        value = decrypt(setting.value)
+                    else:
+                        value = None
+                else:
+                    value = setting.value
                 self.settings[setting.setting_id] = {
-                    setting_model.VALUE: setting.value,
+                    setting_model.VALUE: value,
                     setting_model.DEFAULT: setting.default
                 }
 
@@ -101,6 +109,12 @@ PREDICT_THRESHOLD = 'predict_threshold'
 # Data review process
 MAXIMUM_REJECT = 'maximum_reject'
 MINIMUM_ACCEPT = 'minimum_accept'
+
+# Settings need to encrypt before push to DB
+ENCRYPT_SETTING = [
+    SYSTEM_MAIL,
+    SYSTEM_MAIL_PASSWORD
+]
 
 # Instance
 config_loader = ConfigLoader()

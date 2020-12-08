@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 import os
 from pathlib import Path
-import datetime
 
 USE_TZ = True
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
@@ -173,7 +172,7 @@ if DATABASE_PROVIDER == 'postgresql':
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                'NAME': 'vhcm-db1',
+                'NAME': 'vhcm-production',
                 'USER': 'postgres',
                 'PASSWORD': 'uN9pEGKv14yMJB0a',
                 'HOST': '35.224.128.36',
