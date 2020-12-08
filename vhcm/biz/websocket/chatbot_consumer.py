@@ -104,7 +104,6 @@ class ChatbotConsumer(WebsocketConsumer):
         self.report_note = None
         self.bot_state_to_regist = None
         self.bot_state_to_regist_idx = None
-        self.answer_ng_user_choosen_to_contribute = False
 
     def connect(self):
         user_id = self.scope["session"].get('user_id')
@@ -260,12 +259,10 @@ class ChatbotConsumer(WebsocketConsumer):
                             elif self.last_state in YESNO_REPONSES:
                                 user_input = user_input.lower()
                                 if user_input == 'có' or user_input == 'co':
-                                    self.answer_ng_user_choosen_to_contribute = True
                                     if self.last_state == CHOOSE_TO_CONTRIBUTE:
                                         self.bot_state_to_regist, self.bot_state_to_regist_idx = self.chatbot.get_last_report_able_state()
                                     pass
                                 elif user_input == 'không' or user_input == 'khong':
-                                    self.answer_ng_user_choosen_to_contribute = False
                                     self.state_idx += 1
                                 else:
                                     self.error_cancel_report()
@@ -273,7 +270,7 @@ class ChatbotConsumer(WebsocketConsumer):
                                 self.input_data_type = self.last_state
                             if self.state_idx == len(PROCESSING_ANSWER_CONFIRMATION_NG):
                                 self.regist_report(bot_state=self.bot_state_to_regist)
-                                if self.answer_ng_user_choosen_to_contribute:
+                                if self.report_data:
                                     response_message = bot.MESSAGE_THANK_FOR_CONTRIBUTE
                                 else:
                                     response_message = bot.MESSAGE_CONTINUE_TO_CHAT
@@ -348,7 +345,6 @@ class ChatbotConsumer(WebsocketConsumer):
                     self.report_data = m.system_tmp_report_data
                     self.report_note = m.system_tmp_report_note
                     self.bot_state_to_regist_idx = m.system_tmp_report_bot_state
-                    self.answer_ng_user_choosen_to_contribute = m.system_tmp_user_choose_to_contribute
                     if self.bot_state_to_regist_idx:
                         self.bot_state_to_regist = states[self.bot_state_to_regist_idx]
             self.chatbot.state_tracker.extend(states)
@@ -455,7 +451,6 @@ class ChatbotConsumer(WebsocketConsumer):
         self.input_data_type = None
         self.bot_state_to_regist = None
         self.bot_state_to_regist_idx = None
-        self.answer_ng_user_choosen_to_contribute = None
 
     def error_cancel_report(self):
         self.reset_system_communicate_state()
@@ -479,7 +474,6 @@ class ChatbotConsumer(WebsocketConsumer):
             message_to_regist.system_tmp_report_note = self.report_note
             message_to_regist.system_tmp_report_data = self.report_data
             message_to_regist.system_tmp_report_bot_state = self.bot_state_to_regist_idx
-            message_to_regist.system_tmp_user_choose_to_contribute = self.answer_ng_user_choosen_to_contribute
 
         if bot_state:
             message_to_regist.predicted_intent = bot_state.intent.intent

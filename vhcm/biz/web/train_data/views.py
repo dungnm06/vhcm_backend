@@ -3,19 +3,21 @@ import csv
 import shutil
 from django.db import transaction
 from django.http import HttpResponse
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from vhcm.biz.authentication.user_session import ensure_admin
 from vhcm.common.response_json import ResponseJSON
 from vhcm.common.utils.files import pickle_file
 from vhcm.serializers.train_data import TrainDataSerializer, TrainDataDeletedSerializer
-from vhcm.biz.web.train_data.sql import GET_TRAIN_DATA
+from vhcm.biz.web.train_data.sql import GET_DATA, GET_TRAIN_DATA_KNOWLEDGE_DATA_INFO
 from vhcm.biz.nlu.model.intent import *
 from vhcm.common.utils.CH import isInt
+from vhcm.common.constants import DATETIME_DDMMYYYY_HHMMSS
+from vhcm.common.dao.native_query import execute_native_query
 import vhcm.models.train_data as train_data_model
 import vhcm.models.knowledge_data as knowledge_data_model
+from vhcm.models.knowledge_data_train_data_link import KnowledgeDataTrainDataLink
 from vhcm.common.utils.files import zipdir, ZIP_EXTENSION
 
 
@@ -50,6 +52,7 @@ def all_trainable(request):
 
 
 @api_view(['POST'])
+@transaction.atomic
 def add(request):
     response = Response()
     result = ResponseJSON()
@@ -78,8 +81,7 @@ def add(request):
         if not (include_datas and isinstance(include_datas, list)):
             raise APIException('Create train data form is malformed')
 
-        include_datas_str = [str(id) for id in include_datas]
-        sql = GET_TRAIN_DATA.format(knowledge_ids=COMMA.join(['(' + id + ')' for id in include_datas_str]))
+        sql = GET_DATA.format(knowledge_ids=COMMA.join(['(' + str(id) + ')' for id in include_datas]))
         query_data = execute_native_query(sql)
         questions = []
         intent = []
@@ -105,7 +107,7 @@ def add(request):
                 'knowledgedatarefercencedocumentlink_set__reference_document',
                 'knowledgedatasynonymlink_set__synonym',
                 'responsedata_set', 'subject_set'
-            )
+            ).select_related('edit_user')
         intent_data_filepath = os.path.join(storepath, INTENT_DATA_FILE_NAME)
         intent_references_for_file_saving = {}
         synonyms_for_file_saving = {}
@@ -179,15 +181,15 @@ def add(request):
         train_data = train_data_model.TrainData(
             filename=filename,
             description=request.data.get(train_data_model.DESCRIPTION),
-            include_data=COMMA.join(include_datas_str),
-            delete_reason=None,
             type=1
         )
         train_data.save()
-        # Clear temp files
-        storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + filename)
-        if os.path.exists(storepath):
-            shutil.rmtree(storepath)
+
+        # Create m2m relation
+        kd_td_links = []
+        for kd in knowledge_datas:
+            kd_td_links.append(KnowledgeDataTrainDataLink(knowledge_data=kd, train_data=train_data, edit_user=kd.edit_user))
+        KnowledgeDataTrainDataLink.objects.bulk_create(kd_td_links)
 
         serilized_data = TrainDataSerializer(train_data)
         result.set_status(True)
@@ -197,10 +199,56 @@ def add(request):
     except Exception as e:
         print('Failed to create training data')
         print(e)
+        raise APIException('Failed to create training data')
+    finally:
+        # Clear temp files
         storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + filename)
         if os.path.exists(storepath):
             shutil.rmtree(storepath)
-        raise APIException('Failed to create training data')
+
+
+@api_view(['GET', 'POST'])
+def get(request):
+    response = Response()
+    result = ResponseJSON()
+    ensure_admin(request)
+
+    errors = validate(request, 'get')
+    if errors:
+        result.set_status(False)
+        result.set_messages(errors)
+        response.data = result.to_json()
+        return response
+
+    id = request.data.get(train_data_model.ID) if request.method == 'POST' else request.GET.get(train_data_model.ID)
+    train_data = train_data_model.TrainData.objects.filter(id=id).first()
+    if not train_data:
+        raise APIException('Training file id not exists')
+
+    knowledge_data_info = execute_native_query(GET_TRAIN_DATA_KNOWLEDGE_DATA_INFO.format(id=id))
+    knowledge_datas_display = []
+    for kd in knowledge_data_info:
+        knowledge_datas_display.append({
+            'id': kd.knowledge_data_id,
+            'intent': kd.intent,
+            'intent_fullname': kd.intent_fullname,
+            'edit_user': kd.edit_user
+        })
+
+    train_data_display = {
+        'filename': train_data.filename,
+        'description': train_data.description,
+        'type': train_data.type,
+        'delete_reason': train_data.delete_reason,
+        'cdate': train_data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+        'mdate': train_data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+        'knowledge_datas': knowledge_datas_display
+    }
+
+    result.set_status(True)
+    result.set_result_data(train_data_display)
+    response.data = result.to_json()
+    return response
 
 
 @api_view(['POST'])
@@ -314,8 +362,6 @@ def on_off_data(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
-@authentication_classes([])
 def download(request):
     ensure_admin(request)
 
@@ -342,7 +388,7 @@ def download(request):
 def validate(request, mode):
     errors = []
 
-    if mode == 'update' or mode == 'delete' or mode == 'onoff':
+    if mode == 'update' or mode == 'delete' or mode == 'onoff' or mode == 'get':
         # ID
         id = request.data.get(train_data_model.ID) if request.method == 'POST' else request.GET.get(
             train_data_model.ID)

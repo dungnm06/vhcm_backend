@@ -238,3 +238,7 @@ STATIC_ROOT = 'static'
 USE_LOCAL_MEDIA = True
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+from django.utils import timezone
+import pytz
+timezone.activate(pytz.timezone("Asia/Ho_Chi_Minh"))

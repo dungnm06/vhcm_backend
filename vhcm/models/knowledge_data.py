@@ -2,6 +2,7 @@ from django.db import models
 from .user import User
 from .reference_document import RefercenceDocument
 from .synonym import Synonym
+from .train_data import TrainData
 
 # Fields
 ID = 'knowledge_data_id'
@@ -51,6 +52,7 @@ class KnowledgeData(models.Model):
     # Many-to-many relationship with other models
     references = models.ManyToManyField(RefercenceDocument, through='KnowledgeDataRefercenceDocumentLink')
     synonym = models.ManyToManyField(Synonym, through='KnowledgeDataSynonymLink')
+    train_data = models.ManyToManyField(TrainData, through='KnowledgeDataTrainDataLink')
 
     class Meta:
         db_table = "knowledge_data"

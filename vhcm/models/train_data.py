@@ -26,9 +26,6 @@ class TrainData(models.Model):
     description = models.TextField(
         verbose_name='Description'
     )
-    include_data = models.TextField(
-        verbose_name='Excluded knowledge datas', null=True
-    )
     type = models.IntegerField(
         choices=STATUS, verbose_name='Available status'
     )

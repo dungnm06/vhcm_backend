@@ -27,16 +27,16 @@ class SystemSetting(models.Model):
         max_length=100, verbose_name='setting name'
     )
     description = models.TextField(
-        verbose_name='setting description', null=True, blank=True
+        verbose_name='setting description', null=True
     )
     type = models.IntegerField(
         choices=SETTING_TYPES, verbose_name='setting type'
     )
     value = models.TextField(
-        verbose_name='value', null=True, blank=True
+        verbose_name='value', null=True
     )
     default = models.TextField(
-        verbose_name='default value'
+        verbose_name='default value', null=True
     )
     cdate = models.DateTimeField(
         verbose_name='setting created time', auto_now_add=True

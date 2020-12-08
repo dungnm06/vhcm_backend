@@ -66,6 +66,30 @@ FROM vhcm.knowledge_data kd
 INNER JOIN vhcm.user u
 ON kd.edit_user_id = u.user_id
 WHERE kd.status = 2
+ORDER BY kd.mdate DESC
+'''
+
+GET_LATEST_KNOWLEDGE_DATA_TRAIN_DATA = '''
+SELECT
+	result_data.knowledge_data_id as knowledge_data_id,
+	result_data.id as train_data_id,
+	result_data.filename as train_data
+FROM (
+	SELECT 
+		kd.knowledge_data_id,
+		td.id,
+		td.filename,
+  		RANK() OVER (PARTITION BY kd.knowledge_data_id ORDER BY td.mdate DESC)
+  	FROM vhcm.knowledge_data kd
+	INNER JOIN vhcm.user u
+	ON kd.edit_user_id = u.user_id
+	LEFT JOIN vhcm.knowledge_data_train_data_link kdtd
+	ON kd.knowledge_data_id = kdtd.knowledge_data_id
+	INNER JOIN vhcm.train_data td
+	ON td.id = kdtd.train_data_id
+	WHERE kd.knowledge_data_id = ANY(VALUES {knowledge_datas})
+) result_data
+WHERE result_data.rank <= 3
 '''
 
 GET_ALL_REVIEWS = '''

@@ -25,7 +25,7 @@ from vhcm.serializers.comment import CommentSerializer, DeletedCommentSerializer
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.constants import *
 from vhcm.common.utils.CH import isInt
-from .sql import GET_ALL_KNOWLEDGE_DATA, GET_ALL_TRAINABLE_KNOWLEDGE_DATA, GET_ALL_REVIEWS
+from .sql import GET_ALL_KNOWLEDGE_DATA, GET_ALL_TRAINABLE_KNOWLEDGE_DATA, GET_ALL_REVIEWS, GET_LATEST_KNOWLEDGE_DATA_TRAIN_DATA
 from vhcm.common.dao.native_query import execute_native_query
 
 
@@ -77,11 +77,11 @@ def all_trainable(request):
     ensure_admin(request)
 
     query_data = execute_native_query(GET_ALL_TRAINABLE_KNOWLEDGE_DATA)
-    result_data = {
-        'knowledges': []
-    }
+    knowledge_data_display = []
+    knowledge_data_ids = [-1]
     for data in query_data:
-        knowledge_data = {
+        knowledge_data_ids.append(data.id)
+        knowledge_data_display.append({
             'id': data.id,
             'intent': data.intent,
             'intent_fullname': data.intent_fullname,
@@ -89,8 +89,28 @@ def all_trainable(request):
             'edit_user_id': data.edit_user_id,
             'cdate': data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
             'mdate': data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
-        }
-        result_data['knowledges'].append(knowledge_data)
+        })
+
+    latest_belong_train_data_sql = GET_LATEST_KNOWLEDGE_DATA_TRAIN_DATA.format(
+        knowledge_datas=COMMA.join(['(' + str(id) + ')' for id in knowledge_data_ids])
+    )
+
+    latest_belong_train_data_display = {}
+    for kdi in knowledge_data_ids:
+        latest_belong_train_data_display[kdi] = []
+    del latest_belong_train_data_display[-1]
+
+    latest_belong_train_data = execute_native_query(latest_belong_train_data_sql)
+    for td in latest_belong_train_data:
+        latest_belong_train_data_display[td.knowledge_data_id].append({
+            'id': td.train_data_id,
+            'filename': td.train_data
+        })
+
+    result_data = {
+        'knowledges': knowledge_data_display,
+        'train_data_info': latest_belong_train_data_display
+    }
 
     result.set_status(True)
     result.set_result_data(result_data)

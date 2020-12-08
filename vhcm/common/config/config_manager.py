@@ -37,9 +37,12 @@ class ConfigLoader(object, metaclass=Singleton):
         if setting[setting_model.VALUE]:
             value = setting[setting_model.VALUE]
         else:
-            value = setting[setting_model.DEFAULT]
+            if setting[setting_model.DEFAULT]:
+                value = setting[setting_model.DEFAULT]
+            else:
+                return []
 
-        return [v.strip() for v in value.split(separator)]
+        return [v.strip() for v in value.split(separator) if v.strip()]
 
     def get_setting_value_int(self, key):
         setting = self.settings.get(key)
@@ -83,6 +86,9 @@ SETTING_TYPES = {
 LOGIN_EXPIRATION_LIMIT = 'login_expiration_limit'
 ACCEPT_IMAGE_FORMAT = 'accept_image_format'
 DEFAULT_PASSWORD = 'default_password'
+SYSTEM_MAIL = 'system_mail'
+SYSTEM_MAIL_PASSWORD = 'system_mail_password'
+RESET_PASSWORD_EXPIRE_TIME = 'reset_password_expire_time'
 # NLP
 VNCORENLP = 'vncorenlp'
 STOPWORDS = 'stopwords'
@@ -124,30 +130,30 @@ def add_system_settings(request):
          'These POS-tag will be ignored when analyze sentence subjects and verbs in language processing phase (comma separated)',
          SETTING_TYPES[NLP],
          'E,A,L,CH,X',
-         ''),
+         None),
         (NAMED_ENTITY_TYPES,
          'Language processing: Names entity types',
          'Accepted NER types for extracting main subjects in sentence',
          SETTING_TYPES[NLP],
          'LOC,PER,ORG,MISC',
-         ''),
+         None),
         ('subject_data_ng_pattern',
          'Language processing: Bad subject structure patterns',
          'Using this to analyze main subjects in sentences is matching.\nInput pattern examples:\nX-main\nmain-X\nX-main-X\nIn that (main) is main subject, (X) is word types adjacent to main subject',
          SETTING_TYPES[NLP],
          'N-E-main,N-main',
-         ''),
+         None),
         (EXCLUDE_WORDS,
          'Language processing: Exclude words',
          'These words will be ignored when analyze sentence subjects and verbs in language processing phase (comma separated)',
          SETTING_TYPES[NLP],
          'bị,được,giữa,và,là',
-         ''),
+         None),
         (STOPWORDS,
          'Language processing: Stopwords',
          'Words will be excluded from sentence during text preprocessing (absolute/relative path OK)',
          SETTING_TYPES[NLP],
-         '',
+         None,
          'extras/nlp/data/stopwords.txt'),
         (LOGIN_EXPIRATION_LIMIT,
          'System: Login expiration time',
@@ -160,7 +166,7 @@ def add_system_settings(request):
          'Specify image file format that can be uploaded to system.\nSee available types at: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html',
          SETTING_TYPES[SYSTEM],
          'JPEG,JPEG 2000,PNG',
-         ''),
+         None),
         (DEFAULT_PASSWORD,
          'System: New user default password',
          'Default password for newly created user',
@@ -185,12 +191,30 @@ def add_system_settings(request):
          SETTING_TYPES[REVIEW_PROCESS],
          None,
          '5'),
+        (SYSTEM_MAIL,
+         'System: System email address',
+         'Email address using to send mail from the system',
+         SETTING_TYPES[SYSTEM],
+         None,
+         None),
+        (SYSTEM_MAIL_PASSWORD,
+         'System: System email password',
+         'Password for the email using to send mail from the system',
+         SETTING_TYPES[SYSTEM],
+         None,
+         None),
+        (RESET_PASSWORD_EXPIRE_TIME,
+         'System: Reset password session expire time',
+         'Define how long user reset password session will live (in minute)',
+         SETTING_TYPES[SYSTEM],
+         None,
+         '15'),
     ]
 
-    settings = [SystemSetting(setting_id=s[0], setting_name=s[1], description=s[2], type=s[3], value=s[4], default=s[5])
+    settings = [setting_model.SystemSetting(setting_id=s[0], setting_name=s[1], description=s[2], type=s[3], value=s[4], default=s[5])
                 for s in settings]
-    SystemSetting.objects.all().delete()
-    SystemSetting.objects.bulk_create(settings)
+    setting_model.SystemSetting.objects.all().delete()
+    setting_model.SystemSetting.objects.bulk_create(settings)
 
     result.set_status(True)
     result.set_result_data(True)

@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"dungnm\",\r\n    \"password\": \"123\"\r\n}",
+					"raw": "{\r\n    \"username\": \"dummy\",\r\n    \"password\": \"456\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -214,7 +214,7 @@
 			"response": []
 		},
 		{
-			"name": "Settings/Change settings",
+			"name": "Settings/Change Setting",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -346,7 +346,7 @@
 					},
 					{
 						"key": "X-CSRFTOKEN",
-						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts",
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet",
 						"type": "text"
 					}
 				],
@@ -392,7 +392,7 @@
 						},
 						{
 							"key": "id_number",
-							"value": "0987654321",
+							"value": "2412423432",
 							"description": "unique field",
 							"type": "text"
 						},
@@ -654,7 +654,7 @@
 			"response": []
 		},
 		{
-			"name": "User/Change password",
+			"name": "User/Change Password",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -666,12 +666,12 @@
 					{
 						"key": "X-CSRFTOKEN",
 						"type": "text",
-						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"current_password\": \"123\",\r\n    \"new_password\": \"456\"\r\n}",
+					"raw": "{\r\n    \"current_password\": \"456\",\r\n    \"new_password\": \"123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -692,6 +692,94 @@
 						"api",
 						"user",
 						"change-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/Request Reset Password",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"chicken0695@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/request-reset-password",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"request-reset-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User/Reset Password",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"uid\": \"QNGjKeqQESWMQewPjVwArnTENzkMyu\",\r\n    \"new_password\": \"456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/reset-password",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"reset-password"
 					]
 				}
 			},
@@ -2114,6 +2202,194 @@
 			]
 		},
 		{
+			"name": "Train Data/Get",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/train-data/get?id=1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"train-data",
+						"get"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Train Data/All",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Referer",
+								"type": "text",
+								"value": "https://127.0.0.1:3000"
+							},
+							{
+								"key": "X-CSRFTOKEN",
+								"type": "text",
+								"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+							}
+						],
+						"url": {
+							"raw": "https://127.0.0.1:8000/api/train-data/all",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"train-data",
+								"all"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Origin, Cookie"
+						},
+						{
+							"key": "Allow",
+							"value": "OPTIONS, GET, POST"
+						},
+						{
+							"key": "Content-Length",
+							"value": "213"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "accesstoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MDUyMDQyNTgsImlhdCI6MTYwNTIwMDY1OH0.uggcYO6ebW9-dIDuZLZcNTPTn-l4TaTMgMTWktKPnvk; HttpOnly; Path=/; SameSite=None; Secure"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": true,\n    \"messages\": [],\n    \"result_data\": [\n        {\n            \"id\": 2,\n            \"filename\": \"cocunut_11_9_2020\",\n            \"type\": 1,\n            \"description\": \"Cocunut datas only, for test\",\n            \"cdate\": \"2020-11-10T00:27:48.896674\",\n            \"mdate\": \"2020-11-10T02:15:26.038058\"\n        }\n    ]\n}"
+				},
+				{
+					"name": "Train Data/All",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Referer",
+								"type": "text",
+								"value": "https://127.0.0.1:3000"
+							},
+							{
+								"key": "X-CSRFTOKEN",
+								"type": "text",
+								"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+							}
+						],
+						"url": {
+							"raw": "https://127.0.0.1:8000/api/train-data/all",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"train-data",
+								"all"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Origin, Cookie"
+						},
+						{
+							"key": "Allow",
+							"value": "OPTIONS, GET, POST"
+						},
+						{
+							"key": "Content-Length",
+							"value": "213"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "accesstoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MDUyMDQyNTgsImlhdCI6MTYwNTIwMDY1OH0.uggcYO6ebW9-dIDuZLZcNTPTn-l4TaTMgMTWktKPnvk; HttpOnly; Path=/; SameSite=None; Secure"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": true,\n    \"messages\": [],\n    \"result_data\": [\n        {\n            \"id\": 2,\n            \"filename\": \"cocunut_11_9_2020\",\n            \"type\": 1,\n            \"description\": \"Cocunut datas only, for test\",\n            \"cdate\": \"2020-11-10T00:27:48.896674\",\n            \"mdate\": \"2020-11-10T02:15:26.038058\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
 			"name": "Train Data/All Trainable",
 			"request": {
 				"method": "GET",
@@ -2380,12 +2656,12 @@
 					{
 						"key": "X-CSRFTOKEN",
 						"type": "text",
-						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"filename\": \"test_19_11_2020_6\",\r\n    \"description\": \"Test data\",\r\n    \"include_data\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79]\r\n}",
+					"raw": "{\r\n    \"filename\": \"test_7_12_2020_4\",\r\n    \"description\": \"Test data\",\r\n    \"include_data\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

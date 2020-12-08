@@ -140,9 +140,19 @@ class User(AbstractBaseUser):
         upload_to='user_avatar/',
         null=True, blank=True
     )
-    active = models.BooleanField(default=True, db_index=True)
+    active = models.BooleanField(
+        default=True, db_index=True
+    )
     admin = models.BooleanField(default=False)  # a superuser
     first_login = models.BooleanField(default=False)
+    reset_password_uid = models.TextField(
+        verbose_name='uid for reset password process',
+        null=True, db_index=True
+    )
+    reset_password_uid_expire = models.DateTimeField(
+        verbose_name='reset password uid expire time',
+        null=True
+    )
 
     # notice the absence of a "Password field", that is built in.
     USERNAME_FIELD = USERNAME

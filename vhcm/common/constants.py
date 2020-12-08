@@ -57,6 +57,8 @@ QUESTION_TYPE_MAP = {
     7: "yesno"
 }
 BOT_VERSION_FILE_PATH = 'extras/nlp/classifiers/trained/bot_version'
+RESET_PASSWORD_MAIL_TEMPLATE = 'extras/data/email/reset_password_template.txt'
+EMAIL_REGEX = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
 
 # Date format

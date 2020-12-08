@@ -102,9 +102,6 @@ class ChatState(models.Model):
     system_tmp_report_bot_state = models.SmallIntegerField(
         verbose_name='temp bot state being reported', null=True
     )
-    system_tmp_user_choose_to_contribute = models.BooleanField(
-        verbose_name='temp user choose to contribute state', null=True
-    )
 
     class Meta:
         db_table = "chat_state"

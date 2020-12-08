@@ -60,6 +60,9 @@ urlpatterns = [
     path('user/edit', user_views.EditUser.as_view(), name='edit_user'),
     path('user/change-status', user_views.change_status, name='change_user_status'),
     path('user/update-password-first-login', user_views.update_password_first_login, name='first_time_login_update_password'),
+    path('user/request-reset-password', user_views.request_reset_password, name='request_reset_password'),
+    path('user/reset-password', user_views.reset_password, name='reset_password'),
+    path('user/change-password', user_views.change_password, name='change_password'),
     # Synonym
     path('synonym/all', synonym_views.get_all_synonyms, name='get_all_synonyms'),
     path('synonym/get', synonym_views.get, name='get_one_synonym'),
@@ -74,6 +77,7 @@ urlpatterns = [
     path('reference-document/delete', reference_document_views.delete, name='delete_document'),
     # Train data processing
     path('train-data/all', train_data_views.all, name='get available training data'),
+    path('train-data/get', train_data_views.get, name='get 1 training data'),
     path('train-data/all-trainable', train_data_views.all_trainable, name='get trainable data'),
     path('train-data/all-deleted', train_data_views.all_deleted, name='get deleted training data'),
     path('train-data/toggle', train_data_views.on_off_data, name='toggle data trainable status'),

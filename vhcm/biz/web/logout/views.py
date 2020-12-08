@@ -1,12 +1,9 @@
 import jwt
-# from datetime import datetime
-from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from django.conf import settings
 from vhcm.common.response_json import ResponseJSON
-# from vhcm.models import BlacklistedToken
 from vhcm.biz.authentication.jwt import jwt_utils
 from vhcm.biz.authentication.user_session import sessions_data
 from vhcm.common.constants import ACCESS_TOKEN
@@ -20,9 +17,9 @@ def logout(request):
     result = ResponseJSON()
     access_token = request.COOKIES.get(ACCESS_TOKEN)
 
-    if not access_token:
-        raise exceptions.AuthenticationFailed('You are not even logged in')
-    else:
+    response.set_cookie(key=ACCESS_TOKEN, value='', httponly=True, secure=True, samesite='None', max_age=0)
+
+    if access_token:
         # Clear access-token from header cookie
         response.set_cookie(key=ACCESS_TOKEN, value='', httponly=True, secure=True, samesite='None', max_age=0)
         try:

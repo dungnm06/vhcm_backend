@@ -1,22 +1,26 @@
-import random
-import string
+import datetime
 import vhcm.models.user as user_model
 import vhcm.models.knowledge_data_review as review_model
 import vhcm.models.knowledge_data as knowledge_data_model
 from django.db import transaction
+from email_validator import validate_email, EmailNotValidError
 from rest_framework.exceptions import APIException
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework import exceptions
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.user import UserSerializer
 from .forms import AdminEditUserForm, UserAddForm, EditUserForm, AVATAR_EDIT_FLAG
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
-from vhcm.common.config.config_manager import config_loader, DEFAULT_PASSWORD
+from vhcm.common.utils.string import get_random_string
+from vhcm.common.constants import DATETIME_DDMMYYYY_HHMMSS
+from vhcm.common.config.config_manager import config_loader, DEFAULT_PASSWORD, RESET_PASSWORD_EXPIRE_TIME, SYSTEM_MAIL
 from vhcm.common.dao.native_query import execute_native
 from vhcm.biz.web.user.sql import DEACTIVE_USER_RELATIVES
+from vhcm.biz.email import mail_service
 
 
 @api_view(['GET', 'POST'])
@@ -70,7 +74,6 @@ class AddUser(APIView):
         ensure_admin(request)
         response = Response()
         result = ResponseJSON()
-        ensure_admin(request)
 
         form = UserAddForm(request.POST, request.FILES)
         if form.is_valid():
@@ -280,8 +283,114 @@ def change_password(request):
     return response
 
 
-# get random string password with letters, digits, and symbols
-def get_random_password_string():
-    password_characters = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(password_characters) for i in range(15))
-    return password
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@authentication_classes([])
+@transaction.atomic
+def request_reset_password(request):
+    response = Response()
+    result = ResponseJSON()
+
+    if not ('email' in request.data and request.data.get('email')):
+        result.set_status(False)
+        result.set_messages('Missing email address')
+        response.data = result.to_json()
+        return response
+
+    email = request.data.get('email')
+    try:
+        # Validate.
+        valid = validate_email(email)
+        # Update with the normalized form.
+        email = valid.email
+    except EmailNotValidError as e:
+        # email is not valid
+        result.set_status(False)
+        result.set_messages(str(e))
+        response.data = result.to_json()
+        return response
+
+    # Update user model
+    user = user_model.User.objects.filter(email=email).first()
+    if not user:
+        result.set_status(False)
+        result.set_messages('User is not exists')
+        response.data = result.to_json()
+        return response
+    reset_password_uid = get_random_string(30)
+    print(datetime.datetime.now())
+    expire_time = datetime.datetime.now() + datetime.timedelta(
+        minutes=config_loader.get_setting_value_int(RESET_PASSWORD_EXPIRE_TIME)
+    )
+    print(expire_time)
+    user.reset_password_uid = reset_password_uid
+    user.reset_password_uid_expire = expire_time
+    user.save()
+
+    # Send email
+    mail_content = mail_service.create_reset_password_mail_template(
+        send_from=config_loader.get_setting_value(SYSTEM_MAIL),
+        send_to=email,
+        receipt_name=user.fullname,
+        uid=reset_password_uid,
+        expire_time=expire_time.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+    )
+    mail_service.run_send_mail_task(mail_content)
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@authentication_classes([])
+@transaction.atomic
+def reset_password(request):
+    response = Response()
+    result = ResponseJSON()
+
+    errors = validate_reset_password_form(request)
+    if errors:
+        result.set_status(False)
+        result.set_messages(errors)
+        response.data = result.to_json()
+        return response
+
+    uid = request.data.get('uid')
+    user = user_model.User.objects.filter(reset_password_uid=uid).first()
+    if not user:
+        result.set_status(False)
+        result.set_messages('Invalid reset password uid')
+        response.data = result.to_json()
+        return response
+
+    if datetime.datetime.now() > user.reset_password_uid_expire:
+        result.set_status(False)
+        result.set_messages('Reset password request already expired')
+        response.data = result.to_json()
+        return response
+
+    new_password = request.data.get('new_password')
+    user.set_password(new_password)
+    user.reset_password_uid = None
+    user.reset_password_uid_expire = None
+    user.save()
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
+
+
+def validate_reset_password_form(request):
+    messages = []
+
+    uid = request.data.get('uid')
+    if not (uid and isinstance(uid, str)):
+        messages.append('Invalid reset password uid')
+
+    new_password = request.data.get('new_password')
+    if not (new_password and isinstance(new_password, str)):
+        messages.append('Invalid new password')
+
+    return messages
