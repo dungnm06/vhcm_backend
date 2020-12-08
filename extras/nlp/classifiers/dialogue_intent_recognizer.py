@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import os
 import shutil
@@ -9,7 +10,7 @@ from sklearn.metrics import accuracy_score
 from pathlib import Path
 
 
-def train_dialogue_intent_recognizer(datafile):
+def train_dialogue_intent_recognizer(datafile, output):
     """------------ HCM relative sentence and normal sentence recognition ------------"""
     # Load HCM relative data
     datafile_folder = Path(datafile).resolve().parent
@@ -21,7 +22,7 @@ def train_dialogue_intent_recognizer(datafile):
     print('Total data len: {}'.format(sample_size))
 
     # Load dialogue data
-    dialogue_data = load_text_data('data/conversations.txt')
+    dialogue_data = load_text_data(os.path.join(ROOT, 'data/conversations.txt'))
     dialogue_data = random.sample(dialogue_data, sample_size)
 
     # Apply text_prepare function to preprocess the data.
@@ -29,8 +30,8 @@ def train_dialogue_intent_recognizer(datafile):
     dialogue_data = [text_prepare(text) for text in dialogue_data]
 
     # Do a binary classification on TF-IDF representations of texts.
-    # Labels will be either dialogue for general questions or stackoverflow for programming-related questions.
-    # First, prepare the data for this task:
+    # Labels will be either hcm_question for hcm relative questions or oos_dialogue for out of scope dialogue.
+    # Prepare the data for this task:
     #    concatenate dialogue and stackoverflow examples into one sample
     #    split it into train and test in proportion 9:1, use random_state=0 for reproducibility
     #    transform it into TF-IDF features
@@ -40,7 +41,7 @@ def train_dialogue_intent_recognizer(datafile):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
     print('Train size = {}, test size = {}'.format(len(X_train), len(X_test)))
 
-    X_train_tfidf, X_test_tfidf, tfidf_vectorizer = tfidf_features(X_train, X_test, 'classifiers/trained/dialogue_tfidf_vectorizer.pickle')
+    X_train_tfidf, X_test_tfidf, tfidf_vectorizer = tfidf_features(X_train, X_test, os.path.join(output, 'dialogue_tfidf_vectorizer.pickle'))
 
     # Train the **intent recognizer** using LogisticRegression on the train set
     intent_recognizer = LogisticRegression(penalty='l2', C=10, random_state=0, verbose=1, n_jobs=2, max_iter=2000)
@@ -51,22 +52,10 @@ def train_dialogue_intent_recognizer(datafile):
     test_accuracy = accuracy_score(y_test, y_test_pred)
     print('Test accuracy = {}'.format(test_accuracy))
 
-    question = 'Hôm_nay ngày bao_nhiêu thế nhỉ ?'
-    prepared_question = text_prepare(question)
-    features = tfidf_vectorizer.transform([prepared_question])
-    intent = intent_recognizer.predict(features)[0]
-    print(intent)
-
-    question = 'Ông của Bác_Hồ là ai ?'
-    prepared_question = text_prepare(question)
-    features = tfidf_vectorizer.transform([prepared_question])
-    intent = intent_recognizer.predict(features)[0]
-    print(intent)
-
     # Dump the classifier to use it in the running bot.
     print('Saving data....')
-    pickle_file(intent_recognizer, 'classifiers/trained/dialogue_intent_recognizer.pickle')
+    pickle_file(intent_recognizer, os.path.join(output, 'dialogue_intent_recognizer.pickle'))
 
     # Clear traindata tempfile
-    if os.path.exists(datafile):
-        shutil.rmtree(datafile)
+    if os.path.exists(os.path.splitext(datafile)[0]):
+        shutil.rmtree(os.path.splitext(datafile)[0])

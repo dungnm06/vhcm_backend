@@ -2,6 +2,9 @@ import pickle
 import re
 import zipfile
 from sklearn.feature_extraction.text import TfidfVectorizer
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
 
 
 def load_text_data(txt_file):

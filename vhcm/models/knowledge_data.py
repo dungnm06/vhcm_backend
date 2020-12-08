@@ -26,6 +26,11 @@ PROCESS_STATUS = [
     (DONE, 'Done'),
     (DISABLE, 'Disable')
 ]
+CHANGEABLE_PROCESS_STATUS = [
+    AVAILABLE,
+    PROCESSING,
+    DISABLE
+]
 PROCESS_STATUS_DICT = {
     AVAILABLE: 'Available',
     PROCESSING: 'Processing',

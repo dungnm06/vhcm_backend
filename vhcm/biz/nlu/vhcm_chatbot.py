@@ -132,7 +132,9 @@ def is_bot_ready():
     return system_bot_version[CURRENT_BOT_VERSION] > 0 \
            and question_type_classifier \
            and intent_classifier \
-           and intent_datas
+           and intent_datas \
+           and dialogue_intent_recognizer \
+           and dialogue_tfidf_vectorizer
 
 
 def version_check(session_bot_version):

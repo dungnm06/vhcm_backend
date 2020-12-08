@@ -235,10 +235,6 @@ class LanguageProcessor(object, metaclass=Singleton):
         return [self.generate_similary_sentences(pair) for pair in sentence_synonym_dict_pairs]
 
     def get_synonym_dicts(self, word, synonym_dicts):
-        # TODO:
-        #  Use word embedding for sentiment analyze for more accurate in getting right synonym set
-        #  in case of multiple meaning word may belong to multiple synonym set
-        #  Currently get all synonym sets thats have the word
         return [synonym_dicts[sid] for sid in synonym_dicts if word in synonym_dicts[sid].words]
 
     def find_phrase_in_sentence(self, content, sentence, raw_sentence, synonyms, raw_start=None, raw_end=None):
@@ -580,10 +576,10 @@ class LanguageProcessor(object, metaclass=Singleton):
 
     def chuan_hoa_dau_cau_tieng_viet(self, sentence):
         """
-            Chuyển câu tiếng việt về chuẩn gõ dấu kiểu cũ.
-            :param sentence:
-            :return:
-            """
+        Chuyển câu tiếng việt về chuẩn gõ dấu kiểu cũ.
+        :param sentence:
+        :return:
+        """
         sentence = sentence.lower()
         words = sentence.split()
         for index, word in enumerate(words):

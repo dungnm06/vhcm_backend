@@ -1,9 +1,7 @@
 import os
 import json
 import numpy as np
-import traceback
 from sklearn.preprocessing import MultiLabelBinarizer
-from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.common.constants import *
 from vhcm.common.singleton import Singleton
 import vhcm.common.config.config_manager as config
@@ -77,8 +75,8 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
         if not (self.model or self.label_binarizer or self.tokenizer or self.config or self.threshold):
             return None
         else:
-            print('Predict:')
-            print(x)
+            # print('Predict:')
+            # print(x)
             x = self.tokenizer(
                 text=x,
                 return_tensors='tf',
@@ -90,15 +88,10 @@ class QuestionTypeClassifier(object, metaclass=Singleton):
                 truncation=True)
             input_dict = {
                 'input_ids': x['input_ids'],
-                # 'token_type_ids': x['token_type_ids'],
                 'attention_mask': x['attention_mask']
             }
-            # x_tensor = tf.constant(np.concatenate((ids, atm), axis=0))
-            # print(x_tensor)
             preds = self.model.predict(input_dict)
-            # print(preds['type'])
             preds = np.array([[1 if acc > self.threshold else 0 for acc in p] for p in preds['classifier']])
             preds = self.label_binarizer.inverse_transform(preds)
-            # for predict in preds:
-            print('Predicted types: ', ', '.join(preds[0]))
+            # print('Predicted types: ', ', '.join(preds[0]))
             return list(preds[0])

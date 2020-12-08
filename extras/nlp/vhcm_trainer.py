@@ -1,10 +1,6 @@
 import argparse
 import os
-from classifiers.hcm_intent_classifier import train_intent_classifier
-from classifiers.hcm_question_type_classifier import train_question_classifier
-from classifiers.dialogue_intent_recognizer import train_dialogue_intent_recognizer
-from pathlib import Path
-ROOT = Path(__file__).resolve().parent
+from utils import ROOT
 
 if __name__ == '__main__':
     # Load parameters
@@ -34,15 +30,18 @@ if __name__ == '__main__':
     activation = args.activation
 
     if classifier_type == 1:
+        from classifiers.hcm_intent_classifier import train_intent_classifier
         if activation is None:
             activation = 'softmax'
         train_intent_classifier(data, output, sentence_length, batch, epoch,
                                 learning_rate, epsilon, activation, version)
     if classifier_type == 2:
+        from classifiers.hcm_question_type_classifier import train_question_classifier
         if activation is None:
             activation = 'sigmoid'
         train_question_classifier(data, output, sentence_length, batch, epoch,
                                   learning_rate, epsilon, activation)
 
     if classifier_type == 3:
-        train_dialogue_intent_recognizer(data)
+        from classifiers.dialogue_intent_recognizer import train_dialogue_intent_recognizer
+        train_dialogue_intent_recognizer(data, output)

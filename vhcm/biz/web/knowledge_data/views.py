@@ -35,7 +35,11 @@ def get_all(request):
     result = ResponseJSON()
 
     user = get_current_user(request)
-    query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA.format(user_id=user.user_id))
+    if user.admin:
+        sql_filter = ''
+    else:
+        sql_filter = 'WHERE kd.status != 3'
+    query_data = execute_native_query(GET_ALL_KNOWLEDGE_DATA.format(user_id=user.user_id, sql_filter=sql_filter))
     result_data = {
         'knowledge_datas': [],
         'review_settings': {
@@ -242,6 +246,7 @@ def get(request):
             comment_model.COMMENT: comment.comment if (user.admin or comment.status == comment_model.VIEWABLE) else None,
             comment_model.VIEWABLE_STATUS: comment.status,
             comment_model.EDITED: comment.edited,
+            comment_model.EDITABLE: comment.editable,
             comment_model.MDATE: comment.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
         }
         comments_display.append(display_comment)
@@ -373,6 +378,7 @@ def add(request):
             user=user,
             knowledge_data=knowledge_data,
             comment=message,
+            editable=False,
             status=comment_model.VIEWABLE
         )
         comment.save()
@@ -579,6 +585,7 @@ def edit(request):
             user=user,
             knowledge_data=knowledge_data,
             comment=message,
+            editable=False,
             status=comment_model.VIEWABLE
         )
         comment.save()
@@ -716,6 +723,35 @@ def edit(request):
     return response
 
 
+@api_view(['POST'])
+def change_status(request):
+    response = Response()
+    result = ResponseJSON()
+    ensure_admin(request)
+
+    # Get existing Knowledge data
+    kd_id = request.data.get(knowledge_data_model.ID)
+    if not (kd_id and isInt(kd_id)):
+        raise APIException('Invalid intent id: ID({})'.format(kd_id))
+
+    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=kd_id).first()
+    if knowledge_data is None:
+        raise APIException('Intent id not found: ID({})'.format(kd_id))
+
+    status = request.data.get(knowledge_data_model.STATUS)
+    if not status:
+        raise APIException('Knowledge data status must be specified')
+    if status not in knowledge_data_model.CHANGEABLE_PROCESS_STATUS:
+        raise APIException('Invalid knowledge data status')
+
+    knowledge_data.status = status
+    knowledge_data.save()
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
+
+
 @api_view(['GET', 'POST'])
 def all_comment(request):
     response = Response()
@@ -745,6 +781,7 @@ def all_comment(request):
             comment_model.COMMENT: comment.comment if (user.admin or comment.status == comment_model.VIEWABLE) else None,
             comment_model.VIEWABLE_STATUS: comment.status,
             comment_model.EDITED: comment.edited,
+            comment_model.EDITABLE: comment.editable,
             comment_model.MDATE: comment.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
         }
         display_comments.append(display_comment)
@@ -835,6 +872,8 @@ def edit_comment(request):
     comment = comment_model.Comment.objects.filter(id=comment_id).select_related('user').first()
     if not comment:
         raise APIException('Invalid comment id, comment not exists')
+    if not comment.editable:
+        raise APIException('This comment not editable')
     if user.user_id != comment.user.user_id:
         raise APIException('You cannot edit other users comment')
 
@@ -874,6 +913,8 @@ def delete_comment(request):
     comment = comment_model.Comment.objects.filter(id=comment_id).select_related('user').first()
     if not comment:
         raise APIException('Invalid comment id, comment not exists')
+    if not comment.editable:
+        raise APIException('Cannot delete this comment')
     if user.user_id != comment.user.user_id:
         raise APIException('You cannot delete other users comment')
 

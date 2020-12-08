@@ -75,18 +75,19 @@ class ClassifierTrainer(object):
             '-d', data,
             '-v', str(bot_version)
         ]
-        if sentence_length:
-            args.extend(['-sl', str(sentence_length)])
-        if batch:
-            args.extend(['-b', str(batch)])
-        if epoch:
-            args.extend(['-e', str(epoch)])
-        if learning_rate:
-            args.extend(['-lr', str(learning_rate)])
-        if epsilon:
-            args.extend(['-eps', str(epsilon)])
-        if activation:
-            args.extend(['-a', activation])
+        if train_type != 3:
+            if sentence_length:
+                args.extend(['-sl', str(sentence_length)])
+            if batch:
+                args.extend(['-b', str(batch)])
+            if epoch:
+                args.extend(['-e', str(epoch)])
+            if learning_rate:
+                args.extend(['-lr', str(learning_rate)])
+            if epsilon:
+                args.extend(['-eps', str(epsilon)])
+            if activation:
+                args.extend(['-a', activation])
         print(args)
 
         process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
