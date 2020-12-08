@@ -25,8 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'g7^5)*q^=^#+fib)i$fpiwfzhfso10iqb4#!u@zv8x$j2x-0xi'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 USE_DEBUG_TOOLBAR = False
 
 # SECURITY WARNING: App Engine's security features ensure that it is safe to

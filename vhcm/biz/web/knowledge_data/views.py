@@ -30,7 +30,7 @@ from vhcm.common.dao.native_query import execute_native_query
 
 
 @api_view(['GET', 'POST'])
-def all(request):
+def get_all(request):
     response = Response()
     result = ResponseJSON()
 
@@ -92,7 +92,7 @@ def all_trainable(request):
         })
 
     latest_belong_train_data_sql = GET_LATEST_KNOWLEDGE_DATA_TRAIN_DATA.format(
-        knowledge_datas=COMMA.join(['(' + str(id) + ')' for id in knowledge_data_ids])
+        knowledge_datas=COMMA.join(['(' + str(kid) + ')' for kid in knowledge_data_ids])
     )
 
     latest_belong_train_data_display = {}
@@ -250,7 +250,8 @@ def get(request):
             relative_users[comment.user.user_id] = {
                 user_model.USERNAME: comment.user.username,
                 user_model.FULLNAME: comment.user.fullname,
-                user_model.EMAIL: comment.user.email
+                user_model.EMAIL: comment.user.email,
+                user_model.AVATAR: comment.user.avatar.url if comment.user.avatar else None
             }
 
     # Reviews
@@ -358,6 +359,7 @@ def add(request):
         report.status = report_model.ACCEPTED
         report.processor_note = processor_note
         report.processor = user
+        report.forward_intent = knowledge_data
         report.save()
         # Note a comment of this report processing
         message = 'Report data ID:{report_id} accepted by {user} at {time}.\nProcessor note: {note}'
@@ -563,9 +565,10 @@ def edit(request):
         report.status = report_model.ACCEPTED
         report.processor_note = processor_note
         report.processor = user
+        report.forward_intent = knowledge_data
         report.save()
         # Note a comment of this report processing
-        message = 'Report data ID:{report_id} accepted by {user} at {time}.\nProcessor note: {note}'
+        message = 'Report data ID: {report_id} accepted by {user} at {time}.\nProcessor note: {note}'
         message = message.format(
             report_id=report.id,
             user=user.username,
@@ -750,7 +753,8 @@ def all_comment(request):
             relative_users[comment.user.user_id] = {
                 user_model.USERNAME: comment.user.username,
                 user_model.FULLNAME: comment.user.fullname,
-                user_model.EMAIL: comment.user.email
+                user_model.EMAIL: comment.user.email,
+                user_model.AVATAR: comment.user.avatar.url if comment.user.avatar else None
             }
 
     result_data = {

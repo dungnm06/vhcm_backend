@@ -1,17 +1,14 @@
 from rest_framework import serializers
 import vhcm.models.train_data as train_data_model
-from datetime import datetime
-from vhcm.common.constants import DATETIME_DJANGO_DEFUALT_DDMMYYYY_HHMMSS, DATETIME_DDMMYYYY_HHMMSS
+from vhcm.common.utils.CV import normalize_django_datetime
 
 
 class TrainDataSerializer(serializers.ModelSerializer):
     def to_representation(self, obj):
         data = super().to_representation(obj)
         # Reformat date
-        tmp_date = datetime.strptime(data[train_data_model.CDATE], DATETIME_DJANGO_DEFUALT_DDMMYYYY_HHMMSS.regex)
-        data[train_data_model.CDATE] = tmp_date.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
-        tmp_date = datetime.strptime(data[train_data_model.MDATE], DATETIME_DJANGO_DEFUALT_DDMMYYYY_HHMMSS.regex)
-        data[train_data_model.MDATE] = tmp_date.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+        data[train_data_model.CDATE] = normalize_django_datetime(data[train_data_model.CDATE])
+        data[train_data_model.MDATE] = normalize_django_datetime(data[train_data_model.MDATE])
         return data
 
     class Meta:
@@ -25,10 +22,8 @@ class TrainDataDeletedSerializer(serializers.ModelSerializer):
     def to_representation(self, obj):
         data = super().to_representation(obj)
         # Reformat date
-        tmp_date = datetime.strptime(data[train_data_model.CDATE], DATETIME_DJANGO_DEFUALT_DDMMYYYY_HHMMSS.regex)
-        data[train_data_model.CDATE] = tmp_date.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
-        tmp_date = datetime.strptime(data[train_data_model.MDATE], DATETIME_DJANGO_DEFUALT_DDMMYYYY_HHMMSS.regex)
-        data[train_data_model.MDATE] = tmp_date.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+        data[train_data_model.CDATE] = normalize_django_datetime(data[train_data_model.CDATE])
+        data[train_data_model.MDATE] = normalize_django_datetime(data[train_data_model.MDATE])
         return data
 
     class Meta:

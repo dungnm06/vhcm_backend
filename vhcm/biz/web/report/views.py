@@ -172,8 +172,7 @@ def get_accepted_report(request):
         'processor_id': report.processor.user_id,
         'processor': report.processor.username,
         'processor_note': report.processor_note,
-        'forward_intent_id': report.forward_intent.knowledge_data_id,
-        'forward_intent_name': report.forward_intent.intent_fullname,
+        'forward_intent_name': report.forward_intent.intent if report.forward_intent else None,
         'mdate': report.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
     }
 
@@ -193,7 +192,7 @@ def get_rejected_report(request):
         raise APIException('Invalid report id')
 
     report = report_model.Report.objects.filter(id=report_id, status=report_model.REJECTED)\
-        .select_related('reporter', 'processor', 'bot_version', 'forward_intent')\
+        .select_related('reporter', 'processor', 'bot_version')\
         .first()
     if not report:
         raise APIException('Invalid report id, report not found')

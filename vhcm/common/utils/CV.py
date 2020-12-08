@@ -1,7 +1,8 @@
 import os
 import json
+from datetime import datetime
 from rest_framework.parsers import FileUploadParser
-from vhcm.common.constants import COMMA, COLON, SPACE, PROJECT_ROOT
+from vhcm.common.constants import *
 
 
 def readimage(path):
@@ -37,3 +38,18 @@ class ImageUploadParser(FileUploadParser):
 
 def datetime_to_str(time, format):
     return time.strftime(format)
+
+
+def normalize_django_datetime(date_str):
+    # First need to chop-off un-used timezone part
+    try:
+        tz_idx = date_str.rindex('+')
+    except ValueError:
+        tz_idx = -1
+    if tz_idx > 0:
+        date_str = date_str[:tz_idx]
+
+    tmp_date = datetime.strptime(date_str, DATETIME_DJANGO_DEFUALT_DDMMYYYY_HHMMSS.regex)
+    normalized = tmp_date.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+
+    return normalized
