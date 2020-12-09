@@ -19,12 +19,11 @@ def all_settings(request):
         value = None
         hidden = False
         if setting.setting_id in ENCRYPT_SETTING:
-            if setting.setting_id in ENCRYPT_SETTING:
-                hidden = True
-                if setting.value:
-                    value = decrypt(setting.value)
-            else:
-                value = setting.value
+            hidden = True
+            if setting.value:
+                value = decrypt(setting.value)
+        else:
+            value = setting.value
 
         settings_display.append({
             'setting_id': setting.setting_id,
