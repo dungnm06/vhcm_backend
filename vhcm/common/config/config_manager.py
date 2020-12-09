@@ -6,6 +6,7 @@ from vhcm.common.singleton import Singleton
 from vhcm.common.dao.model_query import is_table_exists
 from vhcm.common.utils.CH import isInt, isFloat
 from vhcm.common.utils.cryptographic import decrypt
+from vhcm.biz.authentication.user_session import ensure_admin
 
 
 class ConfigLoader(object, metaclass=Singleton):
@@ -41,7 +42,6 @@ class ConfigLoader(object, metaclass=Singleton):
         setting = self.settings.get(key)
         if setting is None:
             raise KeyError('Setting not found: ', key)
-        value = None
         if setting[setting_model.VALUE]:
             value = setting[setting_model.VALUE]
         else:
@@ -112,7 +112,6 @@ MINIMUM_ACCEPT = 'minimum_accept'
 
 # Settings need to encrypt before push to DB
 ENCRYPT_SETTING = [
-    SYSTEM_MAIL,
     SYSTEM_MAIL_PASSWORD
 ]
 
@@ -124,6 +123,7 @@ config_loader = ConfigLoader()
 def add_system_settings(request):
     response = Response()
     result = ResponseJSON()
+    ensure_admin(request)
 
     # Adding settings to DB
     settings = [
@@ -200,7 +200,7 @@ def add_system_settings(request):
          None,
          '3'),
         (MINIMUM_ACCEPT,
-         'Knowledge data process: Predict threshold value (For question types predicting)',
+         'Knowledge data processing: Minimum accepts count',
          'Knowledge data will be approved when accepts count reach this value threshold',
          SETTING_TYPES[REVIEW_PROCESS],
          None,
