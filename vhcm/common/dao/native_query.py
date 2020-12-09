@@ -33,7 +33,7 @@ def execute_native_query(sql, params=None, return_type='named_tuple'):
     return result
 
 
-def execute_native(sql, params=None, return_type='named_tuple'):
+def execute_native(sql, params=None):
     if params is None:
         params = []
     with connection.cursor() as cursor:
