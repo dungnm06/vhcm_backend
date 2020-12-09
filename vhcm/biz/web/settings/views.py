@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from vhcm.common.response_json import ResponseJSON
 from vhcm.common.config.config_manager import config_loader, ENCRYPT_SETTING
 from vhcm.biz.authentication.user_session import ensure_admin
-from vhcm.common.utils.cryptographic import encrypt
+from vhcm.common.utils.crypto import encrypt
 import vhcm.models.system_settings as setting_model
 
 

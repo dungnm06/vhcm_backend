@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from django.utils import timezone
 from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.user import UserSerializer
 from .forms import AdminEditUserForm, UserAddForm, EditUserForm, AVATAR_EDIT_FLAG
@@ -343,7 +344,42 @@ def request_reset_password(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @authentication_classes([])
-@transaction.atomic
+def check_reset_password_session_alive(request):
+    response = Response()
+    result = ResponseJSON()
+
+    uid = request.data.get('uid')
+    if not (uid and isinstance(uid, str)):
+        result.set_status(False)
+        result.set_messages('Invalid reset password uid')
+        response.data = result.to_json()
+        return response
+
+    user = user_model.User.objects.filter(reset_password_uid=uid).first()
+    if not user:
+        result.set_status(False)
+        result.set_messages('Invalid reset password uid')
+        response.data = result.to_json()
+        return response
+
+    if timezone.now() > user.reset_password_uid_expire:
+        user.reset_password_uid = None
+        user.reset_password_uid_expire = None
+        user.save()
+
+        result.set_status(False)
+        result.set_messages('Reset password request already expired')
+        response.data = result.to_json()
+        return response
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@authentication_classes([])
 def reset_password(request):
     response = Response()
     result = ResponseJSON()
@@ -363,7 +399,11 @@ def reset_password(request):
         response.data = result.to_json()
         return response
 
-    if datetime.datetime.now() > user.reset_password_uid_expire:
+    if timezone.now() > user.reset_password_uid_expire:
+        user.reset_password_uid = None
+        user.reset_password_uid_expire = None
+        user.save()
+
         result.set_status(False)
         result.set_messages('Reset password request already expired')
         response.data = result.to_json()

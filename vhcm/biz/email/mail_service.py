@@ -1,7 +1,5 @@
-# import the smtplib module. It should be included in Python by default
 from smtplib import SMTPConnectError, SMTP
 import os
-# from asgiref.sync import sync_to_async
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from multiprocessing import Process

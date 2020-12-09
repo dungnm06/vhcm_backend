@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"dummy\",\r\n    \"password\": \"456\"\r\n}",
+					"raw": "{\r\n    \"username\": \"dungnm\",\r\n    \"password\": \"123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -231,7 +231,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"setting_id\": \"login_expiration_limit\",\r\n    \"value\": \"45\"\r\n}\r\n",
+					"raw": "{\r\n    \"setting_id\": \"system_mail\",\r\n    \"value\": \"dungnmse06067@fpt.edu.vn\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -742,6 +742,50 @@
 			"response": []
 		},
 		{
+			"name": "User/Check Reset Password Session",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"uid\": \"FfhhzFOHMbunaWEJnibLRGquHaJffy\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/check-reset-password-session",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"check-reset-password-session"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "User/Reset Password",
 			"request": {
 				"method": "POST",
@@ -759,7 +803,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"uid\": \"QNGjKeqQESWMQewPjVwArnTENzkMyu\",\r\n    \"new_password\": \"456\"\r\n}",
+					"raw": "{\r\n    \"uid\": \"FfhhzFOHMbunaWEJnibLRGquHaJffy\",\r\n    \"new_password\": \"123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

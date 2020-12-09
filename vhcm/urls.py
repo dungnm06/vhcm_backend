@@ -63,6 +63,7 @@ urlpatterns = [
     path('user/update-password-first-login', user_views.update_password_first_login, name='first_time_login_update_password'),
     path('user/request-reset-password', user_views.request_reset_password, name='request_reset_password'),
     path('user/reset-password', user_views.reset_password, name='reset_password'),
+    path('user/check-reset-password-session', user_views.check_reset_password_session_alive, name='check_reset_password_session_alive'),
     path('user/change-password', user_views.change_password, name='change_password'),
     # Synonym
     path('synonym/all', synonym_views.get_all_synonyms, name='get_all_synonyms'),

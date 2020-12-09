@@ -17,8 +17,8 @@ def generate_access_token(user):
         duration = 30
     access_token_payload = {
         USER_ID: user,
-        EXPIRE_TIME: datetime.datetime.utcnow() + datetime.timedelta(minutes=duration),
-        ISSUE_TIME: datetime.datetime.utcnow(),
+        EXPIRE_TIME: datetime.datetime.now() + datetime.timedelta(minutes=duration),
+        ISSUE_TIME: datetime.datetime.now(),
     }
     access_token = jwt.encode(access_token_payload,
                               settings.SECRET_KEY, algorithm='HS256').decode('utf-8')

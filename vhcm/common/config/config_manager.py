@@ -5,8 +5,8 @@ from vhcm.common.response_json import ResponseJSON
 from vhcm.common.singleton import Singleton
 from vhcm.common.dao.model_query import is_table_exists
 from vhcm.common.utils.CH import isInt, isFloat
-from vhcm.common.utils.cryptographic import decrypt
 from vhcm.biz.authentication.user_session import ensure_admin
+from vhcm.common.utils.crypto import decrypt
 
 
 class ConfigLoader(object, metaclass=Singleton):
