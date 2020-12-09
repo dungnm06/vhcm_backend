@@ -128,6 +128,5 @@ def train_intent_classifier(datapath, output, sentencelength, batch, epoch, lear
         json.dump(version, f, indent=4)
 
     # Clear traindata tempfile
-    tempstorepath = os.path.dirname(os.path.abspath(datapath))
-    if os.path.exists(tempstorepath):
-        shutil.rmtree(tempstorepath)
+    if os.path.exists(os.path.splitext(datapath)[0]):
+        shutil.rmtree(os.path.splitext(datapath)[0])

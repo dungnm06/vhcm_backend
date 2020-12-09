@@ -5,7 +5,7 @@ from vhcm.common.dao.native_query import execute_native_query
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.biz.web.dashboard.sql import *
 from vhcm.common.config.config_manager import config_loader, MAXIMUM_REJECT
-from vhcm.biz.nlu.vhcm_chatbot import system_bot_version, CURRENT_BOT_VERSION
+from vhcm.biz.nlu.vhcm_chatbot import system_bot_version, is_bot_ready, CURRENT_BOT_VERSION
 import vhcm.models.knowledge_data as knowledge_data
 import vhcm.models.knowledge_data_review as review
 import vhcm.models.train_data as train_data
@@ -22,15 +22,16 @@ def dashboard_stats(request):
 
     # Bot version
     version = None
-    current_version = system_bot_version[CURRENT_BOT_VERSION]
-    if current_version != 0:
-        bot_data = train_data.TrainData.objects.filter(id=current_version).first()
-        if bot_data:
-            version = {
-                'id': current_version,
-                'name': bot_data.filename,
-                'cdate': bot_data.cdate
-            }
+    if is_bot_ready:
+        current_version = system_bot_version[CURRENT_BOT_VERSION]
+        if current_version != 0:
+            bot_data = train_data.TrainData.objects.filter(id=current_version).first()
+            if bot_data:
+                version = {
+                    'id': current_version,
+                    'name': bot_data.filename,
+                    'cdate': bot_data.cdate
+                }
 
     # Self-work stats
     intent_stats = execute_native_query(INTENT_STATS.format(user_id=user_id))

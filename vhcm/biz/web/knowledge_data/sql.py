@@ -50,6 +50,7 @@ LEFT JOIN (
 	WHERE kdr3.review_user_id = {user_id}
 ) kdr_user
 ON kdr_user.knowledge_data_id = kd.knowledge_data_id
+{sql_filter}
 ORDER BY kd.mdate
 '''
 
