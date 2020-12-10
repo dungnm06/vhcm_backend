@@ -19,6 +19,7 @@ def all(request):
     for log in all_logs:
         display_results.append({
             'log_id': log.log_id,
+            'user_id': log.user_id,
             'username': log.username,
             'session_start': log.session_start.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
             'session_end': log.session_end.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
