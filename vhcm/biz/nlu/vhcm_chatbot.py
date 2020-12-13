@@ -180,6 +180,12 @@ class VirtualHCMChatbot(object):
     def get_last_state(self):
         return self.state_tracker[len(self.state_tracker) - 1]
 
+    def get_last_answer_ok_state(self):
+        for state in reversed(self.state_tracker):
+            if state.action == chat_state.ANSWER or state.action == chat_state.CONFIRMATION_OK:
+                return state
+        return None
+
     def get_last_report_able_state(self):
         if self.report_able_states:
             idx = self.report_able_states.pop()

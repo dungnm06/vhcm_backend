@@ -174,8 +174,8 @@ class ChatbotConsumer(WebsocketConsumer):
                     self.regist_message(chat_state.SYSTEM_SENT, bot.MESSAGE_VIEW_LIST_COMMAND)
                     self.send_response(CHAT_RESPONSE, bot.MESSAGE_VIEW_LIST_COMMAND)
                 elif command == COMMAND_VIEW_REFERENCE:
-                    bot_state = self.chatbot.get_last_state()
-                    if bot_state and bot_state.intent:
+                    bot_state = self.chatbot.get_last_answer_ok_state()
+                    if bot_state:
                         message = self.chatbot.intent_reference_to_response_txt(bot_state.intent)
                     else:
                         message = bot.MESSAGE_BOT_DIDNOT_ANSWER_ANYTHING_YET

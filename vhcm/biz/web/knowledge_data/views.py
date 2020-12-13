@@ -393,7 +393,7 @@ def add(request):
             document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
             if document is None:
                 raise ValueError('')
-            page = reference.get('page')
+            page = reference.get('page').strip()
             extra_info = reference['extra_info'].strip() if reference.get('extra_info') else None
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
                 id=(next_reference_id + i),
@@ -601,7 +601,7 @@ def edit(request):
             document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
             if document is None:
                 raise ValueError('')
-            page = reference.get('page')
+            page = reference.get('page').strip()
             extra_info = reference['extra_info'].strip() if reference.get('extra_info') else None
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
                 id=(next_reference_id + i),
@@ -741,7 +741,7 @@ def change_status(request):
     status = request.data.get(knowledge_data_model.STATUS)
     if not status:
         raise APIException('Knowledge data status must be specified')
-    if status not in knowledge_data_model.CHANGEABLE_PROCESS_STATUS:
+    if status not in knowledge_data_model.CHANGEABLE_PROCESS_STATUS or not isInt(status):
         raise APIException('Invalid knowledge data status')
 
     knowledge_data.status = status
@@ -1123,6 +1123,10 @@ def validate(request, mode):
     # Reference document
     if not ('documentReference' in request.data and request.data.get('documentReference')):
         errors.append('Knowledge data must belong to atleast one reference document')
+    for reference in request.data.get('documentReference'):
+        if not reference['page'].strip() and not reference['extra_info'].strip():
+            errors.append('Reference infomation must has atleast 1 of extra info or page infomation')
+            break
 
     # Questions
     if not ('questions' in request.data
