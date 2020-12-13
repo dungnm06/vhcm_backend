@@ -28,6 +28,8 @@ CHOOSE_TO_INPUT_NOTE = 'input_note'
 COMMAND_START_NEW_SESSION = 'newsession'
 COMMAND_REPORT = 'report'
 COMMAND_END_SESSION = 'endsession'
+COMMAND_HELP = 'help'
+COMMAND_VIEW_REFERENCE = 'reference'
 
 # Report processing
 REPORT = 1
@@ -168,6 +170,17 @@ class ChatbotConsumer(WebsocketConsumer):
                     self.processing_type = REPORT
                     self.regist_message(chat_state.SYSTEM_SENT, bot.MESSAGE_CHOOSE_REPORT_TYPE)
                     self.send_response(CHAT_RESPONSE, bot.MESSAGE_CHOOSE_REPORT_TYPE)
+                elif command == COMMAND_HELP:
+                    self.regist_message(chat_state.SYSTEM_SENT, bot.MESSAGE_VIEW_LIST_COMMAND)
+                    self.send_response(CHAT_RESPONSE, bot.MESSAGE_VIEW_LIST_COMMAND)
+                elif command == COMMAND_VIEW_REFERENCE:
+                    bot_state = self.chatbot.get_last_state()
+                    if bot_state and bot_state.intent:
+                        message = self.chatbot.intent_reference_to_response_txt(bot_state.intent)
+                    else:
+                        message = bot.MESSAGE_BOT_DIDNOT_ANSWER_ANYTHING_YET
+                    self.regist_message(chat_state.SYSTEM_SENT, message)
+                    self.send_response(CHAT_RESPONSE, message)
                 else:
                     self.regist_message(chat_state.SYSTEM_SENT, bot.MESSAGE_INVALID_COMMAND)
                     self.send_response(CHAT_RESPONSE, bot.MESSAGE_INVALID_COMMAND)

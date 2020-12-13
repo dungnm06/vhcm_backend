@@ -15,8 +15,8 @@ class KnowledgeDataRefercenceDocumentLink(models.Model):
     id = models.BigIntegerField(primary_key=True)
     knowledge_data = models.ForeignKey(KnowledgeData, on_delete=models.CASCADE)
     reference_document = models.ForeignKey(RefercenceDocument, on_delete=models.CASCADE)
-    page = models.SmallIntegerField(
-        null=True, blank=True, default=None,
+    page = models.TextField(
+        null=True, default=None,
         verbose_name='document page number'
     )
     extra_info = models.TextField(
@@ -26,3 +26,4 @@ class KnowledgeDataRefercenceDocumentLink(models.Model):
 
     class Meta:
         db_table = "knowledge_data_reference_document_link"
+        unique_together = ('knowledge_data', 'reference_document', )

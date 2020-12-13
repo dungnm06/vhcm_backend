@@ -37,6 +37,18 @@ MESSAGE_NO_DATA_TO_REPORT = 'Bot chưa ghi nhận có dữ liệu sai để ti�
 MESSAGE_INVALID_COMMAND = 'Câu lệnh không hợp lệ.'
 MESSAGE_INPUT_REFERENCE = 'Xin bạn hãy cho biết nguồn của thông tin:'
 MESSAGE_CHOOSE_TO_INPUT_NOTE = 'Bạn có note thêm gì không (có/không) ?'
+MESSAGE_VIEW_LIST_COMMAND = '''Danh sách các câu lệnh:
+!help: xem danh sách các câu lệnh
+!report: báo cáo dữ liệu sai, đóng góp thông tin
+!reference: xem nguồn của câu trả lời gần nhất
+!newsession: làm mới khung chat, bắt đầu phiên trò chuyện mới
+'''
+MESSAGE_VIEW_REFERENCE = '''Tên tri thức: {intent_name}
+Nguồn:
+{references}
+'''
+MESSAGE_REFERENCE_INFO = '''{idx}{reference_name}\n{reference_author}{reference_info}'''
+MESSAGE_BOT_DIDNOT_ANSWER_ANYTHING_YET = 'Bot đã trả lời bạn thông tin gì đâu !?'
 
 
 # Chatbot state
@@ -104,13 +116,13 @@ def init_bot():
         intent_data_filepath = os.path.join(train_data_storepath, INTENT_DATA_FILE_NAME)
         references_filepath = os.path.join(train_data_storepath, REFERENCES_FILE_NAME)
         synonyms_filepath = os.path.join(train_data_storepath, SYNONYMS_FILE_NAME)
-        idatas = load_from_data_file(intent_data_filepath, references_filepath, synonyms_filepath)
+        idatas, documents = load_from_data_file(intent_data_filepath, references_filepath, synonyms_filepath)
 
         tempstorepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + current_train_data.filename)
         if os.path.exists(tempstorepath):
             shutil.rmtree(tempstorepath)
 
-        return intent_classifier_instance, question_classifier_instance, idatas, hcm_chatchit_intent_recognizer, hcm_chatchit_tfidf_vectorizer, current_train_data, version
+        return intent_classifier_instance, question_classifier_instance, idatas, documents, hcm_chatchit_intent_recognizer, hcm_chatchit_tfidf_vectorizer, current_train_data, version
     except Exception as e:
         # Lul
         print(e)
@@ -119,13 +131,14 @@ def init_bot():
         intent_classifier_instance = None
         question_classifier_instance = None
         idatas = None
+        documents = None
         current_train_data = None
         hcm_chatchit_intent_recognizer = None
         hcm_chatchit_tfidf_vectorizer = None
-        return intent_classifier_instance, question_classifier_instance, idatas, hcm_chatchit_intent_recognizer, hcm_chatchit_tfidf_vectorizer, current_train_data, version
+        return None, None, None, None, None, None, None, version
 
 
-intent_classifier, question_type_classifier, intent_datas, dialogue_intent_recognizer, dialogue_tfidf_vectorizer, train_data_model, system_bot_version = init_bot()
+intent_classifier, question_type_classifier, intent_datas, documents_data, dialogue_intent_recognizer, dialogue_tfidf_vectorizer, train_data_model, system_bot_version = init_bot()
 
 
 def is_bot_ready():
@@ -185,6 +198,37 @@ class VirtualHCMChatbot(object):
             self.report_able_states = [int(idx) for idx in indexes.split(COMMA)]
         else:
             self.report_able_states = []
+
+    def intent_reference_to_response_txt(self, intent):
+        intent_reference = intent.references
+        reference_info_to_message = []
+        if len(intent_reference) == 1:
+            for document_id in intent_reference:
+                reference_info_to_message.append(self.__create_reference_info_message(None, document_id, intent_reference[document_id]))
+        else:
+            for idx, document_id in enumerate(intent_reference):
+                reference_info_to_message.append(self.__create_reference_info_message(idx+1, document_id, intent_reference[document_id]))
+        return MESSAGE_VIEW_REFERENCE.format(
+            intent_name=intent.fullname,
+            references=NEW_LINE.join(reference_info_to_message)
+        )
+
+    @staticmethod
+    def __create_reference_info_message(idx, document_id, intent_reference):
+        document = documents_data[document_id]
+        link = ('Nguồn online: ' + document['link']) if document['link'] else None
+        page = ('Trang: ' + intent_reference[document_id]['page']) if intent_reference[document_id]['page'] else None
+        extra_info = ('Thông tin thêm: ' + intent_reference[document_id]['extra_info']) if intent_reference[document_id]['extra_info'] else None
+        reference_info = NEW_LINE.join([link, page, extra_info])
+        author = document['author'] + ('\n' if (link or page or extra_info) else ''),
+        message = MESSAGE_REFERENCE_INFO.format(
+            idx=(str(idx)+'.') if idx else '',
+            reference_name=document['name'],
+            reference_author=author,
+            reference_info=reference_info
+        )
+
+        return message
 
     @staticmethod
     def __decide_action(chat_input, chat_type, intent, types, last_state):

@@ -110,6 +110,7 @@ def add(request):
             ).select_related('edit_user')
         intent_data_filepath = os.path.join(storepath, INTENT_DATA_FILE_NAME)
         intent_references_for_file_saving = {}
+        reference_document_for_file_saving = {}
         synonyms_for_file_saving = {}
         with open(intent_data_filepath, 'w', newline='', encoding=UTF8) as file:
             writer = csv.writer(file, quoting=csv.QUOTE_ALL)
@@ -142,13 +143,23 @@ def add(request):
                 # References
                 references = kd.knowledgedatarefercencedocumentlink_set.all()
                 for reference in references:
+                    reference_document = reference.reference_document
                     if intent_id not in intent_references_for_file_saving:
-                        intent_references_for_file_saving[intent_id] = []
-                    intent_references_for_file_saving[intent_id].append({
-                        'name': reference.reference_document.reference_name,
+                        intent_references_for_file_saving[intent_id] = {}
+                    if reference_document.reference_document_id not in reference_document_for_file_saving:
+                        reference_document_for_file_saving[reference_document.reference_document_id] = {
+                            'name': reference_document.reference_name,
+                            'link': reference_document.link,
+                            'author': reference_document.author
+                        }
+                    intent_references_for_file_saving[intent_id][reference_document.reference_document_id] = {
                         'page': reference.page,
                         'extra_info': reference.extra_info
-                    })
+                    }
+                references_data = {
+                    'intent_references': intent_references_for_file_saving,
+                    'documents': reference_document_for_file_saving
+                }
                 # Synonyms
                 synonyms = kd.knowledgedatasynonymlink_set.all()
                 intent_synonyms = []
@@ -169,7 +180,7 @@ def add(request):
         # Write references data to file
         references_filepath = os.path.join(storepath, REFERENCES_FILE_NAME)
         with open(references_filepath, 'w', encoding=UTF8) as fp:
-            json.dump(intent_references_for_file_saving, fp, indent=4)
+            json.dump(references_data, fp, indent=4)
 
         # Write synonyms data to file
         synonyms_filepath = os.path.join(storepath, SYNONYMS_FILE_NAME)
@@ -417,7 +428,8 @@ def validate(request, mode):
     if mode == 'delete':
         # Delete reason
         if not (train_data_model.DELETE_REASON in request.data
-                and isinstance(request.data.get(train_data_model.DELETE_REASON), str)):
+                and isinstance(request.data.get(train_data_model.DELETE_REASON), str)
+                and request.data.get(train_data_model.DELETE_REASON).strip()):
             errors.append('Must input reason to delete train data')
 
     return errors

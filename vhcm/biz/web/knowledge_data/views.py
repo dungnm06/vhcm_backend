@@ -393,8 +393,8 @@ def add(request):
             document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
             if document is None:
                 raise ValueError('')
-            page = reference['page'] if (reference['page'] and reference['page'] > 0) else None
-            extra_info = reference['extra_info'].strip()
+            page = reference.get('page')
+            extra_info = reference['extra_info'].strip() if reference.get('extra_info') else None
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
                 id=(next_reference_id + i),
                 knowledge_data=knowledge_data,
@@ -601,8 +601,8 @@ def edit(request):
             document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
             if document is None:
                 raise ValueError('')
-            page = reference['page'] if (reference['page'] and reference['page'] > 0) else None
-            extra_info = reference['extra_info'].strip()
+            page = reference.get('page')
+            extra_info = reference['extra_info'].strip() if reference.get('extra_info') else None
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
                 id=(next_reference_id + i),
                 knowledge_data=knowledge_data,

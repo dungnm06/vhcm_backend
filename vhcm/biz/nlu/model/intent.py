@@ -72,7 +72,7 @@ class Intent:
         if synonym_sets is None:
             synonym_sets = {}
         if references is None:
-            references = []
+            references = {}
         # Assign attributes
         self.intent_id = intent_id
         self.intent = intent
@@ -148,6 +148,8 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
         references = json.load(references_file)
         synonyms = json.load(synonym_file)
 
+        reference_documents = references['documents']
+        # Intent data
         for idx, data in intent_datas.iterrows():
             intent = Intent()
             # ID
@@ -197,9 +199,7 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
                     })
 
             # Reference document
-            rdi = references[str(data[INTENT_ID])]
-            if rdi:
-                intent.references = rdi
+            intent.references = references['intent_references'].get(str(data[INTENT_ID]))
 
             # Synonym words dictionary
             synonym_ids = data[INTENT_SYNONYM_IDS]
@@ -214,4 +214,4 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
             # Push to intents map
             intent_maps[intent.intent] = intent
 
-    return intent_maps
+    return intent_maps, reference_documents

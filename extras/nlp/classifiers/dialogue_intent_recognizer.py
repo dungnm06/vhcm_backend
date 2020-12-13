@@ -1,4 +1,3 @@
-import sys
 import numpy as np
 import os
 import shutil
@@ -52,8 +51,21 @@ def train_dialogue_intent_recognizer(datafile, output):
     test_accuracy = accuracy_score(y_test, y_test_pred)
     print('Test accuracy = {}'.format(test_accuracy))
 
+    print('Simple test: ')
+    print('Bác Hồ sinh năm nào?')
+    question = text_prepare('Bác_Hồ sinh năm nào?')
+    features = tfidf_vectorizer.transform([question])
+    intent = intent_recognizer.predict(features)[0]
+    print('Predicted: ' + intent)
+    print()
+    print('Xin chào bạn khoẻ không ?')
+    question = text_prepare('Xin chào bạn khoẻ không ?')
+    features = tfidf_vectorizer.transform([question])
+    intent = intent_recognizer.predict(features)[0]
+    print('Predicted: ' + intent)
+
     # Dump the classifier to use it in the running bot.
-    print('Saving data....')
+    # print('Saving data....')
     pickle_file(intent_recognizer, os.path.join(output, 'dialogue_intent_recognizer.pickle'))
 
     # Clear traindata tempfile
