@@ -739,7 +739,7 @@ def change_status(request):
         raise APIException('Intent id not found: ID({})'.format(kd_id))
 
     status = request.data.get(knowledge_data_model.STATUS)
-    if not status:
+    if status is None:
         raise APIException('Knowledge data status must be specified')
     if status not in knowledge_data_model.CHANGEABLE_PROCESS_STATUS or not isInt(status):
         raise APIException('Invalid knowledge data status')
