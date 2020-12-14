@@ -114,7 +114,7 @@ SELECT
 	cm.comment as "comment",
 	cm.status as "status",
 	cm.edited as "edited",
-	cm.editable as "editable",
+	cm.able_to_delete as "able_to_delete",
 	cm.mdate as "mdate",
 	u.user_id as "user",
 	u.username as "username",

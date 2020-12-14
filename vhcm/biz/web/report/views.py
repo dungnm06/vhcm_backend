@@ -304,7 +304,7 @@ def report_to_contributor(request):
         user=user,
         knowledge_data=knowledge_data,
         comment=processor_note,
-        editable=False,
+        able_to_delete=False,
         status=comment_model.VIEWABLE
     )
     comment.save()
