@@ -94,6 +94,7 @@ urlpatterns = [
     path('chat-history/get', chat_history_views.get, name='get_chat_log_details'),
     # Dashboard
     path('dashboard', dashboard_views.dashboard_stats, name='dashboard_stats'),
+    path('dashboard/unseen-report', dashboard_views.unseen_report, name='unseen_report_count'),
     # Classifier training service
     # path('trainer/is-running', trainer_views.is_process_running, name='check_trainning_process'),
 ]

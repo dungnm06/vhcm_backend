@@ -42,3 +42,19 @@ SELECT
 FROM vhcm.knowledge_data kd
 GROUP BY kd.status
 '''
+
+UNSEEN_REPORT = '''
+SELECT
+    COUNT(cr.id) as "count"
+FROM vhcm.knowledge_data_comment_report cr
+INNER JOIN vhcm.user u
+ON cr.report_to_id = u.user_id
+INNER JOIN vhcm.knowledge_data_comment cm
+ON cm.id = cr.comment_id
+INNER JOIN vhcm.knowledge_data kd
+ON cm.knowledge_data_id = kd.knowledge_data_id
+INNER JOIN vhcm.user u2
+ON u2.user_id = cm.user_id
+WHERE u.user_id = {user_id}
+AND cr.user_seen = false
+'''

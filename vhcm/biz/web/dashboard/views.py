@@ -85,3 +85,19 @@ def dashboard_stats(request):
     })
     response.data = result.to_json()
     return response
+
+
+@api_view(['GET', 'POST'])
+def unseen_report(request):
+    response = Response()
+    result = ResponseJSON()
+
+    user = get_current_user(request)
+    unseen_report_count = execute_native_query(UNSEEN_REPORT.format(user_id=user.user_id))[0].count
+
+    result.set_status(True)
+    result.set_result_data({
+        'unseen_report_count': unseen_report_count
+    })
+    response.data = result.to_json()
+    return response

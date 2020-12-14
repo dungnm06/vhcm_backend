@@ -949,6 +949,41 @@
 			"response": []
 		},
 		{
+			"name": "Dashboard/Unseen Report",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "CBrTaXsktiwNorQQBf4OdIZgM2nNQsm02dMd17FzgFfeLM0FDNw1opba26hai5Fe"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/dashboard/unseen-report",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"dashboard",
+						"unseen-report"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Knowledge Data/All",
 			"request": {
 				"method": "GET",
