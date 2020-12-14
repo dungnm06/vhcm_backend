@@ -28,7 +28,7 @@ from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.constants import *
 from vhcm.common.utils.CH import isInt
 from .sql import *
-from vhcm.common.dao.native_query import execute_native_query
+from vhcm.common.dao.native_query import execute_native_query, execute_native
 
 
 @api_view(['GET', 'POST'])
@@ -243,7 +243,7 @@ def get(request):
         display_comment = {
             comment_model.ID: comment.id,
             comment_model.USER: comment.user,
-            comment_model.REPLY_TO: comment.report_id,
+            comment_model.REPLY_TO: comment.reply_to,
             comment_model.COMMENT: comment.comment if (user.admin or comment.status == comment_model.VIEWABLE) else None,
             comment_model.VIEWABLE_STATUS: comment.status,
             comment_model.EDITED: comment.edited,
@@ -280,6 +280,12 @@ def get(request):
             review_model.STATUS: user_review.status,
             review_model.MDATE: user_review.mdate
         }
+
+    # Report seen status update
+    execute_native(UPDATE_REPORT_SEEN_STATE.format(
+        user_id=user.user_id,
+        knowledge_data_id=knowledge_data.knowledge_data_id
+    ))
 
     result_data = {
         'id': knowledge_data.knowledge_data_id,
@@ -800,7 +806,7 @@ def all_comment(request):
         display_comment = {
             comment_model.ID: comment.id,
             comment_model.USER: comment.user,
-            comment_model.REPLY_TO: comment.report_id,
+            comment_model.REPLY_TO: comment.reply_to,
             comment_model.COMMENT: comment.comment if (
                         user.admin or comment.status == comment_model.VIEWABLE) else None,
             comment_model.VIEWABLE_STATUS: comment.status,

@@ -141,3 +141,23 @@ ON cm.id = cru.comment_id
 WHERE cm.knowledge_data_id = {knowledge_data_id}
 ORDER BY cm.cdate DESC
 '''
+
+UPDATE_REPORT_SEEN_STATE = '''
+UPDATE vhcm.knowledge_data_comment_report
+SET user_seen = false
+WHERE id in (
+	SELECT
+		cr.id
+	FROM vhcm.knowledge_data_comment_report cr
+	INNER JOIN vhcm.user u
+	ON cr.report_to_id = u.user_id
+	INNER JOIN vhcm.knowledge_data_comment cm
+	ON cm.id = cr.comment_id
+	INNER JOIN vhcm.knowledge_data kd
+	ON cm.knowledge_data_id = kd.knowledge_data_id
+	INNER JOIN vhcm.user u2
+	ON u2.user_id = cm.user_id
+	WHERE u.user_id = {user_id}
+	AND kd.knowledge_data_id = {knowledge_data_id}
+)
+'''
