@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"dungnm\",\r\n    \"password\": \"123\"\r\n}",
+					"raw": "{\r\n    \"username\": \"dunglt\",\r\n    \"password\": \"123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -830,6 +830,50 @@
 			"response": []
 		},
 		{
+			"name": "User/Get Notifications",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"uid\": \"FfhhzFOHMbunaWEJnibLRGquHaJffy\",\r\n    \"new_password\": \"123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/user/report-notifications",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"report-notifications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "User/Change Status",
 			"request": {
 				"method": "GET",
@@ -991,7 +1035,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://127.0.0.1:8000/api/knowledge-data/get?intent=Coconut",
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/get?intent=OngBacHo",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -1008,7 +1052,7 @@
 					"query": [
 						{
 							"key": "intent",
-							"value": "Coconut"
+							"value": "OngBacHo"
 						}
 					]
 				}
@@ -1098,6 +1142,50 @@
 						"api",
 						"knowledge-data",
 						"edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Knowledge Data/Change status",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "ZuA9lIvpB4Fwm1Rmk4m6USNYu1OSTMfYqGTg05QGqdWou1YWlOCUSJVF4xANcvnX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"knowledge_data_id\": 1,\r\n    \"status\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/knowledge-data/change-status",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"knowledge-data",
+						"change-status"
 					]
 				}
 			},
@@ -1552,7 +1640,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:8000/api/report/get-pending?id=2",
+					"raw": "https://127.0.0.1:8000/api/report/get-pending?id=11",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -1569,7 +1657,7 @@
 					"query": [
 						{
 							"key": "id",
-							"value": "2"
+							"value": "11"
 						}
 					]
 				}
@@ -1709,6 +1797,50 @@
 						"api",
 						"report",
 						"reject-report"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Report/Report To Contributor",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Referer",
+						"type": "text",
+						"value": "https://127.0.0.1:3000"
+					},
+					{
+						"key": "X-CSRFTOKEN",
+						"type": "text",
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"knowledge_data_id\": 104,\r\n    \"report_processing\": {\r\n        \"id\": 11,\r\n        \"processor_note\": \"dữ liệu làm như shit\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8000/api/report/report-to-contributor",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"report",
+						"report-to-contributor"
 					]
 				}
 			},
