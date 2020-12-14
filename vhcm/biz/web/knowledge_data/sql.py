@@ -144,7 +144,7 @@ ORDER BY cm.cdate DESC
 
 UPDATE_REPORT_SEEN_STATE = '''
 UPDATE vhcm.knowledge_data_comment_report
-SET user_seen = false
+SET user_seen = true
 WHERE id in (
 	SELECT
 		cr.id

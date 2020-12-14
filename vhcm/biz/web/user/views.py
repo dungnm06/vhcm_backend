@@ -434,7 +434,7 @@ def validate_reset_password_form(request):
     return messages
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 def get_reported_notifications(request):
     response = Response()
     result = ResponseJSON()
