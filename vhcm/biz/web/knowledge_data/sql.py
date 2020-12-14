@@ -121,15 +121,23 @@ SELECT
 	u.fullname as "user_fullname",
 	u.email as "user_email",
 	u.avatar as "user_avatar",
-	cr.report_id as "report_id",
-	cr.report_to_id as "report_to",
-	u2.username as "report_to_username"
+	cru.report_id as "report_id",
+	cru.report_to_id as "report_to",
+	cru.username as "report_to_username"
 FROM vhcm.knowledge_data_comment cm
-LEFT JOIN vhcm.knowledge_data_comment_report cr
-ON cm.id = cr.comment_id
 INNER JOIN vhcm.user u
 ON cm.user_id = u.user_id
-INNER JOIN vhcm.user u2
-ON cr.report_to_id = u2.user_id
+LEFT JOIN (
+	SELECT
+		cr.comment_id,
+		cr.report_id,
+		cr.report_to_id,
+		u2.username
+	FROM vhcm.knowledge_data_comment_report cr
+	INNER JOIN vhcm.user u2
+	ON cr.report_to_id = u2.user_id
+) cru
+ON cm.id = cru.comment_id
 WHERE cm.knowledge_data_id = {knowledge_data_id}
+ORDER BY cm.cdate DESC
 '''
