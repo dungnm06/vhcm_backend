@@ -19,8 +19,8 @@ from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
 from vhcm.common.utils.string import get_random_string
 from vhcm.common.constants import DATETIME_DDMMYYYY_HHMMSS
 from vhcm.common.config.config_manager import config_loader, DEFAULT_PASSWORD, RESET_PASSWORD_EXPIRE_TIME, SYSTEM_MAIL
-from vhcm.common.dao.native_query import execute_native
-from vhcm.biz.web.user.sql import DEACTIVE_USER_RELATIVES
+from vhcm.common.dao.native_query import execute_native, execute_native_query
+from vhcm.biz.web.user.sql import DEACTIVE_USER_RELATIVES, GET_REPORTED
 from vhcm.biz.email import mail_service
 
 
@@ -432,3 +432,30 @@ def validate_reset_password_form(request):
         messages.append('Invalid new password')
 
     return messages
+
+
+@api_view(['POST'])
+def get_reported_notifications(request):
+    response = Response()
+    result = ResponseJSON()
+    user = get_current_user(request)
+
+    reported_data = execute_native_query(GET_REPORTED.format(user_id=user.user_id))
+    reported_data_display = []
+    for report in reported_data:
+        reported_data_display.append({
+            'report_id': report.report_id,
+            'knowledge_data_id': report.knowledge_data_id,
+            'intent': report.intent,
+            'intent_fullname': report.intent_fullname,
+            'report_user_id': report.report_user_id,
+            'report_username': report.report_username,
+            'report_comment': report.report_comment,
+            'user_seen': report.user_seen,
+            'cdate': report.cdate
+        })
+
+    result.set_status(True)
+    result.set_result_data(reported_data_display)
+    response.data = result.to_json()
+    return response

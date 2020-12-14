@@ -10,6 +10,8 @@ from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.biz.web.report.sql import *
 import vhcm.models.report as report_model
 import vhcm.models.knowledge_data as knowledge_data_model
+import vhcm.models.knowledge_data_comment as comment_model
+import vhcm.models.knowledge_data_comment_report as report_comment_model
 
 
 @api_view(['GET', 'POST'])
@@ -102,15 +104,20 @@ def get_pending_report(request):
     if not report_id or not isInt(report_id):
         raise APIException('Invalid report id')
 
-    report = report_model.Report.objects.filter(id=report_id, status=report_model.PENDING)\
-        .select_related('reporter', 'bot_version')\
+    report = report_model.Report.objects.filter(id=report_id, status=report_model.PENDING) \
+        .select_related('reporter', 'bot_version') \
         .first()
     if not report:
         raise APIException('Invalid report id, report not found')
 
-    available_knowledge_datas = knowledge_data_model.KnowledgeData.objects\
+    available_knowledge_datas = knowledge_data_model.KnowledgeData.objects \
         .filter(Q(status=knowledge_data_model.AVAILABLE)
                 | Q(status__in=[knowledge_data_model.PROCESSING, knowledge_data_model.DONE], edit_user=user))
+
+    other_knowledge_datas = knowledge_data_model.KnowledgeData.objects \
+        .select_related('edit_user') \
+        .filter(status__in=[knowledge_data_model.PROCESSING, knowledge_data_model.DONE]) \
+        .exclude(edit_user=user)
 
     kds = []
     for kd in available_knowledge_datas:
@@ -118,6 +125,16 @@ def get_pending_report(request):
             'id': kd.knowledge_data_id,
             'intent': kd.intent,
             'intent_fullname': kd.intent_fullname
+        })
+
+    okds = []
+    for kd in other_knowledge_datas:
+        okds.append({
+            'id': kd.knowledge_data_id,
+            'intent': kd.intent,
+            'intent_fullname': kd.intent_fullname,
+            'edit_user_id': kd.edit_user.user_id,
+            'edit_username': kd.edit_user.username
         })
 
     result_data = {
@@ -133,7 +150,8 @@ def get_pending_report(request):
         'bot_version_id': report.bot_version.id,
         'bot_version_date': report.bot_version.cdate.strftime(DATETIME_DDMMYYYY.regex),
         'cdate': report.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
-        'available_knowledge_data': kds
+        'available_knowledge_data': kds,
+        'other_knowledge_data': okds
     }
 
     result.set_status(True)
@@ -151,8 +169,8 @@ def get_accepted_report(request):
     if not report_id or not isInt(report_id):
         raise APIException('Invalid report id')
 
-    report = report_model.Report.objects.filter(id=report_id, status=report_model.ACCEPTED)\
-        .select_related('reporter', 'processor', 'bot_version', 'forward_intent')\
+    report = report_model.Report.objects.filter(id=report_id, status=report_model.PROCESSED) \
+        .select_related('reporter', 'processor', 'bot_version', 'forward_intent') \
         .first()
     if not report:
         raise APIException('Invalid report id, report not found')
@@ -191,8 +209,8 @@ def get_rejected_report(request):
     if not report_id or not isInt(report_id):
         raise APIException('Invalid report id')
 
-    report = report_model.Report.objects.filter(id=report_id, status=report_model.REJECTED)\
-        .select_related('reporter', 'processor', 'bot_version')\
+    report = report_model.Report.objects.filter(id=report_id, status=report_model.REJECTED) \
+        .select_related('reporter', 'processor', 'bot_version') \
         .first()
     if not report:
         raise APIException('Invalid report id, report not found')
@@ -244,6 +262,58 @@ def reject_report(request):
     report.processor_note = reject_reason
     report.processor = user
     report.save()
+
+    result.set_status(True)
+    response.data = result.to_json()
+    return response
+
+
+@api_view(['POST'])
+def report_to_contributor(request):
+    response = Response()
+    result = ResponseJSON()
+
+    user = get_current_user(request)
+
+    # Get existing Knowledge data
+    kd_id = request.data.get(knowledge_data_model.ID)
+    if not (kd_id and isInt(kd_id)):
+        raise APIException('Invalid intent id: ID({})'.format(kd_id))
+
+    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=kd_id).select_related('edit_user').first()
+    if knowledge_data is None:
+        raise APIException('Intent id not found: ID({})'.format(kd_id))
+
+    report_process = request.data.get('report_processing')
+    if not report_process:
+        raise APIException('Report process data is invalid')
+
+    report_id = report_process.get(report_model.ID)
+    if not (report_id and isInt(report_id)):
+        raise APIException('Report id is invalid')
+
+    processor_note = report_process.get(report_model.PROCESSOR_NOTE)
+    if not processor_note or not isinstance(processor_note, str):
+        raise APIException('Report processor must leave a comment')
+
+    report = report_model.Report.objects.filter(id=report_id, status=report_model.PENDING).first()
+    if not report:
+        raise APIException('Report id is invalid')
+
+    comment = comment_model.Comment(
+        user=user,
+        knowledge_data=knowledge_data,
+        comment=processor_note,
+        editable=False,
+        status=comment_model.VIEWABLE
+    )
+    comment.save()
+    report_comment = report_comment_model.ReportComment(
+        report_to=knowledge_data.edit_user,
+        report=report,
+        comment=comment
+    )
+    report_comment.save()
 
     result.set_status(True)
     response.data = result.to_json()

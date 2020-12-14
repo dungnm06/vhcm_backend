@@ -10,7 +10,7 @@ KNOWLEDGE_DATA = 'knowledge_data'
 COMMENT = 'comment'
 VIEWABLE_STATUS = 'status'
 EDITED = 'edited'
-EDITABLE = 'editable'
+DELETEABLE = 'able_to_delete'
 CDATE = 'cdate'
 MDATE = 'mdate'
 
@@ -45,8 +45,8 @@ class Comment(models.Model):
     edited = models.BooleanField(
         default=False, verbose_name='edited status'
     )
-    editable = models.BooleanField(
-        default=True, verbose_name='editable status'
+    able_to_delete = models.BooleanField(
+        default=True, verbose_name='able to delete status'
     )
     cdate = models.DateTimeField(
         verbose_name='created date', auto_now_add=True

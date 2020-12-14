@@ -106,3 +106,30 @@ ON kdr.review_user_id = u.user_id
 WHERE kdr.status != 3
 AND kdr.knowledge_data_id = {knowledge_data_id}
 '''
+
+GET_ALL_COMMENTS = '''
+SELECT
+	cm.id as "id",
+	cm.reply_to_id as "reply_to",
+	cm.comment as "comment",
+	cm.status as "status",
+	cm.edited as "edited",
+	cm.editable as "editable",
+	cm.mdate as "mdate",
+	u.user_id as "user",
+	u.username as "username",
+	u.fullname as "user_fullname",
+	u.email as "user_email",
+	u.avatar as "user_avatar",
+	cr.report_id as "report_id",
+	cr.report_to_id as "report_to",
+	u2.username as "report_to_username"
+FROM vhcm.knowledge_data_comment cm
+LEFT JOIN vhcm.knowledge_data_comment_report cr
+ON cm.id = cr.comment_id
+INNER JOIN vhcm.user u
+ON cm.user_id = u.user_id
+INNER JOIN vhcm.user u2
+ON cr.report_to_id = u2.user_id
+WHERE cm.knowledge_data_id = {knowledge_data_id}
+'''

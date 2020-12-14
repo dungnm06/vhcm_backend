@@ -35,16 +35,16 @@ REPORT_TYPES_ARR = [
 
 # Approve status
 PENDING = 1
-ACCEPTED = 2
+PROCESSED = 2
 REJECTED = 3
 APPROVE_STATUS = [
     (PENDING, 'Pending'),
-    (ACCEPTED, 'Accepted'),
+    (PROCESSED, 'Processed'),
     (REJECTED, 'Rejected')
 ]
 APPROVE_STATUS_ARR = [
     PENDING,
-    ACCEPTED,
+    PROCESSED,
     REJECTED
 ]
 

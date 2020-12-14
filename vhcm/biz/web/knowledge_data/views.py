@@ -1,5 +1,6 @@
 from datetime import datetime
 from collections import Counter
+from django.conf import settings
 from django.db.models import Prefetch
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
@@ -18,6 +19,7 @@ import vhcm.models.knowledge_data_question as question_model
 import vhcm.models.knowledge_data_synonym_link as kd_synonym_model
 import vhcm.models.knowledge_data_generated_question as gq_model
 import vhcm.models.knowledge_data_comment as comment_model
+import vhcm.models.knowledge_data_comment_report as report_comment_model
 import vhcm.models.knowledge_data_review as review_model
 import vhcm.models.report as report_model
 import vhcm.common.config.config_manager as config
@@ -25,7 +27,7 @@ from vhcm.serializers.comment import CommentSerializer, DeletedCommentSerializer
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.constants import *
 from vhcm.common.utils.CH import isInt
-from .sql import GET_ALL_KNOWLEDGE_DATA, GET_ALL_TRAINABLE_KNOWLEDGE_DATA, GET_ALL_REVIEWS, GET_LATEST_KNOWLEDGE_DATA_TRAIN_DATA
+from .sql import *
 from vhcm.common.dao.native_query import execute_native_query
 
 
@@ -143,7 +145,6 @@ def get(request):
             'responsedata_set',
             'subject_set',
             'question_set',
-            'comment_kd__user',
             Prefetch('review_kd', queryset=review_model.Review.objects.select_related('review_user').exclude(status=review_model.DRAFT))
         )\
         .first()
@@ -234,29 +235,35 @@ def get(request):
         })
 
     # Comments
-    comments = knowledge_data.comment_kd.all()
+    comments = execute_native_query(GET_ALL_COMMENTS.format(knowledge_data_id=knowledge_data.knowledge_data_id))
     comments_display = []
     relative_users = {}
     for comment in comments:
         # Comment data
         display_comment = {
             comment_model.ID: comment.id,
-            comment_model.USER: comment.user.user_id,
-            comment_model.REPLY_TO: comment.reply_to_id,
+            comment_model.USER: comment.user,
+            comment_model.REPLY_TO: comment.report_id,
             comment_model.COMMENT: comment.comment if (user.admin or comment.status == comment_model.VIEWABLE) else None,
             comment_model.VIEWABLE_STATUS: comment.status,
             comment_model.EDITED: comment.edited,
-            comment_model.EDITABLE: comment.editable,
+            comment_model.DELETEABLE: comment.able_to_delete,
             comment_model.MDATE: comment.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
         }
+        report_comment = {
+            report_model.ID: comment.report_id,
+            report_comment_model.REPORT_TO: comment.report_to,
+            report_comment_model.REPORT_TO + '_username': comment.report_to_username,
+        }
+        display_comment['report'] = report_comment
         comments_display.append(display_comment)
         # User data
-        if comment.user.user_id not in relative_users:
-            relative_users[comment.user.user_id] = {
-                user_model.USERNAME: comment.user.username,
-                user_model.FULLNAME: comment.user.fullname,
-                user_model.EMAIL: comment.user.email,
-                user_model.AVATAR: comment.user.avatar.url if comment.user.avatar else None
+        if comment.user not in relative_users:
+            relative_users[comment.user] = {
+                user_model.USERNAME: comment.username,
+                user_model.FULLNAME: comment.user_fullname,
+                user_model.EMAIL: comment.user_email,
+                user_model.AVATAR: (settings.MEDIA_URL + comment.user_avatar) if comment.user_avatar else None
             }
 
     # Reviews
@@ -361,27 +368,26 @@ def add(request):
 
     # Report process
     if report:
-        report.status = report_model.ACCEPTED
+        report.status = report_model.PROCESSED
         report.processor_note = processor_note
         report.processor = user
         report.forward_intent = knowledge_data
         report.save()
         # Note a comment of this report processing
-        message = 'Report data ID:{report_id} accepted by {user} at {time}.\nProcessor note: {note}'
-        message = message.format(
-            report_id=report.id,
-            user=user.username,
-            time=datetime.now().strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
-            note=processor_note
-        )
         comment = comment_model.Comment(
             user=user,
             knowledge_data=knowledge_data,
-            comment=message,
-            editable=False,
+            comment=processor_note,
+            able_to_delete=False,
             status=comment_model.VIEWABLE
         )
         comment.save()
+        report_comment = report_comment_model.ReportComment(
+            report_to=knowledge_data.edit_user,
+            report=report,
+            comment=comment
+        )
+        report_comment.save()
 
     # Reference document
     references = []
@@ -560,6 +566,7 @@ def edit(request):
     # Raw data
     knowledge_data.raw_data = request.data.get('rawData').strip()
     # User
+    old_user = knowledge_data.edit_user
     knowledge_data.edit_user = user
     # Status
     knowledge_data.status = knowledge_data_model.PROCESSING
@@ -568,24 +575,40 @@ def edit(request):
 
     # Report process
     if report:
-        report.status = report_model.ACCEPTED
+        report.status = report_model.PROCESSED
         report.processor_note = processor_note
         report.processor = user
         report.forward_intent = knowledge_data
         report.save()
         # Note a comment of this report processing
-        message = 'Report data ID: {report_id} accepted by {user} at {time}.\nProcessor note: {note}'
+        comment = comment_model.Comment(
+            user=user,
+            knowledge_data=knowledge_data,
+            comment=processor_note,
+            able_to_delete=False,
+            status=comment_model.VIEWABLE
+        )
+        comment.save()
+        report_comment = report_comment_model.ReportComment(
+            report_to=knowledge_data.edit_user,
+            report=report,
+            comment=comment
+        )
+        report_comment.save()
+
+    if user.user_id != old_user.edit_user.user_id:
+        # Note a comment for this edit user changing
+        message = 'Knowledge data owner changed from {old_user} to {new_user} at {time}.'
         message = message.format(
-            report_id=report.id,
-            user=user.username,
-            time=datetime.now().strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
-            note=processor_note
+            old_user=old_user.username,
+            new_user=user.username,
+            time=datetime.now().strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
         )
         comment = comment_model.Comment(
             user=user,
             knowledge_data=knowledge_data,
             comment=message,
-            editable=False,
+            able_to_delete=False,
             status=comment_model.VIEWABLE
         )
         comment.save()
@@ -769,29 +792,36 @@ def all_comment(request):
     knowledge_data_id = request.data.get(comment_model.KNOWLEDGE_DATA) if request.method == 'POST' \
         else request.GET.get(comment_model.KNOWLEDGE_DATA)
 
-    comments = comment_model.Comment.objects.filter(knowledge_data=knowledge_data_id).select_related('user')
+    comments = comments = execute_native_query(GET_ALL_COMMENTS.format(knowledge_data_id=knowledge_data_id))
     display_comments = []
     relative_users = {}
     for comment in comments:
         # Comment data
         display_comment = {
             comment_model.ID: comment.id,
-            comment_model.USER: comment.user.user_id,
-            comment_model.REPLY_TO: comment.reply_to_id,
-            comment_model.COMMENT: comment.comment if (user.admin or comment.status == comment_model.VIEWABLE) else None,
+            comment_model.USER: comment.user,
+            comment_model.REPLY_TO: comment.report_id,
+            comment_model.COMMENT: comment.comment if (
+                        user.admin or comment.status == comment_model.VIEWABLE) else None,
             comment_model.VIEWABLE_STATUS: comment.status,
             comment_model.EDITED: comment.edited,
-            comment_model.EDITABLE: comment.editable,
+            comment_model.DELETEABLE: comment.able_to_delete,
             comment_model.MDATE: comment.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
         }
+        report_comment = {
+            report_model.ID: comment.report_id,
+            report_comment_model.REPORT_TO: comment.report_to,
+            report_comment_model.REPORT_TO + '_username': comment.report_to_username,
+        }
+        display_comment['report'] = report_comment
         display_comments.append(display_comment)
         # User data
-        if comment.user.user_id not in relative_users:
-            relative_users[comment.user.user_id] = {
-                user_model.USERNAME: comment.user.username,
-                user_model.FULLNAME: comment.user.fullname,
-                user_model.EMAIL: comment.user.email,
-                user_model.AVATAR: comment.user.avatar.url if comment.user.avatar else None
+        if comment.user not in relative_users:
+            relative_users[comment.user] = {
+                user_model.USERNAME: comment.username,
+                user_model.FULLNAME: comment.user_fullname,
+                user_model.EMAIL: comment.user_email,
+                user_model.AVATAR: (settings.MEDIA_URL + comment.user_avatar) if comment.user_avatar else None
             }
 
     result_data = {
@@ -872,8 +902,6 @@ def edit_comment(request):
     comment = comment_model.Comment.objects.filter(id=comment_id).select_related('user').first()
     if not comment:
         raise APIException('Invalid comment id, comment not exists')
-    if not comment.editable:
-        raise APIException('This comment not editable')
     if user.user_id != comment.user.user_id:
         raise APIException('You cannot edit other users comment')
 
@@ -913,7 +941,7 @@ def delete_comment(request):
     comment = comment_model.Comment.objects.filter(id=comment_id).select_related('user').first()
     if not comment:
         raise APIException('Invalid comment id, comment not exists')
-    if not comment.editable:
+    if not comment.able_to_delete:
         raise APIException('Cannot delete this comment')
     if user.user_id != comment.user.user_id:
         raise APIException('You cannot delete other users comment')

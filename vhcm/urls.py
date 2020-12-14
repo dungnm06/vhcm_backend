@@ -53,6 +53,7 @@ urlpatterns = [
     path('report/get-accepted', report_views.get_accepted_report, name='get_pending_report'),
     path('report/get-rejected', report_views.get_rejected_report, name='get_pending_report'),
     path('report/reject-report', report_views.reject_report, name='reject_report'),
+    path('report/report-to-contributor', report_views.report_to_contributor, name='report_to_contributor'),
     # User
     path('user/all', user_views.all_user, name='get_all_users'),
     path('user/get', user_views.get, name='get_user'),
@@ -65,6 +66,7 @@ urlpatterns = [
     path('user/reset-password', user_views.reset_password, name='reset_password'),
     path('user/check-reset-password-session', user_views.check_reset_password_session_alive, name='check_reset_password_session_alive'),
     path('user/change-password', user_views.change_password, name='change_password'),
+    path('user/report-notifications', user_views.get_reported_notifications, name='get_reported_notifications'),
     # Synonym
     path('synonym/all', synonym_views.get_all_synonyms, name='get_all_synonyms'),
     path('synonym/get', synonym_views.get, name='get_one_synonym'),
