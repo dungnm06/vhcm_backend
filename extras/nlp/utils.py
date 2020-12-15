@@ -1,6 +1,7 @@
 import pickle
 import re
 import zipfile
+import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from pathlib import Path
 
@@ -20,21 +21,20 @@ def load_text_data(txt_file):
         return []
 
 
-# stopwords_set = set(load_text_data('data/stopwords.txt'))
+stopwords_set = set(load_text_data(os.path.join(ROOT, 'data/stopwords.txt')))
 
 
 def text_prepare(text):
     """Performs tokenization and simple preprocessing."""
     replace_by_space_re = re.compile(r'[/(){}\[\]|@,;!?]')
-    # good_symbols_re = re.compile('[^0-9a-z #+_]')
 
     text = text.lower()
     text = replace_by_space_re.sub(' ', text)
     text = re.sub(r'\s+', ' ', text).strip()
     # text = good_symbols_re.sub('', text)
-    # text = ' '.join([x for x in text.split() if x and x not in stopwords_set])
+    text = ' '.join([x for x in text.split() if x and x not in stopwords_set])
 
-    return text.strip()
+    return text
 
 
 def unpickle_file(filename):
@@ -54,7 +54,7 @@ def tfidf_features(x_train, x_test, vectorizer_path):
 
     # Train a vectorizer on X_train data.
     # Transform X_train and X_test data.
-    tfidf_vectorizer = TfidfVectorizer(min_df=5, max_df=0.9, ngram_range=(1, 2), token_pattern=r'(\S+)')
+    tfidf_vectorizer = TfidfVectorizer(min_df=2, max_df=0.9, ngram_range=(1, 2), token_pattern=r'(\S+)')
     x_train = tfidf_vectorizer.fit_transform(x_train)
     x_test = tfidf_vectorizer.transform(x_test)
 

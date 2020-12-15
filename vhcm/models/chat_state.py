@@ -80,6 +80,12 @@ class ChatState(models.Model):
     reportable_bot_states = models.TextField(
         verbose_name='indexes of reportable bot states', null=True
     )
+    hcm_question = models.BooleanField(
+        verbose_name='is user asking hcm related question', null=True
+    )
+    context_question = models.BooleanField(
+        verbose_name='is user asking context question', null=True
+    )
     # System state
     system_state_idx = models.SmallIntegerField(
         verbose_name='index of current system process state', null=True

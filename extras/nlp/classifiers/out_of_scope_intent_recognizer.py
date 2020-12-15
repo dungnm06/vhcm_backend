@@ -17,12 +17,25 @@ def train_oos_intent_recognizer(datafile, output):
     train_data_filepath = os.path.join(os.path.splitext(datafile)[0], 'train_data.pickle')
     hcm_data = unpickle_file(train_data_filepath)
     hcm_data = hcm_data['question']
+    print('HCM data len: {}'.format(len(hcm_data)))
+
+    # Load context question data
+    context_questions = load_text_data(os.path.join(ROOT, 'data/context_questions.txt'))
+    hcm_data.extend(context_questions*5)
+    print('Context question data len: {}'.format(len(context_questions)))
+
+    # Load context word data
+    context_words = load_text_data(os.path.join(ROOT, 'data/context_words.txt'))
+    hcm_data.extend(context_words*20)
+    print('Context words data len: {}'.format(len(context_words)))
+
     sample_size = len(hcm_data)
     print('Total data len: {}'.format(sample_size))
 
     # Load dialogue data
     dialogue_data = load_text_data(os.path.join(ROOT, 'data/conversations.txt'))
-    dialogue_data = random.sample(dialogue_data, sample_size)
+    dialogue_data = random.sample(dialogue_data, sample_size*2)
+    print('Dialogue data len: {}'.format(len(dialogue_data)))
 
     # Apply text_prepare function to preprocess the data.
     hcm_data = [text_prepare(text) for text in hcm_data]
@@ -54,6 +67,12 @@ def train_oos_intent_recognizer(datafile, output):
     print('Simple test: ')
     print('Bác Hồ sinh năm nào?')
     question = text_prepare('Bác_Hồ sinh năm nào?')
+    features = tfidf_vectorizer.transform([question])
+    intent = intent_recognizer.predict(features)[0]
+    print('Predicted: ' + intent)
+    print()
+    print('Ở đâu vậy?')
+    question = text_prepare('Ở đâu vậy?')
     features = tfidf_vectorizer.transform([question])
     intent = intent_recognizer.predict(features)[0]
     print('Predicted: ' + intent)

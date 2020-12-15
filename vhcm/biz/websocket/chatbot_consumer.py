@@ -106,6 +106,7 @@ class ChatbotConsumer(WebsocketConsumer):
         self.report_note = None
         self.bot_state_to_regist = None
         self.bot_state_to_regist_idx = None
+        self.is_last_state_system_state = False
 
     def connect(self):
         user_id = self.scope["session"].get('user_id')
@@ -160,6 +161,10 @@ class ChatbotConsumer(WebsocketConsumer):
             self.regist_message(chat_state.USER_SENT, user_input)
             # User sending command
             if user_input.startswith(EXCLAMATION):
+                if self.last_state:
+                    self.reset_system_communicate_state()
+                    self.regist_message(chat_state.SYSTEM_SENT, bot.MESSAGE_CANCER_LAST_COMMAND)
+                    self.send_response(CHAT_RESPONSE, bot.MESSAGE_CANCER_LAST_COMMAND)
                 command = user_input[1:]
                 if command == COMMAND_START_NEW_SESSION:
                     self.send_new_session()
@@ -344,10 +349,13 @@ class ChatbotConsumer(WebsocketConsumer):
                             m.user_question,
                             m.message,
                             [int(i) for i in m.question_type.split(COMMA)] if m.question_type else [],
+                            m.hcm_question,
+                            m.context_question,
                             m.action
                         ))
                     else:
                         states.append(bot.State())
+                    self.is_last_state_system_state = False
                 if m.sent_from == chat_state.SYSTEM_SENT:
                     self.state_idx = m.system_state_idx
                     self.processing_type = m.system_processing_type
@@ -360,6 +368,7 @@ class ChatbotConsumer(WebsocketConsumer):
                     self.bot_state_to_regist_idx = m.system_tmp_report_bot_state
                     if self.bot_state_to_regist_idx:
                         self.bot_state_to_regist = states[self.bot_state_to_regist_idx]
+                    self.is_last_state_system_state = True
             self.chatbot.state_tracker.extend(states)
             self.chatbot.extract_reportable_states(last_session.reverse()[0].reportable_bot_states)
         return {
@@ -398,6 +407,9 @@ class ChatbotConsumer(WebsocketConsumer):
                 self.state_idx = 0
                 self.last_state = PROCESSING_ANSWER_CONFIRMATION_NG[self.state_idx]
                 self.processing_report_type = ANSWER_CONFIRMATION_NG
+            elif self.is_last_state_system_state and last_bot_state.context_question:
+                self.chatbot.state_tracker[len(self.chatbot.state_tracker)-1].answer = bot.MESSAGE_NOTHING_TO_ANSWER
+                bot_response = bot.MESSAGE_NOTHING_TO_ANSWER
             return {
                 'command': None,
                 'message': bot_response
@@ -487,12 +499,16 @@ class ChatbotConsumer(WebsocketConsumer):
             message_to_regist.system_tmp_report_note = self.report_note
             message_to_regist.system_tmp_report_data = self.report_data
             message_to_regist.system_tmp_report_bot_state = self.bot_state_to_regist_idx
+            self.is_last_state_system_state = True
 
         if bot_state:
             message_to_regist.predicted_intent = bot_state.intent.intent
             message_to_regist.user_question = bot_state.question
             message_to_regist.question_type = COMMA.join(str(t) for t in bot_state.question_types) if bot_state.question_types else None
             message_to_regist.action = bot_state.action
+            message_to_regist.hcm_question = bot_state.hcm_question
+            message_to_regist.context_question = bot_state.context_question
+            self.is_last_state_system_state = False
 
         message_to_regist.save()
 

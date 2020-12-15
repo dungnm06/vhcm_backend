@@ -57,11 +57,11 @@ def normalize_django_datetime(date_str):
 
 
 default_utc_zone = tz.gettz('UTC')
-local_to_zone = tz.gettz('Asia/Ho_Chi_Minh')
+local_zone = tz.gettz('Asia/Ho_Chi_Minh')
 
 
 def utc_to_gmt7(dt):
     utc = dt.replace(tzinfo=default_utc_zone)
-    local = utc.astimezone(local_to_zone)
+    local = utc.astimezone(local_zone)
 
     return local

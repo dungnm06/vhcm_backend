@@ -474,7 +474,7 @@ class LanguageProcessor(object, metaclass=Singleton):
         text = replace_by_space_re.sub(' ', text)
         text = re.sub(r'\s+', ' ', text).strip()
         text = self.word_segmentation(text).strip()
-        # text = ' '.join([x for x in text.split() if x and x not in stopwords_set])
+        text = ' '.join([x for x in text.split() if x and x not in self.stopwords])
 
         return text
 
