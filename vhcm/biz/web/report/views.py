@@ -8,6 +8,7 @@ from vhcm.common.dao.native_query import execute_native_query
 from vhcm.common.utils.CH import isInt
 from vhcm.biz.authentication.user_session import get_current_user
 from vhcm.biz.web.report.sql import *
+from vhcm.common.utils.CV import utc_to_gmt7
 import vhcm.models.report as report_model
 import vhcm.models.knowledge_data as knowledge_data_model
 import vhcm.models.knowledge_data_comment as comment_model
@@ -29,8 +30,8 @@ def all_pending_report(request):
             'reporter': report.reporter,
             'report_data': report.report_data,
             'reported_intent': report.reported_intent,
-            'bot_version': report.bot_version.strftime(DATETIME_DDMMYYYY.regex),
-            'cdate': report.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+            'bot_version': utc_to_gmt7(report.bot_version).strftime(DATETIME_DDMMYYYY.regex),
+            'cdate': utc_to_gmt7(report.cdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
         })
 
     result.set_status(True)
@@ -57,7 +58,7 @@ def all_accepted_report(request):
             'processor_id': report.processor_id,
             'processor': report.processor,
             'forward_intent': report.forward_intent,
-            'mdate': report.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+            'mdate': utc_to_gmt7(report.mdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
         })
 
     result.set_status(True)
@@ -84,7 +85,7 @@ def all_rejected_report(request):
             'processor_id': report.processor_id,
             'processor': report.processor,
             'reject_reason': report.reason,
-            'mdate': report.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+            'mdate': utc_to_gmt7(report.mdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
         })
 
     result.set_status(True)

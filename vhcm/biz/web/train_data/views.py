@@ -13,6 +13,7 @@ from vhcm.serializers.train_data import TrainDataSerializer, TrainDataDeletedSer
 from vhcm.biz.web.train_data.sql import GET_DATA, GET_TRAIN_DATA_KNOWLEDGE_DATA_INFO
 from vhcm.biz.nlu.model.intent import *
 from vhcm.common.utils.CH import isInt
+from vhcm.common.utils.CV import utc_to_gmt7
 from vhcm.common.constants import DATETIME_DDMMYYYY_HHMMSS
 from vhcm.common.dao.native_query import execute_native_query
 import vhcm.models.train_data as train_data_model
@@ -251,8 +252,8 @@ def get(request):
         'description': train_data.description,
         'type': train_data.type,
         'delete_reason': train_data.delete_reason,
-        'cdate': train_data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
-        'mdate': train_data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+        'cdate': utc_to_gmt7(train_data.cdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+        'mdate': utc_to_gmt7(train_data.mdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
         'knowledge_datas': knowledge_datas_display
     }
 

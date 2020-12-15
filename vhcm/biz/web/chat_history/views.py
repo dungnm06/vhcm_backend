@@ -6,6 +6,7 @@ from vhcm.common.response_json import ResponseJSON
 from vhcm.common.constants import DATETIME_DDMMYYYY_HHMMSS
 from vhcm.common.dao.native_query import execute_native_query
 from vhcm.biz.web.chat_history.sql import GET_ALL_CHATLOG
+from vhcm.common.utils.CV import utc_to_gmt7
 import vhcm.models.chat_history as chat_history_model
 
 
@@ -21,8 +22,8 @@ def all(request):
             'log_id': log.log_id,
             'user_id': log.user_id,
             'username': log.username,
-            'session_start': log.session_start.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
-            'session_end': log.session_end.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'session_start': utc_to_gmt7(log.session_start).strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'session_end': utc_to_gmt7(log.session_end).strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
             'bot_version': log.bot_version
         })
 

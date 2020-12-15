@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime
+from dateutil import tz
 from rest_framework.parsers import FileUploadParser
 from vhcm.common.constants import *
 
@@ -53,3 +54,14 @@ def normalize_django_datetime(date_str):
     normalized = tmp_date.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
 
     return normalized
+
+
+default_utc_zone = tz.gettz('UTC')
+local_to_zone = tz.gettz('Asia/Ho_Chi_Minh')
+
+
+def utc_to_gmt7(dt):
+    utc = dt.replace(tzinfo=default_utc_zone)
+    local = utc.astimezone(local_to_zone)
+
+    return local

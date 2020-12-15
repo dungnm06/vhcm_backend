@@ -1,4 +1,3 @@
-from datetime import datetime
 from collections import Counter
 from django.conf import settings
 from django.db.models import Prefetch
@@ -27,6 +26,7 @@ from vhcm.serializers.comment import CommentSerializer, DeletedCommentSerializer
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
 from vhcm.common.constants import *
 from vhcm.common.utils.CH import isInt
+from vhcm.common.utils.CV import utc_to_gmt7
 from .sql import *
 from vhcm.common.dao.native_query import execute_native_query, execute_native
 
@@ -59,8 +59,8 @@ def get_all(request):
             'create_user_id': kd.create_user_id,
             'edit_user': kd.edit_user,
             'edit_user_id': kd.edit_user_id,
-            'cdate': kd.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
-            'mdate': kd.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'cdate': utc_to_gmt7(kd.cdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'mdate': utc_to_gmt7(kd.mdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
             'reviews': {
                 'accept': kd.accept_count,
                 'reject': kd.refuse_count
@@ -93,8 +93,8 @@ def all_trainable(request):
             'intent_fullname': data.intent_fullname,
             'edit_user': data.edit_user,
             'edit_user_id': data.edit_user_id,
-            'cdate': data.cdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
-            'mdate': data.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
+            'cdate': utc_to_gmt7(data.cdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            'mdate': utc_to_gmt7(data.mdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
         })
 
     latest_belong_train_data_sql = GET_LATEST_KNOWLEDGE_DATA_TRAIN_DATA.format(
@@ -248,7 +248,7 @@ def get(request):
             comment_model.VIEWABLE_STATUS: comment.status,
             comment_model.EDITED: comment.edited,
             comment_model.DELETEABLE: comment.able_to_delete,
-            comment_model.MDATE: comment.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            comment_model.MDATE: utc_to_gmt7(comment.mdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
         }
         report_comment = {
             report_model.ID: comment.report_id,
@@ -603,13 +603,12 @@ def edit(request):
         )
         report_comment.save()
 
-    if user.user_id != old_user.edit_user.user_id:
+    if user.user_id != old_user.user_id:
         # Note a comment for this edit user changing
-        message = 'Knowledge data owner changed from {old_user} to {new_user} at {time}.'
+        message = 'Knowledge data owner changed from {old_user} to {new_user}.'
         message = message.format(
             old_user=old_user.username,
             new_user=user.username,
-            time=datetime.now().strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
         )
         comment = comment_model.Comment(
             user=user,
@@ -813,7 +812,7 @@ def all_comment(request):
             comment_model.VIEWABLE_STATUS: comment.status,
             comment_model.EDITED: comment.edited,
             comment_model.DELETEABLE: comment.able_to_delete,
-            comment_model.MDATE: comment.mdate.strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
+            comment_model.MDATE: utc_to_gmt7(comment.mdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex),
         }
         report_comment = {
             report_model.ID: comment.report_id,
@@ -1007,7 +1006,7 @@ def all_reviews(request):
             'username': review.username,
             'review': review.review,
             'status': review.status,
-            'mdate': review.mdate
+            'mdate': utc_to_gmt7(review.mdate)
         }
         reviews_display.append(review_display)
 

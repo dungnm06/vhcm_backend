@@ -15,7 +15,7 @@ from vhcm.common.response_json import ResponseJSON
 from vhcm.serializers.user import UserSerializer
 from .forms import AdminEditUserForm, UserAddForm, EditUserForm, AVATAR_EDIT_FLAG
 from vhcm.biz.authentication.user_session import get_current_user, ensure_admin
-from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser
+from vhcm.common.utils.CV import extract_validation_messages, ImageUploadParser, utc_to_gmt7
 from vhcm.common.utils.string import get_random_string
 from vhcm.common.constants import DATETIME_DDMMYYYY_HHMMSS
 from vhcm.common.config.config_manager import config_loader, DEFAULT_PASSWORD, RESET_PASSWORD_EXPIRE_TIME, SYSTEM_MAIL
@@ -452,7 +452,7 @@ def get_reported_notifications(request):
             'report_username': report.report_username,
             'report_comment': report.report_comment,
             'user_seen': report.user_seen,
-            'cdate': report.cdate
+            'cdate': utc_to_gmt7(report.cdate).strftime(DATETIME_DDMMYYYY_HHMMSS.regex)
         })
 
     result.set_status(True)
