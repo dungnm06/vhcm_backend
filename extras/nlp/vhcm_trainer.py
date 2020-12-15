@@ -30,18 +30,20 @@ if __name__ == '__main__':
     activation = args.activation
 
     if classifier_type == 1:
-        from classifiers.hcm_intent_classifier import train_intent_classifier
+        from classifiers.intent_classifier import train_intent_classifier
         if activation is None:
             activation = 'softmax'
         train_intent_classifier(data, output, sentence_length, batch, epoch,
                                 learning_rate, epsilon, activation, version)
-    if classifier_type == 2:
-        from classifiers.hcm_question_type_classifier import train_question_classifier
+    elif classifier_type == 2:
+        from classifiers.question_type_classifier import train_question_classifier
         if activation is None:
             activation = 'sigmoid'
         train_question_classifier(data, output, sentence_length, batch, epoch,
                                   learning_rate, epsilon, activation)
-
-    if classifier_type == 3:
-        from classifiers.dialogue_intent_recognizer import train_dialogue_intent_recognizer
-        train_dialogue_intent_recognizer(data, output)
+    elif classifier_type == 3:
+        from classifiers.out_of_scope_intent_recognizer import train_oos_intent_recognizer
+        train_oos_intent_recognizer(data, output)
+    elif classifier_type == 4:
+        from classifiers.context_question_recognizer import train_context_intent_recognizer
+        train_context_intent_recognizer(data, output)

@@ -87,60 +87,6 @@ class Intent:
         self.references = references
 
 
-# def load_from_db(models):
-#     intent_maps = {}
-#     for knowledge_data in models:
-#         intent = Intent()
-#         # ID
-#         intent.intent_id = knowledge_data.knowledge_data_id
-#         # Intent name
-#         intent.intent = knowledge_data.intent
-#         # Intent full name
-#         intent.name = knowledge_data.intent_fullname
-#         # # Questions
-#         # questions = question_model.Question.objects.filter(knowledge_data=knowledge_data)
-#         # for q in questions:
-#         #     # Generated questions
-#         #     generated_questions = generated_question_model.GeneratedQuestion.objects.filter(accept_status=True,
-#         #                                                                                     question=q)
-#         #     question = Question(q.question, [gq.generated_question for gq in generated_questions])
-#         #     intent.questions.append(question)
-#         # Raw data
-#         intent.raw_data = knowledge_data.raw_data
-#         # Base response
-#         intent.base_response = knowledge_data.base_response
-#         # # Response datas
-#         # response_datas = response_model.ResponseData.objects.filter(knowledge_data=knowledge_data)
-#         # for response in response_datas:
-#         #     intent.corresponding_datas[response.type] = response.answer
-#         #     # Intent types
-#         #     intent.intent_types.append(response.type)
-#
-#         # Subjects
-#         subjects = subject_model.Subject.objects.filter(knowledge_data=knowledge_data)
-#         for subject in subjects:
-#             pass
-#             # Subject
-#
-#             # Verbs
-#             # verbs = verbs_model.Verb.objects.filter(subject=subject)
-#             # intent.subjects.append(None)
-#         # Verbs
-#
-#         # Synonym words dictionary
-#         synonyms = execute_native_query(KNOWLEDGE_DATA_GET_SYNONYMS, [knowledge_data.knowledge_data_id])
-#         for synonym in synonyms:
-#             synonym_set = SynonymSet()
-#             synonym_set.id = synonym.synonym_id
-#             synonym_set.meaning = synonym.meaning
-#             synonym_set.words = synonym.words.split(COMMA)
-#             intent.synonym_sets[synonym.synonym_id] = synonym_set
-#         # Push to intents map
-#         intent_maps[intent.intent] = intent
-#
-#     return intent_maps
-
-
 def load_from_data_file(intents_data_path, references_path, synonyms_path):
     with open(synonyms_path, encoding=UTF8) as synonym_file, open(references_path, encoding=UTF8) as references_file:
         intent_maps = {}

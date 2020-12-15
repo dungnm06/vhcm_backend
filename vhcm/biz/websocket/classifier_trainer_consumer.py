@@ -4,9 +4,9 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from vhcm.biz.nlu.classifier_trainer import ClassifierTrainer
 import vhcm.common.config.config_manager as config
-from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FOLDER, NEW_LINE
+from vhcm.common.constants import TRAIN_CLASSIFIER_ROOM_GROUP, PROJECT_ROOT, TRAIN_DATA_FOLDER, NEW_LINE, BOT_VERSION_FILE_PATH
 from vhcm.models import train_data as train_data_model
-from vhcm.biz.nlu.vhcm_chatbot import is_bot_ready
+from vhcm.biz.nlu.vhcm_chatbot import is_bot_ready, system_bot_version, TURN_OFF_NEXT_STARTUP
 from vhcm.common.utils.files import ZIP_EXTENSION
 
 # Response types
@@ -14,6 +14,7 @@ SEND_MESSAGE = 'message'
 TRAIN_START_FAILED = 'start_failed'
 PROCESS_RUNNING_STATUS = 'running_status'
 TRAIN_PROCESS_STOP_STATUS = 'stop_status'
+SEND_TURN_OFF_STATUS = 'turn_off_status'
 
 
 class ClassifierConsumer(WebsocketConsumer):
@@ -93,6 +94,16 @@ class ClassifierConsumer(WebsocketConsumer):
         elif command == 'check_status':
             status = self.is_process_running()
             self.send_response(PROCESS_RUNNING_STATUS, status)
+
+        elif command == 'turn_off_bot':
+            if system_bot_version[TURN_OFF_NEXT_STARTUP]:
+                self.send_response(TURN_OFF_NEXT_STARTUP, 'Already sent an signal to turn off chatbot next startup')
+            else:
+                system_bot_version[TURN_OFF_NEXT_STARTUP] = False
+                version_file_path = os.path.join(PROJECT_ROOT, BOT_VERSION_FILE_PATH)
+                with open(version_file_path, 'w') as f:
+                    json.dump(system_bot_version, f, indent=4)
+                self.send_response(TURN_OFF_NEXT_STARTUP, 'Sent an signal to turn off chatbot on next start up sucessfully')
 
     # Receive message from trainer service
     def send_message(self, event):

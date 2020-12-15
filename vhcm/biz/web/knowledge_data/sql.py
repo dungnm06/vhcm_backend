@@ -123,7 +123,8 @@ SELECT
 	u.avatar as "user_avatar",
 	cru.report_id as "report_id",
 	cru.report_to_id as "report_to",
-	cru.username as "report_to_username"
+	cru.username as "report_to_username",
+	cru.status as "report_status"
 FROM vhcm.knowledge_data_comment cm
 INNER JOIN vhcm.user u
 ON cm.user_id = u.user_id
@@ -132,10 +133,13 @@ LEFT JOIN (
 		cr.comment_id,
 		cr.report_id,
 		cr.report_to_id,
-		u2.username
+		u2.username,
+		r.status
 	FROM vhcm.knowledge_data_comment_report cr
 	INNER JOIN vhcm.user u2
 	ON cr.report_to_id = u2.user_id
+	INNER JOIN vhcm.report r
+	ON r.id = cr.report_id
 ) cru
 ON cm.id = cru.comment_id
 WHERE cm.knowledge_data_id = {knowledge_data_id}

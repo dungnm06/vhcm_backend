@@ -42,6 +42,8 @@ INTENT_MAP_FILE_PATH = 'extras/nlp/classifiers/trained/intent_map.json'
 QUESTION_TYPE_MAP_FILE_PATH = 'extras/nlp/classifiers/trained/question_type_map.json'
 DIALOGUE_INTENT_RECOGNIZER_FILE_PATH = 'extras/nlp/classifiers/trained/dialogue_intent_recognizer.pickle'
 DIALOGUE_TFIDF_VECTORIZER_FILE_PATH = 'extras/nlp/classifiers/trained/dialogue_tfidf_vectorizer.pickle'
+CONTEXT_QUESTION_RECOGNIZER_FILE_PATH = 'extras/nlp/classifiers/trained/context_question_recognizer.pickle'
+CONTEXT_TFIDF_VECTORIZER_FILE_PATH = 'extras/nlp/classifiers/trained/context_tfidf_vectorizer.pickle'
 CLASSIFIER_MODEL_FILES = ['checkpoint', 'model_weights.data-00000-of-00001', 'model_weights.index']
 CLASSIFIER_TYPES = {
     INTENT: 1,

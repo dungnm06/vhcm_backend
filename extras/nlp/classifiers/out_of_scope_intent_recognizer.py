@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score
 from pathlib import Path
 
 
-def train_dialogue_intent_recognizer(datafile, output):
+def train_oos_intent_recognizer(datafile, output):
     """------------ HCM relative sentence and normal sentence recognition ------------"""
     # Load HCM relative data
     datafile_folder = Path(datafile).resolve().parent

@@ -122,7 +122,8 @@ def train_intent_classifier(datapath, output, sentencelength, batch, epoch, lear
     else:
         version = {
             'current': 0,
-            'next_startup': bot_version
+            'next_startup': bot_version,
+            'turn_off_next_startup': False
         }
     with open(bot_version_path, 'w') as f:
         json.dump(version, f, indent=4)

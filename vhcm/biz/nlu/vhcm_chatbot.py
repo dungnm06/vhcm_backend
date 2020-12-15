@@ -6,15 +6,18 @@ import tensorflow as tf
 from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.biz.nlu.classifiers.intent_classifier import IntentClassifier
 from vhcm.biz.nlu.classifiers.question_type_classifier import QuestionTypeClassifier
+from vhcm.biz.nlu.classifiers.out_of_scope_intent_recognizer import OutOfScopeIntentRecognizer
+from vhcm.biz.nlu.classifiers.context_question_recognizer import ContextQuestionRecognizer
 from vhcm.biz.nlu.model.intent import Intent, load_from_data_file
 from vhcm.models.knowledge_data_question import QUESTION_TYPES_IDX2T, QUESTION_TYPES_T2IDX
 from vhcm.models import chat_state, train_data
 from vhcm.common.constants import *
-from vhcm.common.utils.files import unzip, unpickle_file, ZIP_EXTENSION
+from vhcm.common.utils.files import unzip, ZIP_EXTENSION
 
 # Constants
 CURRENT_BOT_VERSION = 'current'
 NEXT_STARTUP_VERSION = 'next_startup'
+TURN_OFF_NEXT_STARTUP = 'turn_off_next_startup'
 HCM_QUESTION = 'hcm_question'
 OUT_OF_SCOPE_DIALOGUE = 'oos_dialogue'
 
@@ -68,24 +71,32 @@ def init_bot():
     try:
         # Bot version
         version_file_path = os.path.join(PROJECT_ROOT, BOT_VERSION_FILE_PATH)
+        turnoff_bot_flag = False
         try:
             if os.path.exists(version_file_path):
                 with open(version_file_path) as f:
                     version = json.load(f)
                     version[CURRENT_BOT_VERSION] = version[NEXT_STARTUP_VERSION]
+                    turnoff_bot_flag = version[TURN_OFF_NEXT_STARTUP]
+                    version[TURN_OFF_NEXT_STARTUP] = False
             else:
                 version = {
                     CURRENT_BOT_VERSION: 0,
-                    NEXT_STARTUP_VERSION: 0
+                    NEXT_STARTUP_VERSION: 0,
+                    TURN_OFF_NEXT_STARTUP: False
                 }
         except IOError:
             version = {
                 CURRENT_BOT_VERSION: 0,
-                NEXT_STARTUP_VERSION: 0
+                NEXT_STARTUP_VERSION: 0,
+                TURN_OFF_NEXT_STARTUP: False
             }
 
         with open(version_file_path, 'w') as f:
             json.dump(version, f, indent=4)
+
+        if turnoff_bot_flag:
+            raise RuntimeError('[startup] Chatbot has been flagged to turn off')
         if version[CURRENT_BOT_VERSION] == 0:
             raise RuntimeError('[startup] Could not initial chatbot (Bot version: 0)')
 
@@ -108,8 +119,12 @@ def init_bot():
         question_classifier_instance.load()
 
         # Dialogue intent recognizer
-        hcm_chatchit_intent_recognizer = unpickle_file(os.path.join(PROJECT_ROOT, DIALOGUE_INTENT_RECOGNIZER_FILE_PATH))
-        hcm_chatchit_tfidf_vectorizer = unpickle_file(os.path.join(PROJECT_ROOT, DIALOGUE_TFIDF_VECTORIZER_FILE_PATH))
+        oos_intent_recognizer_instance = OutOfScopeIntentRecognizer()
+        oos_intent_recognizer_instance.load()
+
+        # Context question recognizer
+        context_question_recognizer_instance = ContextQuestionRecognizer()
+        context_question_recognizer_instance.load()
 
         train_data_storepath = os.path.join(PROJECT_ROOT, TRAIN_DATA_FOLDER + current_train_data.filename)
 
@@ -122,7 +137,7 @@ def init_bot():
         if os.path.exists(tempstorepath):
             shutil.rmtree(tempstorepath)
 
-        return intent_classifier_instance, question_classifier_instance, idatas, documents, hcm_chatchit_intent_recognizer, hcm_chatchit_tfidf_vectorizer, current_train_data, version
+        return intent_classifier_instance, question_classifier_instance, idatas, documents, oos_intent_recognizer_instance, context_question_recognizer_instance, current_train_data, version
     except Exception as e:
         # Lul
         print(e)
@@ -138,7 +153,7 @@ def init_bot():
         return None, None, None, None, None, None, None, version
 
 
-intent_classifier, question_type_classifier, intent_datas, documents_data, dialogue_intent_recognizer, dialogue_tfidf_vectorizer, train_data_model, system_bot_version = init_bot()
+intent_classifier, question_type_classifier, intent_datas, documents_data, oos_intent_recognizer, context_question_recognizer, train_data_model, system_bot_version = init_bot()
 
 
 def is_bot_ready():
@@ -146,8 +161,8 @@ def is_bot_ready():
            and question_type_classifier \
            and intent_classifier \
            and intent_datas \
-           and dialogue_intent_recognizer \
-           and dialogue_tfidf_vectorizer
+           and oos_intent_recognizer \
+           and context_question_recognizer
 
 
 def version_check(session_bot_version):
@@ -258,8 +273,7 @@ class VirtualHCMChatbot(object):
                 # Input preprocesing
                 segmented_input = language_processor.text_prepare(user_input)
                 # Predict
-                tfidf_vectorized_input = dialogue_tfidf_vectorizer.transform([segmented_input.lower()])
-                chat_type = dialogue_intent_recognizer.predict(tfidf_vectorized_input)[0]
+                chat_type = oos_intent_recognizer.predict(segmented_input)
                 if chat_type == HCM_QUESTION:
                     intent_name = intent_classifier.predict(segmented_input)
                     types = question_type_classifier.predict(segmented_input)
