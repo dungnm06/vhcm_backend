@@ -1,0 +1,759 @@
+bức thư viết vào ngày bao_nhiêu
+bức thư ghi vào ngày bao_nhiêu
+bức thư ghi_chép vào ngày bao_nhiêu
+thư viết vào ngày bao_nhiêu
+thư ghi vào ngày bao_nhiêu
+thư ghi_chép vào ngày bao_nhiêu
+lá thư viết vào ngày bao_nhiêu
+lá thư ghi vào ngày bao_nhiêu
+lá thư ghi_chép vào ngày bao_nhiêu
+bởi người nào
+ai viết bức thư này
+ai viết thư này
+ai viết lá thư này
+ai ghi bức thư này
+ai ghi thư này
+ai ghi lá thư này
+ai ghi_chép bức thư này
+ai ghi_chép thư này
+ai ghi_chép lá thư này
+bức thư này viết khi nào
+bức thư này ghi khi nào
+bức thư này ghi_chép khi nào
+thư này viết khi nào
+thư này ghi khi nào
+thư này ghi_chép khi nào
+lá thư này viết khi nào
+lá thư này ghi khi nào
+lá thư này ghi_chép khi nào
+vào thời_gian nào
+người đã nói
+người đã trình_bày
+người đã thể_hiện
+người đã phát_biểu
+ai là người đọc tuyên_ngôn này
+bản tuyên_ngôn này được đọc ngày nào
+diễn ra bởi những người nào
+tổ_chức bởi những người nào
+tiến_hành bởi những người nào
+diễn_biến bởi những người nào
+bùng_nổ bởi những người nào
+diễn ra bao_giờ
+tổ_chức bao_giờ
+tiến_hành bao_giờ
+diễn_biến bao_giờ
+bùng_nổ bao_giờ
+diễn ra tại đâu
+tổ_chức tại đâu
+tiến_hành tại đâu
+diễn_biến tại đâu
+bùng_nổ tại đâu
+diễn ra bởi ai và bao_giờ
+tổ_chức bởi ai và bao_giờ
+tiến_hành bởi ai và bao_giờ
+diễn_biến bởi ai và bao_giờ
+bùng_nổ bởi ai và bao_giờ
+diễn ra bao_giờ và ở đâu
+tổ_chức bao_giờ và ở đâu
+tiến_hành bao_giờ và ở đâu
+diễn_biến bao_giờ và ở đâu
+bùng_nổ bao_giờ và ở đâu
+diễn ra bởi ai và ở chỗ nào
+tổ_chức bởi ai và ở chỗ nào
+tiến_hành bởi ai và ở chỗ nào
+diễn_biến bởi ai và ở chỗ nào
+bùng_nổ bởi ai và ở chỗ nào
+có mấy đoàn_thể cộng_sản
+có mấy nhóm cộng_sản
+có mấy tổ chức cộng_sản
+có mấy đội cộng_sản
+là những đoàn_thể nào
+là những nhóm nào
+là những tổ chức nào
+là những đội nào
+những đoàn_thể cộng_sản này tên là gì
+những nhóm cộng_sản này tên là gì
+những tổ chức cộng_sản này tên là gì
+những đội cộng_sản này tên là gì
+các đoàn_thể này tên gì
+các nhóm này tên gì
+các tổ chức này tên gì
+các đội này tên gì
+lý_do gì lại khó thống_nhất
+lý_do gì lại khó kết_hợp
+ban_đầu bị làm_sao
+lúc đầu bị làm_sao
+giai_đoạn đầu bị làm_sao
+thời_kì đầu bị làm_sao
+thuở đầu bị làm_sao
+thống_nhất vào thời_điểm nào
+kết_hợp vào thời_điểm nào
+bởi những thành_phần nào
+thống_nhất bằng cách nào thống_nhất thời_điểm nào và bởi những người nào
+thống_nhất bằng cách nào kết_hợp thời_điểm nào và bởi những người nào
+kết_hợp bằng cách nào thống_nhất thời_điểm nào và bởi những người nào
+kết_hợp bằng cách nào kết_hợp thời_điểm nào và bởi những người nào
+thống_nhất như_thế_nào và bởi những người nào
+kết_hợp như_thế_nào và bởi những người nào
+thống_nhất bởi những người nào và như_thế_nào
+kết_hợp bởi những người nào và như_thế_nào
+là cách_mạng gì
+là cách_mạng như_thế_nào
+cách_mạng diễn ra trong khoảng thời_gian nào
+cách_mạng tổ_chức trong khoảng thời_gian nào
+cách_mạng tiến_hành trong khoảng thời_gian nào
+cách_mạng diễn_biến trong khoảng thời_gian nào
+cách_mạng bùng_nổ trong khoảng thời_gian nào
+lúc đó cách_mạng diễn ra tại đâu
+lúc đó cách_mạng tổ_chức tại đâu
+lúc đó cách_mạng tiến_hành tại đâu
+lúc đó cách_mạng diễn_biến tại đâu
+lúc đó cách_mạng bùng_nổ tại đâu
+diễn ra vào thời_điểm địa_điểm nào
+tổ_chức vào thời_điểm địa_điểm nào
+tiến_hành vào thời_điểm địa_điểm nào
+diễn_biến vào thời_điểm địa_điểm nào
+bùng_nổ vào thời_điểm địa_điểm nào
+có phải là cuộc cách_mạng_vô_sản đầu_tiên ở nước ta hay không
+sự_kiện đó nổ ra ở đâu
+vào thời_điểm đó thì cách_mạng diễn ra tại đâu
+vào thời_điểm đó thì cách_mạng tổ_chức tại đâu
+vào thời_điểm đó thì cách_mạng tiến_hành tại đâu
+vào thời_điểm đó thì cách_mạng diễn_biến tại đâu
+vào thời_điểm đó thì cách_mạng bùng_nổ tại đâu
+sự_kiện đó là gì
+có ý_nghĩa như_thế_nào
+ở đâu
+gồm có bao_nhiêu người đoàn_thể du_kích đó gồm có bao_nhiêu người
+gồm có bao_nhiêu người nhóm du_kích đó gồm có bao_nhiêu người
+gồm có bao_nhiêu người tổ chức du_kích đó gồm có bao_nhiêu người
+gồm có bao_nhiêu người đội du_kích đó gồm có bao_nhiêu người
+gồm 12 người phải không
+đoàn_thể đó ở đâu
+nhóm đó ở đâu
+tổ chức đó ở đâu
+đội đó ở đâu
+ở cao_bằng đúng không
+và được giao_phó cho ai
+và được giao cho ai
+và được điều_phối cho ai
+thế cải_tổ thành_đội gì
+thế đoàn_thể đó đc cải_tạo thành gì
+thế nhóm đó đc cải_tạo thành gì
+thế tổ chức đó đc cải_tạo thành gì
+thế đội đó đc cải_tạo thành gì
+việc cải_tổ giao_phó cho ai nhỉ
+việc cải_tổ giao cho ai nhỉ
+việc cải_tổ điều_phối cho ai nhỉ
+cải_tổ thành đoàn_thể nam tiến phải không
+cải_tổ thành nhóm nam tiến phải không
+cải_tổ thành tổ chức nam tiến phải không
+cải_tổ thành đội nam tiến phải không
+công_việc đó được giao_phó cho võ_nguyên_giáp phải không
+công_việc đó được giao cho võ_nguyên_giáp phải không
+công_việc đó được điều_phối cho võ_nguyên_giáp phải không
+viết thời_điểm nào
+viết bởi ai thế
+viết vào năm 1949 phải không
+viết bởi trần_thắng_lợi phải không
+bức thư đó bởi ai
+thư đó bởi ai
+lá thư đó bởi ai
+được viết vào năm bao_nhiêu
+vào năm nào
+nhận làm cái gì
+công_nhận làm cái gì
+thừa_nhận làm cái gì
+nhận làm một chi_nhánh chánh thức phải không
+nhận làm một chi_nhánh chính_thức phải không
+nhận làm một chi_nhánh chính thức phải không
+nhận làm một nhánh chánh thức phải không
+nhận làm một nhánh chính_thức phải không
+nhận làm một nhánh chính thức phải không
+công_nhận làm một chi_nhánh chánh thức phải không
+công_nhận làm một chi_nhánh chính_thức phải không
+công_nhận làm một chi_nhánh chính thức phải không
+công_nhận làm một nhánh chánh thức phải không
+công_nhận làm một nhánh chính_thức phải không
+công_nhận làm một nhánh chính thức phải không
+thừa_nhận làm một chi_nhánh chánh thức phải không
+thừa_nhận làm một chi_nhánh chính_thức phải không
+thừa_nhận làm một chi_nhánh chính thức phải không
+thừa_nhận làm một nhánh chánh thức phải không
+thừa_nhận làm một nhánh chính_thức phải không
+thừa_nhận làm một nhánh chính thức phải không
+được nhận vào năm nào
+được công_nhận vào năm nào
+được thừa_nhận vào năm nào
+được nhận vào năm 1935 thật không
+được công_nhận vào năm 1935 thật không
+được thừa_nhận vào năm 1935 thật không
+viết vào tháng năm bao_nhiêu
+ghi vào tháng năm bao_nhiêu
+ghi_chép vào tháng năm bao_nhiêu
+viết bởi người nào vậy
+ghi bởi người nào vậy
+ghi_chép bởi người nào vậy
+bản kiểm_điểm đó viết bởi ai nhỉ
+bản kiểm_điểm đó ghi bởi ai nhỉ
+bản kiểm_điểm đó ghi_chép bởi ai nhỉ
+bài viết kiểm_điểm đó viết bởi ai nhỉ
+bài viết kiểm_điểm đó ghi bởi ai nhỉ
+bài viết kiểm_điểm đó ghi_chép bởi ai nhỉ
+văn_bản kiểm_điểm đó viết bởi ai nhỉ
+văn_bản kiểm_điểm đó ghi bởi ai nhỉ
+văn_bản kiểm_điểm đó ghi_chép bởi ai nhỉ
+bài kiểm_điểm đó viết bởi ai nhỉ
+bài kiểm_điểm đó ghi bởi ai nhỉ
+bài kiểm_điểm đó ghi_chép bởi ai nhỉ
+bản kiểm_điểm đó viết vào thời_điểm nào
+bản kiểm_điểm đó ghi vào thời_điểm nào
+bản kiểm_điểm đó ghi_chép vào thời_điểm nào
+bài viết kiểm_điểm đó viết vào thời_điểm nào
+bài viết kiểm_điểm đó ghi vào thời_điểm nào
+bài viết kiểm_điểm đó ghi_chép vào thời_điểm nào
+văn_bản kiểm_điểm đó viết vào thời_điểm nào
+văn_bản kiểm_điểm đó ghi vào thời_điểm nào
+văn_bản kiểm_điểm đó ghi_chép vào thời_điểm nào
+bài kiểm_điểm đó viết vào thời_điểm nào
+bài kiểm_điểm đó ghi vào thời_điểm nào
+bài kiểm_điểm đó ghi_chép vào thời_điểm nào
+viết vào thời_gian 1-1949 đúng không
+ghi vào thời_gian 1-1949 đúng không
+ghi_chép vào thời_gian 1-1949 đúng không
+viết bởi hồ_chí_minh thật không
+ghi bởi hồ_chí_minh thật không
+ghi_chép bởi hồ_chí_minh thật không
+nói vào ngày nào
+trình_bày vào ngày nào
+thể_hiện vào ngày nào
+phát_biểu vào ngày nào
+bởi người nào
+bài nói_chuyện đó được nói bởi ai
+bài nói_chuyện đó được trình_bày bởi ai
+bài nói_chuyện đó được thể_hiện bởi ai
+bài nói_chuyện đó được phát_biểu bởi ai
+bài trò_chuyện đó được nói bởi ai
+bài trò_chuyện đó được trình_bày bởi ai
+bài trò_chuyện đó được thể_hiện bởi ai
+bài trò_chuyện đó được phát_biểu bởi ai
+bài đàm_thoại đó được nói bởi ai
+bài đàm_thoại đó được trình_bày bởi ai
+bài đàm_thoại đó được thể_hiện bởi ai
+bài đàm_thoại đó được phát_biểu bởi ai
+bài hội_đàm đó được nói bởi ai
+bài hội_đàm đó được trình_bày bởi ai
+bài hội_đàm đó được thể_hiện bởi ai
+bài hội_đàm đó được phát_biểu bởi ai
+buổi nói_chuyện đó được nói bởi ai
+buổi nói_chuyện đó được trình_bày bởi ai
+buổi nói_chuyện đó được thể_hiện bởi ai
+buổi nói_chuyện đó được phát_biểu bởi ai
+buổi trò_chuyện đó được nói bởi ai
+buổi trò_chuyện đó được trình_bày bởi ai
+buổi trò_chuyện đó được thể_hiện bởi ai
+buổi trò_chuyện đó được phát_biểu bởi ai
+buổi đàm_thoại đó được nói bởi ai
+buổi đàm_thoại đó được trình_bày bởi ai
+buổi đàm_thoại đó được thể_hiện bởi ai
+buổi đàm_thoại đó được phát_biểu bởi ai
+buổi hội_đàm đó được nói bởi ai
+buổi hội_đàm đó được trình_bày bởi ai
+buổi hội_đàm đó được thể_hiện bởi ai
+buổi hội_đàm đó được phát_biểu bởi ai
+cuộc nói_chuyện đó được nói bởi ai
+cuộc nói_chuyện đó được trình_bày bởi ai
+cuộc nói_chuyện đó được thể_hiện bởi ai
+cuộc nói_chuyện đó được phát_biểu bởi ai
+cuộc trò_chuyện đó được nói bởi ai
+cuộc trò_chuyện đó được trình_bày bởi ai
+cuộc trò_chuyện đó được thể_hiện bởi ai
+cuộc trò_chuyện đó được phát_biểu bởi ai
+cuộc đàm_thoại đó được nói bởi ai
+cuộc đàm_thoại đó được trình_bày bởi ai
+cuộc đàm_thoại đó được thể_hiện bởi ai
+cuộc đàm_thoại đó được phát_biểu bởi ai
+cuộc hội_đàm đó được nói bởi ai
+cuộc hội_đàm đó được trình_bày bởi ai
+cuộc hội_đàm đó được thể_hiện bởi ai
+cuộc hội_đàm đó được phát_biểu bởi ai
+cái đó được nói vào thời_điểm nào
+cái đó được trình_bày vào thời_điểm nào
+cái đó được thể_hiện vào thời_điểm nào
+cái đó được phát_biểu vào thời_điểm nào
+vào năm 1949 phải không
+có phải bài nói_chuyện đó của bác_hồ phải không
+có phải bài trò_chuyện đó của bác_hồ phải không
+có phải bài đàm_thoại đó của bác_hồ phải không
+có phải bài hội_đàm đó của bác_hồ phải không
+có phải buổi nói_chuyện đó của bác_hồ phải không
+có phải buổi trò_chuyện đó của bác_hồ phải không
+có phải buổi đàm_thoại đó của bác_hồ phải không
+có phải buổi hội_đàm đó của bác_hồ phải không
+có phải cuộc nói_chuyện đó của bác_hồ phải không
+có phải cuộc trò_chuyện đó của bác_hồ phải không
+có phải cuộc đàm_thoại đó của bác_hồ phải không
+có phải cuộc hội_đàm đó của bác_hồ phải không
+nguời nào viết
+nguời nào ghi
+nguời nào ghi_chép
+khi nào
+bởi người nào
+viết vào lúc_nào
+ghi vào lúc_nào
+ghi_chép vào lúc_nào
+có phải do hồ_chí_minh viết không
+có phải do hồ_chí_minh ghi không
+có phải do hồ_chí_minh ghi_chép không
+bức thư này được bác_hồ viết năm 1949 có phải không
+bức thư này được bác_hồ ghi năm 1949 có phải không
+bức thư này được bác_hồ ghi_chép năm 1949 có phải không
+thư này được bác_hồ viết năm 1949 có phải không
+thư này được bác_hồ ghi năm 1949 có phải không
+thư này được bác_hồ ghi_chép năm 1949 có phải không
+lá thư này được bác_hồ viết năm 1949 có phải không
+lá thư này được bác_hồ ghi năm 1949 có phải không
+lá thư này được bác_hồ ghi_chép năm 1949 có phải không
+bức thư này do ai viết thế
+bức thư này do ai ghi thế
+bức thư này do ai ghi_chép thế
+thư này do ai viết thế
+thư này do ai ghi thế
+thư này do ai ghi_chép thế
+lá thư này do ai viết thế
+lá thư này do ai ghi thế
+lá thư này do ai ghi_chép thế
+ai là tác_giả
+bức thư này do ai viết
+bức thư này do ai ghi
+bức thư này do ai ghi_chép
+thư này do ai viết
+thư này do ai ghi
+thư này do ai ghi_chép
+lá thư này do ai viết
+lá thư này do ai ghi
+lá thư này do ai ghi_chép
+được viết vào lúc_nào
+được ghi vào lúc_nào
+được ghi_chép vào lúc_nào
+viết khi nào
+ghi khi nào
+ghi_chép khi nào
+có phải do hồ_chí_minh viết bức thư này không
+có phải do hồ_chí_minh viết thư này không
+có phải do hồ_chí_minh viết lá thư này không
+có phải do hồ_chí_minh ghi bức thư này không
+có phải do hồ_chí_minh ghi thư này không
+có phải do hồ_chí_minh ghi lá thư này không
+có phải do hồ_chí_minh ghi_chép bức thư này không
+có phải do hồ_chí_minh ghi_chép thư này không
+có phải do hồ_chí_minh ghi_chép lá thư này không
+bức thư này do hồ_chí_minh viết có phải không
+bức thư này do hồ_chí_minh ghi có phải không
+bức thư này do hồ_chí_minh ghi_chép có phải không
+thư này do hồ_chí_minh viết có phải không
+thư này do hồ_chí_minh ghi có phải không
+thư này do hồ_chí_minh ghi_chép có phải không
+lá thư này do hồ_chí_minh viết có phải không
+lá thư này do hồ_chí_minh ghi có phải không
+lá thư này do hồ_chí_minh ghi_chép có phải không
+ai viết
+tác_giả là ai
+khi nào
+vào năm nào
+vào năm bao_nhiêu
+do ai viết
+do ai ghi
+do ai ghi_chép
+vào ngày nào
+khi nào
+được viết bởi ai
+được ghi bởi ai
+được ghi_chép bởi ai
+hồ_chí_minh đã viết bản ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã viết bản quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã viết bài viết ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã viết bài viết quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã viết văn_bản ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã viết văn_bản quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã viết bài ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã viết bài quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã ghi bản ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã ghi bản quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã ghi bài viết ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã ghi bài viết quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã ghi văn_bản ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã ghi văn_bản quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã ghi bài ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã ghi bài quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã ghi_chép bản ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã ghi_chép bản quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã ghi_chép bài viết ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã ghi_chép bài viết quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã ghi_chép văn_bản ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã ghi_chép văn_bản quan_điểm này vào năm 1948 đúng không
+hồ_chí_minh đã ghi_chép bài ý_kiến này vào năm 1948 đúng không
+hồ_chí_minh đã ghi_chép bài quan_điểm này vào năm 1948 đúng không
+bản ý_kiến này được viết vào khi nào
+bản ý_kiến này được ghi vào khi nào
+bản ý_kiến này được ghi_chép vào khi nào
+bản quan_điểm này được viết vào khi nào
+bản quan_điểm này được ghi vào khi nào
+bản quan_điểm này được ghi_chép vào khi nào
+bài viết ý_kiến này được viết vào khi nào
+bài viết ý_kiến này được ghi vào khi nào
+bài viết ý_kiến này được ghi_chép vào khi nào
+bài viết quan_điểm này được viết vào khi nào
+bài viết quan_điểm này được ghi vào khi nào
+bài viết quan_điểm này được ghi_chép vào khi nào
+văn_bản ý_kiến này được viết vào khi nào
+văn_bản ý_kiến này được ghi vào khi nào
+văn_bản ý_kiến này được ghi_chép vào khi nào
+văn_bản quan_điểm này được viết vào khi nào
+văn_bản quan_điểm này được ghi vào khi nào
+văn_bản quan_điểm này được ghi_chép vào khi nào
+bài ý_kiến này được viết vào khi nào
+bài ý_kiến này được ghi vào khi nào
+bài ý_kiến này được ghi_chép vào khi nào
+bài quan_điểm này được viết vào khi nào
+bài quan_điểm này được ghi vào khi nào
+bài quan_điểm này được ghi_chép vào khi nào
+được sáng_tác vào ngày bao_nhiêu
+được viết ra khi nào
+được ghi ra khi nào
+được ghi_chép ra khi nào
+do hồ_chí_minh sáng_tác à
+có phải là được viết vào năm 1949 không
+có phải là được ghi vào năm 1949 không
+có phải là được ghi_chép vào năm 1949 không
+tác_giả là ai
+bức thư này do ai viết
+bức thư này do ai ghi
+bức thư này do ai ghi_chép
+thư này do ai viết
+thư này do ai ghi
+thư này do ai ghi_chép
+lá thư này do ai viết
+lá thư này do ai ghi
+lá thư này do ai ghi_chép
+được viết tháng nào
+được ghi tháng nào
+được ghi_chép tháng nào
+viết khi nào
+ghi khi nào
+ghi_chép khi nào
+có phải do hồ_chí_minh viết bức thư này không
+có phải do hồ_chí_minh viết thư này không
+có phải do hồ_chí_minh viết lá thư này không
+có phải do hồ_chí_minh ghi bức thư này không
+có phải do hồ_chí_minh ghi thư này không
+có phải do hồ_chí_minh ghi lá thư này không
+có phải do hồ_chí_minh ghi_chép bức thư này không
+có phải do hồ_chí_minh ghi_chép thư này không
+có phải do hồ_chí_minh ghi_chép lá thư này không
+bức thư này do hồ_chí_minh viết có phải không
+bức thư này do hồ_chí_minh ghi có phải không
+bức thư này do hồ_chí_minh ghi_chép có phải không
+thư này do hồ_chí_minh viết có phải không
+thư này do hồ_chí_minh ghi có phải không
+thư này do hồ_chí_minh ghi_chép có phải không
+lá thư này do hồ_chí_minh viết có phải không
+lá thư này do hồ_chí_minh ghi có phải không
+lá thư này do hồ_chí_minh ghi_chép có phải không
+do ai viết
+vào năm nào
+vào khi nào
+vào lúc_nào
+ai viết
+viết lúc_nào
+tác_giả là ai
+bức thư này do ai viết
+thư này do ai viết
+lá thư này do ai viết
+được viết tháng nào
+viết khi nào
+có phải do bác viết bức thư này không
+có phải do bác viết thư này không
+có phải do bác viết lá thư này không
+có phải do bác_hồ viết bức thư này không
+có phải do bác_hồ viết thư này không
+có phải do bác_hồ viết lá thư này không
+có phải do hồ_chí_minh viết bức thư này không
+có phải do hồ_chí_minh viết thư này không
+có phải do hồ_chí_minh viết lá thư này không
+có phải do nguyễn_ái_quốc viết bức thư này không
+có phải do nguyễn_ái_quốc viết thư này không
+có phải do nguyễn_ái_quốc viết lá thư này không
+có phải do nguyễn_sinh_cung viết bức thư này không
+có phải do nguyễn_sinh_cung viết thư này không
+có phải do nguyễn_sinh_cung viết lá thư này không
+có phải do hồ viết bức thư này không
+có phải do hồ viết thư này không
+có phải do hồ viết lá thư này không
+có phải do hồ_chủ_tịch viết bức thư này không
+có phải do hồ_chủ_tịch viết thư này không
+có phải do hồ_chủ_tịch viết lá thư này không
+có phải do nguyễn_tất_thành viết bức thư này không
+có phải do nguyễn_tất_thành viết thư này không
+có phải do nguyễn_tất_thành viết lá thư này không
+bức thư này do bác viết có phải không
+bức thư này do bác_hồ viết có phải không
+bức thư này do hồ_chí_minh viết có phải không
+bức thư này do nguyễn_ái_quốc viết có phải không
+bức thư này do nguyễn_sinh_cung viết có phải không
+bức thư này do hồ viết có phải không
+bức thư này do hồ_chủ_tịch viết có phải không
+bức thư này do nguyễn_tất_thành viết có phải không
+thư này do bác viết có phải không
+thư này do bác_hồ viết có phải không
+thư này do hồ_chí_minh viết có phải không
+thư này do nguyễn_ái_quốc viết có phải không
+thư này do nguyễn_sinh_cung viết có phải không
+thư này do hồ viết có phải không
+thư này do hồ_chủ_tịch viết có phải không
+thư này do nguyễn_tất_thành viết có phải không
+lá thư này do bác viết có phải không
+lá thư này do bác_hồ viết có phải không
+lá thư này do hồ_chí_minh viết có phải không
+lá thư này do nguyễn_ái_quốc viết có phải không
+lá thư này do nguyễn_sinh_cung viết có phải không
+lá thư này do hồ viết có phải không
+lá thư này do hồ_chủ_tịch viết có phải không
+lá thư này do nguyễn_tất_thành viết có phải không
+được ai viết
+được ai ghi
+được ai ghi_chép
+vào khi nào
+tác_giả là ai
+vào tháng nào
+do người nào viết
+do người nào ghi
+do người nào ghi_chép
+do ai viết
+do ai ghi
+do ai ghi_chép
+vào năm nào
+vào tháng mấy
+vào lúc_nào
+được ai viết
+được ai ghi
+được ai ghi_chép
+tác_giả là ai
+bức thư này do ai viết
+bức thư này do ai ghi
+bức thư này do ai ghi_chép
+thư này do ai viết
+thư này do ai ghi
+thư này do ai ghi_chép
+lá thư này do ai viết
+lá thư này do ai ghi
+lá thư này do ai ghi_chép
+được viết tháng nào
+được ghi tháng nào
+được ghi_chép tháng nào
+viết khi nào
+ghi khi nào
+ghi_chép khi nào
+có phải do hồ_chí_minh viết bức thư này không
+có phải do hồ_chí_minh viết thư này không
+có phải do hồ_chí_minh viết lá thư này không
+có phải do hồ_chí_minh ghi bức thư này không
+có phải do hồ_chí_minh ghi thư này không
+có phải do hồ_chí_minh ghi lá thư này không
+có phải do hồ_chí_minh ghi_chép bức thư này không
+có phải do hồ_chí_minh ghi_chép thư này không
+có phải do hồ_chí_minh ghi_chép lá thư này không
+bức thư này do hồ_chí_minh viết có phải không
+bức thư này do hồ_chí_minh ghi có phải không
+bức thư này do hồ_chí_minh ghi_chép có phải không
+thư này do hồ_chí_minh viết có phải không
+thư này do hồ_chí_minh ghi có phải không
+thư này do hồ_chí_minh ghi_chép có phải không
+lá thư này do hồ_chí_minh viết có phải không
+lá thư này do hồ_chí_minh ghi có phải không
+lá thư này do hồ_chí_minh ghi_chép có phải không
+do ai viết
+do ai ghi
+do ai ghi_chép
+bức thư này do ai viết
+bức thư này do ai ghi
+bức thư này do ai ghi_chép
+thư này do ai viết
+thư này do ai ghi
+thư này do ai ghi_chép
+lá thư này do ai viết
+lá thư này do ai ghi
+lá thư này do ai ghi_chép
+được viết tháng nào
+được ghi tháng nào
+được ghi_chép tháng nào
+viết khi nào
+ghi khi nào
+ghi_chép khi nào
+có phải do hồ_chí_minh viết bức thư này không
+có phải do hồ_chí_minh viết thư này không
+có phải do hồ_chí_minh viết lá thư này không
+có phải do hồ_chí_minh ghi bức thư này không
+có phải do hồ_chí_minh ghi thư này không
+có phải do hồ_chí_minh ghi lá thư này không
+có phải do hồ_chí_minh ghi_chép bức thư này không
+có phải do hồ_chí_minh ghi_chép thư này không
+có phải do hồ_chí_minh ghi_chép lá thư này không
+do ai viết
+do ai ghi
+do ai ghi_chép
+được viết vào lúc_nào
+được ghi vào lúc_nào
+được ghi_chép vào lúc_nào
+tác_giả là ai
+có phải hồ_chí_minh đã viết bức thư này hay không
+có phải hồ_chí_minh đã viết thư này hay không
+có phải hồ_chí_minh đã viết lá thư này hay không
+có phải hồ_chí_minh đã ghi bức thư này hay không
+có phải hồ_chí_minh đã ghi thư này hay không
+có phải hồ_chí_minh đã ghi lá thư này hay không
+có phải hồ_chí_minh đã ghi_chép bức thư này hay không
+có phải hồ_chí_minh đã ghi_chép thư này hay không
+có phải hồ_chí_minh đã ghi_chép lá thư này hay không
+hồ_chí_minh viết bức thư này đúng không
+hồ_chí_minh viết thư này đúng không
+hồ_chí_minh viết lá thư này đúng không
+hồ_chí_minh ghi bức thư này đúng không
+hồ_chí_minh ghi thư này đúng không
+hồ_chí_minh ghi lá thư này đúng không
+hồ_chí_minh ghi_chép bức thư này đúng không
+hồ_chí_minh ghi_chép thư này đúng không
+hồ_chí_minh ghi_chép lá thư này đúng không
+vị nào đã viết bức thư này
+vị nào đã viết thư này
+vị nào đã viết lá thư này
+vị nào đã ghi bức thư này
+vị nào đã ghi thư này
+vị nào đã ghi lá thư này
+vị nào đã ghi_chép bức thư này
+vị nào đã ghi_chép thư này
+vị nào đã ghi_chép lá thư này
+vào khi nào
+vào lúc_nào
+do hồ_chí_minh viết có phải không
+do hồ_chí_minh ghi có phải không
+do hồ_chí_minh ghi_chép có phải không
+vào năm 1949 có phải không
+do ai viết
+do ai ghi
+do ai ghi_chép
+được viết vào khi nào
+được ghi vào khi nào
+được ghi_chép vào khi nào
+người nào đã biết bức thư này
+người nào đã biết thư này
+người nào đã biết lá thư này
+do ai viết
+do ai ghi
+do ai ghi_chép
+vào năm nào
+vào khi nào
+vào tháng mấy
+bức thư cảm_ơn này do người nào viết
+bức thư cảm_ơn này do người nào ghi
+bức thư cảm_ơn này do người nào ghi_chép
+bức thư cảm_tạ này do người nào viết
+bức thư cảm_tạ này do người nào ghi
+bức thư cảm_tạ này do người nào ghi_chép
+thư cảm_ơn này do người nào viết
+thư cảm_ơn này do người nào ghi
+thư cảm_ơn này do người nào ghi_chép
+thư cảm_tạ này do người nào viết
+thư cảm_tạ này do người nào ghi
+thư cảm_tạ này do người nào ghi_chép
+lá thư cảm_ơn này do người nào viết
+lá thư cảm_ơn này do người nào ghi
+lá thư cảm_ơn này do người nào ghi_chép
+lá thư cảm_tạ này do người nào viết
+lá thư cảm_tạ này do người nào ghi
+lá thư cảm_tạ này do người nào ghi_chép
+bức thư cảm_ơn đó viết vào tháng bao_nhiêu
+bức thư cảm_ơn đó ghi vào tháng bao_nhiêu
+bức thư cảm_ơn đó ghi_chép vào tháng bao_nhiêu
+bức thư cảm_tạ đó viết vào tháng bao_nhiêu
+bức thư cảm_tạ đó ghi vào tháng bao_nhiêu
+bức thư cảm_tạ đó ghi_chép vào tháng bao_nhiêu
+thư cảm_ơn đó viết vào tháng bao_nhiêu
+thư cảm_ơn đó ghi vào tháng bao_nhiêu
+thư cảm_ơn đó ghi_chép vào tháng bao_nhiêu
+thư cảm_tạ đó viết vào tháng bao_nhiêu
+thư cảm_tạ đó ghi vào tháng bao_nhiêu
+thư cảm_tạ đó ghi_chép vào tháng bao_nhiêu
+lá thư cảm_ơn đó viết vào tháng bao_nhiêu
+lá thư cảm_ơn đó ghi vào tháng bao_nhiêu
+lá thư cảm_ơn đó ghi_chép vào tháng bao_nhiêu
+lá thư cảm_tạ đó viết vào tháng bao_nhiêu
+lá thư cảm_tạ đó ghi vào tháng bao_nhiêu
+lá thư cảm_tạ đó ghi_chép vào tháng bao_nhiêu
+nào có phải bức thư cảm_ơn đó được hồ_chí_minh viết
+nào có phải bức thư cảm_ơn đó được hồ_chí_minh ghi
+nào có phải bức thư cảm_ơn đó được hồ_chí_minh ghi_chép
+nào có phải bức thư cảm_tạ đó được hồ_chí_minh viết
+nào có phải bức thư cảm_tạ đó được hồ_chí_minh ghi
+nào có phải bức thư cảm_tạ đó được hồ_chí_minh ghi_chép
+nào có phải thư cảm_ơn đó được hồ_chí_minh viết
+nào có phải thư cảm_ơn đó được hồ_chí_minh ghi
+nào có phải thư cảm_ơn đó được hồ_chí_minh ghi_chép
+nào có phải thư cảm_tạ đó được hồ_chí_minh viết
+nào có phải thư cảm_tạ đó được hồ_chí_minh ghi
+nào có phải thư cảm_tạ đó được hồ_chí_minh ghi_chép
+nào có phải lá thư cảm_ơn đó được hồ_chí_minh viết
+nào có phải lá thư cảm_ơn đó được hồ_chí_minh ghi
+nào có phải lá thư cảm_ơn đó được hồ_chí_minh ghi_chép
+nào có phải lá thư cảm_tạ đó được hồ_chí_minh viết
+nào có phải lá thư cảm_tạ đó được hồ_chí_minh ghi
+nào có phải lá thư cảm_tạ đó được hồ_chí_minh ghi_chép
+bức thư cảm_ơn đó viết vào tháng 3 năm 1949 phải không
+bức thư cảm_ơn đó ghi vào tháng 3 năm 1949 phải không
+bức thư cảm_ơn đó ghi_chép vào tháng 3 năm 1949 phải không
+bức thư cảm_tạ đó viết vào tháng 3 năm 1949 phải không
+bức thư cảm_tạ đó ghi vào tháng 3 năm 1949 phải không
+bức thư cảm_tạ đó ghi_chép vào tháng 3 năm 1949 phải không
+thư cảm_ơn đó viết vào tháng 3 năm 1949 phải không
+thư cảm_ơn đó ghi vào tháng 3 năm 1949 phải không
+thư cảm_ơn đó ghi_chép vào tháng 3 năm 1949 phải không
+thư cảm_tạ đó viết vào tháng 3 năm 1949 phải không
+thư cảm_tạ đó ghi vào tháng 3 năm 1949 phải không
+thư cảm_tạ đó ghi_chép vào tháng 3 năm 1949 phải không
+lá thư cảm_ơn đó viết vào tháng 3 năm 1949 phải không
+lá thư cảm_ơn đó ghi vào tháng 3 năm 1949 phải không
+lá thư cảm_ơn đó ghi_chép vào tháng 3 năm 1949 phải không
+lá thư cảm_tạ đó viết vào tháng 3 năm 1949 phải không
+lá thư cảm_tạ đó ghi vào tháng 3 năm 1949 phải không
+lá thư cảm_tạ đó ghi_chép vào tháng 3 năm 1949 phải không
+điện phỏng_vấn đó được hồ_chí_minh trả_lời vào lúc_nào
+điện phỏng_vấn được trả_lời được trả_lời bởi ai
+điện phỏng_vấn được trả_lời lúc_nào
+được trả_lời bởi ai nhỉ
+được trả_lời bởi hồ_chí_minh phải không
+nào có phải được trả_lời vào tháng 3 năm 1949 đúng không
+tin này được đăng vào năm nào
+tin này được đăng ở đâu
+do thành_phần nào đăng_tải
+tin này được đăng khi nào
+tin này được đăng ở đâu
+do thành_phần nào đăng_tải
+tin này được đăng trên báo nào
+thư này đăng ở đâu
+tin này ở đâu ra
+tin này ở đâu thế
+vào năm bao_nhiêu
+vào khi nào
+có phải tin này ở trên báo cứu_quốc không
+vào lúc_nào
+bức thư này được đăng vào lúc_nào thế
+bài này ở đâu ra thế
+bài này được đăng báo khi nào
+báo nào đã đăng bài viết này
+bài viết này có phải được đăng trên báo sự_thật không
+ngày bao_nhiêu thì bài viết này được đăng báo
+phỏng_vấn khi nào thế
+bài này từ khi nào thế
+có phải cuộc phỏng_vấn này được thực_hiện vào năm 1949 không
+cuộc phỏng_vấn này được thực_hiện khi nào
+nào có phải bài phỏng_vấn này được đăng trên báo cứu_quốc không
