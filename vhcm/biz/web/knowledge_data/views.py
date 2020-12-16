@@ -406,7 +406,7 @@ def add(request):
             document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
             if document is None:
                 raise ValueError('')
-            page = reference.get('page').strip()
+            page = reference.get('page').strip() if reference.get('page') else None
             extra_info = reference['extra_info'].strip() if reference.get('extra_info') else None
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
                 id=(next_reference_id + i),
@@ -630,7 +630,7 @@ def edit(request):
             document = document_model.RefercenceDocument.objects.filter(reference_document_id=document_id).first()
             if document is None:
                 raise ValueError('')
-            page = reference.get('page').strip()
+            page = reference.get('page').strip() if reference.get('page') else None
             extra_info = reference['extra_info'].strip() if reference.get('extra_info') else None
             references.append(kd_document_model.KnowledgeDataRefercenceDocumentLink(
                 id=(next_reference_id + i),
@@ -1158,7 +1158,7 @@ def validate(request, mode):
     if not ('documentReference' in request.data and request.data.get('documentReference')):
         errors.append('Knowledge data must belong to atleast one reference document')
     for reference in request.data.get('documentReference'):
-        if not reference['page'].strip() and not reference['extra_info'].strip():
+        if not (reference.get('page') and reference.get('page').strip()) and not (reference.get('extra_info') and reference.get('extra_info').strip()):
             errors.append('Reference infomation must has atleast 1 of extra info or page infomation')
             break
 
