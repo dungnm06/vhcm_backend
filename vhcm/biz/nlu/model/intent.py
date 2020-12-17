@@ -1,11 +1,7 @@
 import json
 import pandas as pd
 from collections import namedtuple
-# import vhcm.models.knowledge_data_subject as subject_model
-# import vhcm.models.knowledge_data_question as question_model
-# import vhcm.models.knowledge_data_generated_question as generated_question_model
-# import vhcm.models.knowledge_data_response_data as response_model
-# from vhcm.common.dao.native_query import execute_native_query
+import vhcm.models.synonym as synonym_model
 from vhcm.common.constants import *
 from vhcm.biz.nlu.model.synonym import *
 
@@ -157,9 +153,12 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
                 for s in synonym_ids:
                     synonym_set = SynonymSet()
                     synonym_set.id = int(s)
-                    synonym_set.meaning = synonyms[s][SYNONYM_MEANING]
-                    synonym_set.words = synonyms[s][SYNONYM_WORDS]
-                    intent.synonyms[s] = synonym_set
+                    synonym_set.meaning = synonyms[s][synonym_model.MEANING]
+                    synonym_set.words = synonyms[s][synonym_model.WORDS]
+                    if synonyms[s][synonym_model.NAMED_ENTITY]:
+                        intent.ne_synonyms[s] = synonym_set
+                    else:
+                        intent.synonyms[s] = synonym_set
             # Push to intents map
             intent_maps[intent.intent] = intent
 

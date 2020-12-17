@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from vhcm.biz.nlu.language_processing import language_processor
 import vhcm.models.synonym as synonym_model
 from vhcm.biz.nlu.model.synonym import SynonymSet
-from vhcm.common.constants import COMMA, SPACE
+from vhcm.common.constants import SPACE
 
 
 @api_view(['POST'])

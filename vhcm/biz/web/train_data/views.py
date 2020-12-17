@@ -168,8 +168,9 @@ def add(request):
                     synonym_id = synonym_link.synonym.synonym_id
                     if synonym_id not in synonyms_for_file_saving:
                         synonyms_for_file_saving[synonym_id] = {
-                            'meaning': synonym_link.synonym.meaning,
-                            'words': synonym_link.synonym.words.split(COMMA)
+                            synonym_model.MEANING: synonym_link.synonym.meaning,
+                            synonym_model.WORDS: synonym_link.synonym.words.split(COMMA),
+                            synonym_model.NAMED_ENTITY: synonym_link.synonym.ne_synonym
                         }
                     intent_synonyms.append(synonym_id)
                 intent_synonyms = COMMA.join(str(i) for i in intent_synonyms)
