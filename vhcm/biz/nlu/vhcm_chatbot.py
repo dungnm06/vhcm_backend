@@ -21,7 +21,7 @@ TURN_OFF_NEXT_STARTUP = 'turn_off_next_startup'
 
 # Messages
 MESSAGE_UNAVAILABLE = 'Chatbot hiện tại không khả dụng, mời bạn quay lại lúc khác!'
-MESSAGE_BOT_GREATING = 'Đã bắt đầu phiên trò chuyện mới, bạn có thể chat ngay với bot'
+MESSAGE_BOT_GREATING = 'Đã bắt đầu phiên trò chuyện mới, bạn có thể chat ngay với bot\nNhập !help để xem các câu lệnh.'
 MESSAGE_BOT_END_SESSION_SUCCESS = 'Phiên trò chuyện của bạn đã kết thúc'
 MESSAGE_BOT_END_SESSION_FAILED = 'Đã có sự cố khi kết thúc phiên trò chuyện, hãy liên lạc với admin'
 MESSAGE_BOT_NEW_SESSION_WAIT = 'Chatbox sẽ được làm mới trong 3s'
@@ -232,10 +232,10 @@ class VirtualHCMChatbot(object):
     @staticmethod
     def __create_reference_info_message(idx, document_id, intent_reference):
         document = documents_data[document_id]
-        link = ('Nguồn online: ' + document['link']) if document['link'] else None
-        page = ('Trang: ' + intent_reference['page']) if intent_reference['page'] else None
-        extra_info = ('Thông tin thêm: ' + intent_reference['extra_info']) if intent_reference['extra_info'] else None
-        reference_info = NEW_LINE.join([link, page, extra_info])
+        link = ('Nguồn online: ' + document['link']) if document['link'] else ''
+        page = ('Trang: ' + intent_reference['page']) if intent_reference['page'] else ''
+        extra_info = ('Thông tin thêm: ' + intent_reference['extra_info']) if intent_reference['extra_info'] else ''
+        reference_info = NEW_LINE.join([link, page, extra_info]).strip()
         author = 'Tác giả: ' + document['author'] + '\n' if reference_info else ''
         message = MESSAGE_REFERENCE_INFO.format(
             idx=(str(idx)+'.') if idx else '',

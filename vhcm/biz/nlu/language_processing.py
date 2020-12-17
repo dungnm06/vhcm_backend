@@ -428,7 +428,7 @@ class LanguageProcessor(object, metaclass=Singleton):
                 content = [c.lower() for c in content if c.lower() not in self.exclude_words]
                 # print(content)
                 corresponse_part = self.find_phrase_in_sentence(content, tokenized_sentence, raw_tokenized_sentence,
-                                                                intent.synonym_sets, intent.ne_synonyms)
+                                                                intent.synonyms, intent.ne_synonyms)
                 # Critical part still not found -> not same intent
                 if not corresponse_part:
                     check_flag = False
