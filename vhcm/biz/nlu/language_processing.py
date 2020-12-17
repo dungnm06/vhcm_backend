@@ -276,6 +276,16 @@ class LanguageProcessor(object, metaclass=Singleton):
                 segemented_output=True,
                 lower=True)
             )
+        # Clean exclude things from generated similaries
+        tmp = []
+        for sim in similaries:
+            tmp_pos = self.pos_tagging(self.words_unsegmentation(SPACE.join(sim)))
+            cleaned_tmp_pos = []
+            for arr in tmp_pos:
+                cleaned_tmp_pos.extend([word[0] for word in arr if (
+                            word[0].lower() not in self.exclude_words and word[1] not in self.exclude_pos_tag)])
+                tmp.append(cleaned_tmp_pos)
+        similaries = tmp
         # print(similaries)
         possibilities = []
         word_ranges = []
