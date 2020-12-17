@@ -97,13 +97,13 @@ class ClassifierConsumer(WebsocketConsumer):
 
         elif command == 'turn_off_bot':
             if system_bot_version[TURN_OFF_NEXT_STARTUP]:
-                self.send_response(TURN_OFF_NEXT_STARTUP, 'Already sent an signal to turn off chatbot next startup')
+                self.send_response(SEND_TURN_OFF_STATUS, 'Already sent an signal to turn off chatbot next startup')
             else:
-                system_bot_version[TURN_OFF_NEXT_STARTUP] = False
+                system_bot_version[TURN_OFF_NEXT_STARTUP] = True
                 version_file_path = os.path.join(PROJECT_ROOT, BOT_VERSION_FILE_PATH)
                 with open(version_file_path, 'w') as f:
                     json.dump(system_bot_version, f, indent=4)
-                self.send_response(TURN_OFF_NEXT_STARTUP, 'Sent an signal to turn off chatbot on next start up sucessfully')
+                self.send_response(SEND_TURN_OFF_STATUS, 'Sent an signal to turn off chatbot on next startup sucessfully')
 
     # Receive message from trainer service
     def send_message(self, event):

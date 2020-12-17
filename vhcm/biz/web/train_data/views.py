@@ -23,7 +23,7 @@ from vhcm.common.utils.files import zipdir, ZIP_EXTENSION
 
 
 @api_view(['GET', 'POST'])
-def all(request):
+def all_train_data(request):
     response = Response()
     result = ResponseJSON()
     ensure_admin(request)
@@ -82,7 +82,7 @@ def add(request):
         if not (include_datas and isinstance(include_datas, list)):
             raise APIException('Create train data form is malformed')
 
-        sql = GET_DATA.format(knowledge_ids=COMMA.join(['(' + str(id) + ')' for id in include_datas]))
+        sql = GET_DATA.format(knowledge_ids=COMMA.join(['(' + str(kd_id) + ')' for kd_id in include_datas]))
         query_data = execute_native_query(sql)
         questions = []
         intent = []
@@ -232,12 +232,12 @@ def get(request):
         response.data = result.to_json()
         return response
 
-    id = request.data.get(train_data_model.ID) if request.method == 'POST' else request.GET.get(train_data_model.ID)
-    train_data = train_data_model.TrainData.objects.filter(id=id).first()
+    train_data_id = request.data.get(train_data_model.ID) if request.method == 'POST' else request.GET.get(train_data_model.ID)
+    train_data = train_data_model.TrainData.objects.filter(id=train_data_id).first()
     if not train_data:
         raise APIException('Training file id not exists')
 
-    knowledge_data_info = execute_native_query(GET_TRAIN_DATA_KNOWLEDGE_DATA_INFO.format(id=id))
+    knowledge_data_info = execute_native_query(GET_TRAIN_DATA_KNOWLEDGE_DATA_INFO.format(id=train_data_id))
     knowledge_datas_display = []
     for kd in knowledge_data_info:
         knowledge_datas_display.append({
@@ -402,9 +402,9 @@ def validate(request, mode):
 
     if mode == 'update' or mode == 'delete' or mode == 'onoff' or mode == 'get':
         # ID
-        id = request.data.get(train_data_model.ID) if request.method == 'POST' else request.GET.get(
+        train_data_id = request.data.get(train_data_model.ID) if request.method == 'POST' else request.GET.get(
             train_data_model.ID)
-        if not (id and isInt(id)):
+        if not (train_data_id and isInt(train_data_id)):
             errors.append('Invalid training file id')
 
     if mode == 'update' or mode == 'add':

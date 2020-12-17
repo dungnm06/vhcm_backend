@@ -76,20 +76,13 @@ def init_bot():
         # Bot version
         version_file_path = os.path.join(PROJECT_ROOT, BOT_VERSION_FILE_PATH)
         turnoff_bot_flag = False
-        try:
-            if os.path.exists(version_file_path):
-                with open(version_file_path) as f:
-                    version = json.load(f)
-                    version[CURRENT_BOT_VERSION] = version[NEXT_STARTUP_VERSION]
-                    turnoff_bot_flag = version[TURN_OFF_NEXT_STARTUP]
-                    version[TURN_OFF_NEXT_STARTUP] = False
-            else:
-                version = {
-                    CURRENT_BOT_VERSION: 0,
-                    NEXT_STARTUP_VERSION: 0,
-                    TURN_OFF_NEXT_STARTUP: False
-                }
-        except IOError:
+        if os.path.exists(version_file_path):
+            with open(version_file_path) as f:
+                version = json.load(f)
+                version[CURRENT_BOT_VERSION] = version[NEXT_STARTUP_VERSION]
+                turnoff_bot_flag = version[TURN_OFF_NEXT_STARTUP]
+                version[TURN_OFF_NEXT_STARTUP] = False
+        else:
             version = {
                 CURRENT_BOT_VERSION: 0,
                 NEXT_STARTUP_VERSION: 0,
@@ -147,13 +140,11 @@ def init_bot():
         print(e)
         # print(traceback.format_exc())
         tf.keras.backend.clear_session()
-        intent_classifier_instance = None
-        question_classifier_instance = None
-        idatas = None
-        documents = None
-        current_train_data = None
-        hcm_chatchit_intent_recognizer = None
-        hcm_chatchit_tfidf_vectorizer = None
+        version = {
+            CURRENT_BOT_VERSION: 0,
+            NEXT_STARTUP_VERSION: 0,
+            TURN_OFF_NEXT_STARTUP: False
+        }
         return None, None, None, None, None, None, None, version
 
 
@@ -242,10 +233,10 @@ class VirtualHCMChatbot(object):
     def __create_reference_info_message(idx, document_id, intent_reference):
         document = documents_data[document_id]
         link = ('Nguồn online: ' + document['link']) if document['link'] else None
-        page = ('Trang: ' + intent_reference[document_id]['page']) if intent_reference[document_id]['page'] else None
-        extra_info = ('Thông tin thêm: ' + intent_reference[document_id]['extra_info']) if intent_reference[document_id]['extra_info'] else None
+        page = ('Trang: ' + intent_reference['page']) if intent_reference['page'] else None
+        extra_info = ('Thông tin thêm: ' + intent_reference['extra_info']) if intent_reference['extra_info'] else None
         reference_info = NEW_LINE.join([link, page, extra_info])
-        author = document['author'] + ('\n' if (link or page or extra_info) else ''),
+        author = 'Tác giả: ' + document['author'] + '\n' if reference_info else ''
         message = MESSAGE_REFERENCE_INFO.format(
             idx=(str(idx)+'.') if idx else '',
             reference_name=document['name'],
@@ -256,7 +247,7 @@ class VirtualHCMChatbot(object):
         return message
 
     @staticmethod
-    def __decide_action(chat_input, chat_type, intent, types, last_state):
+    def __decide_action(chat_input, chat_type, intent, types, context_question, last_state):
         """Combines intent and question type recognition to decide bot action"""
         # print(last_state)
         if intent.intent_id == last_state.intent.intent_id and last_state.action == chat_state.AWAIT_CONFIRMATION:
@@ -267,12 +258,13 @@ class VirtualHCMChatbot(object):
         else:
             if (intent.intent_id and language_processor.analyze_sentence_components(intent, chat_input)) \
                     or chat_type == OUT_OF_SCOPE_DIALOGUE\
-                    or not intent.intent_id:
+                    or not intent.intent_id \
+                    or (intent.intent_id and context_question):
                 return chat_state.ANSWER
             else:
                 return chat_state.AWAIT_CONFIRMATION
 
-    def chat(self, user_input, init=False):
+    def chat(self, user_input=None, init=False):
         if not init:
             last_state = self.get_last_state()
             if last_state.action != chat_state.AWAIT_CONFIRMATION:
@@ -300,7 +292,7 @@ class VirtualHCMChatbot(object):
                 intent = last_state.intent
                 types = last_state.question_types
             # Decide what to do base on predicted data
-            action = self.__decide_action(user_input, hcm_question, intent, types, last_state)
+            action = self.__decide_action(user_input, hcm_question, intent, types, context_question, last_state)
             bot_response = self.answer_generator.get_response(hcm_question, intent, types, action, last_state)
             self.__regis_history(intent, user_input, bot_response, types, hcm_question, context_question, action)
         else:

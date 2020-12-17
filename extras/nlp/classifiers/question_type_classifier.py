@@ -9,7 +9,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import CategoricalAccuracy
 from bert.PhoBERT import build_PhoBERT_classifier_model
-from utils import unpickle_file, unzip
+from utils import unpickle_file, unzip, text_prepare
 
 
 def types_map_generate(types):
@@ -32,6 +32,7 @@ def train_question_classifier(datapath, output, sentencelength, batch, epoch, le
     train_data_filepath = os.path.join(os.path.splitext(datapath)[0], 'train_data.pickle')
     data = unpickle_file(train_data_filepath)
     x = data['question']
+    x = [text_prepare(text) for text in x]
     y = data['type']
     # Ready output data for the model
     y = [[int(t) for t in types.split(',')] for types in y]

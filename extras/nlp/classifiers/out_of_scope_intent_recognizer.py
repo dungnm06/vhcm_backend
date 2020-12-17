@@ -26,7 +26,7 @@ def train_oos_intent_recognizer(datafile, output):
 
     # Load context word data
     context_words = load_text_data(os.path.join(ROOT, 'data/context_words.txt'))
-    hcm_data.extend(context_words*20)
+    hcm_data.extend(context_words*50)
     print('Context words data len: {}'.format(len(context_words)))
 
     sample_size = len(hcm_data)
@@ -64,24 +64,24 @@ def train_oos_intent_recognizer(datafile, output):
     test_accuracy = accuracy_score(y_test, y_test_pred)
     print('Test accuracy = {}'.format(test_accuracy))
 
-    print('Simple test: ')
-    print('Bác Hồ sinh năm nào?')
-    question = text_prepare('Bác_Hồ sinh năm nào?')
-    features = tfidf_vectorizer.transform([question])
-    intent = intent_recognizer.predict(features)[0]
-    print('Predicted: ' + intent)
-    print()
-    print('Ở đâu vậy?')
-    question = text_prepare('Ở đâu vậy?')
-    features = tfidf_vectorizer.transform([question])
-    intent = intent_recognizer.predict(features)[0]
-    print('Predicted: ' + intent)
-    print()
-    print('Xin chào bạn khoẻ không ?')
-    question = text_prepare('Xin chào bạn khoẻ không ?')
-    features = tfidf_vectorizer.transform([question])
-    intent = intent_recognizer.predict(features)[0]
-    print('Predicted: ' + intent)
+    # print('Simple test: ')
+    # print('Bác Hồ sinh năm nào?')
+    # question = text_prepare('Bác_Hồ sinh năm nào?')
+    # features = tfidf_vectorizer.transform([question])
+    # intent = intent_recognizer.predict(features)[0]
+    # print('Predicted: ' + intent)
+    # print()
+    # print('Ở đâu vậy?')
+    # question = text_prepare('Ở đâu vậy?')
+    # features = tfidf_vectorizer.transform([question])
+    # intent = intent_recognizer.predict(features)[0]
+    # print('Predicted: ' + intent)
+    # print()
+    # print('Xin chào bạn khoẻ không ?')
+    # question = text_prepare('Xin chào bạn khoẻ không ?')
+    # features = tfidf_vectorizer.transform([question])
+    # intent = intent_recognizer.predict(features)[0]
+    # print('Predicted: ' + intent)
 
     # Dump the classifier to use it in the running bot.
     # print('Saving data....')

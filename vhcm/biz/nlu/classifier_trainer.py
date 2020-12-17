@@ -68,7 +68,6 @@ class ClassifierTrainer(object):
     @staticmethod
     def train(script_path, communicate_queue, train_type, data, sentence_length,
               batch, epoch, learning_rate, epsilon, activation, bot_version):
-        # console_log = open('C:/Users/Tewi/Desktop/log.txt', 'w', buffering=1)
         args = [
             'python', script_path,
             '-t', str(train_type),
@@ -94,11 +93,8 @@ class ClassifierTrainer(object):
         while process.poll() is None:
             output = process.stdout.readline()
             if output:
-                stdout = output.decode(UTF8).strip()
+                stdout = str(output, encoding=UTF8, errors='ignore').strip()
                 communicate_queue.put(stdout)
-                # console_log.write(stdout)
-                # console_log.flush()
         rc = process.poll()
         return_message = 'Training process done' if rc == 0 else 'Training process error'
         communicate_queue.put(return_message)
-        # console_log.close()

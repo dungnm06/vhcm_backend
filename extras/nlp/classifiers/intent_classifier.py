@@ -9,7 +9,7 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
 from collections import Counter
 from bert.PhoBERT import build_PhoBERT_classifier_model
-from utils import unpickle_file, unzip
+from utils import unpickle_file, unzip, text_prepare
 
 
 def train_intent_classifier(datapath, output, sentencelength, batch, epoch, learning_rate, epsilon, activation, bot_version):
@@ -21,6 +21,7 @@ def train_intent_classifier(datapath, output, sentencelength, batch, epoch, lear
     train_data_filepath = os.path.join(os.path.splitext(datapath)[0], 'train_data.pickle')
     TRAIN_DATA = unpickle_file(train_data_filepath)
     x = TRAIN_DATA['question']
+    x = [text_prepare(text) for text in x]
     y = TRAIN_DATA['intent']
     # Intent mapping for future uses
     intents_count = Counter(y)

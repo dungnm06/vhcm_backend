@@ -80,7 +80,7 @@ urlpatterns = [
     path('reference-document/edit', reference_document_views.EditReferenceDocument.as_view(), name='edit-reference'),
     path('reference-document/delete', reference_document_views.delete, name='delete_document'),
     # Train data processing
-    path('train-data/all', train_data_views.all, name='get available training data'),
+    path('train-data/all', train_data_views.all_train_data, name='get available training data'),
     path('train-data/get', train_data_views.get, name='get 1 training data'),
     path('train-data/all-trainable', train_data_views.all_trainable, name='get trainable data'),
     path('train-data/all-deleted', train_data_views.all_deleted, name='get deleted training data'),

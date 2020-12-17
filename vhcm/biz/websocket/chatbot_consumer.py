@@ -238,12 +238,13 @@ class ChatbotConsumer(WebsocketConsumer):
                                 if user_input == 'có' or user_input == 'co':
                                     pass
                                 elif user_input == 'không' or user_input == 'khong':
-                                    self.state_idx += 1
+                                    # End report
+                                    self.state_idx = len(PROCESSING_REPORT_WRONG_ANSWER)
                                 else:
                                     self.error_cancel_report()
                                     return
                                 self.input_data_type = self.last_state
-                            if self.state_idx >= len(PROCESSING_REPORT_WRONG_ANSWER):
+                            if self.state_idx == len(PROCESSING_REPORT_WRONG_ANSWER):
                                 self.regist_report(bot_state=self.bot_state_to_regist)
                                 self.reset_system_communicate_state()
                                 self.regist_message(chat_state.SYSTEM_SENT, bot.MESSAGE_THANK_FOR_CONTRIBUTE)
@@ -281,13 +282,14 @@ class ChatbotConsumer(WebsocketConsumer):
                                         self.bot_state_to_regist, self.bot_state_to_regist_idx = self.chatbot.get_last_report_able_state()
                                     pass
                                 elif user_input == 'không' or user_input == 'khong':
-                                    self.state_idx += 1
+                                    self.state_idx = len(PROCESSING_ANSWER_CONFIRMATION_NG)
                                 else:
                                     self.error_cancel_report()
                                     return
                                 self.input_data_type = self.last_state
                             if self.state_idx == len(PROCESSING_ANSWER_CONFIRMATION_NG):
-                                self.regist_report(bot_state=self.bot_state_to_regist)
+                                if self.bot_state_to_regist:
+                                    self.regist_report(bot_state=self.bot_state_to_regist)
                                 if self.report_data:
                                     response_message = bot.MESSAGE_THANK_FOR_CONTRIBUTE
                                 else:

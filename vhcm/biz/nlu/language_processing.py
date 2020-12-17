@@ -268,7 +268,7 @@ class LanguageProcessor(object, metaclass=Singleton):
             word_segemented=True,
             segemented_output=True,
             lower=True)
-        print(similaries)
+        # print(similaries)
         possibilities = []
         word_ranges = []
         for sim in similaries:
@@ -278,7 +278,7 @@ class LanguageProcessor(object, metaclass=Singleton):
             if sim:
                 possibilities_starts_pos = [idx for idx, w in enumerate(split_sentence) if w == sim[0].lower()]
                 raw_possibilities_starts_pos = [idx for idx, w in enumerate(raw_split_sentence) if w == sim[0].lower()]
-                print(possibilities_starts_pos)
+                # print(possibilities_starts_pos)
                 if not possibilities_starts_pos:
                     continue
 

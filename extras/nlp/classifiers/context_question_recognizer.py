@@ -1,7 +1,6 @@
 import json
 import random
 import numpy as np
-import os
 import shutil
 import pandas as pd
 from vncorenlp import VnCoreNLP
@@ -56,7 +55,7 @@ class LanguageProcessor(object):
     def __init__(self):
         # Variables for language understanding tasks
         # self.config = config.config_loader
-        self.rdrsegmenter = VnCoreNLP("C:\\Users\\Tewi\\Desktop\\nlp\\vncorenlp\\VnCoreNLP-1.1.1.jar")
+        self.rdrsegmenter = VnCoreNLP(os.path.join(ROOT, 'data/vncorenlp/VnCoreNLP-1.1.1.jar'))
         # self.rdrsegmenter = None
         self.ner_types = ['LOC', 'PER', 'ORG', 'MISC']
         self.critical_data_ng_patterns = ['N-E-main', 'N-main']
@@ -359,13 +358,12 @@ def train_context_intent_recognizer(datafile, output):
     hcm_data = hcm_data['question']
 
     # Load context question data
-    intents_data_path = os.path.join(os.path.splitext(datafile)[0], 'IntentData.csv')
+    intents_data_path = os.path.join(os.path.splitext(datafile)[0], 'IntentData_raw.csv')
     intent_datas = pd.read_csv(intents_data_path, dtype=str)
 
     intents_data_path_org = os.path.join(os.path.splitext(datafile)[0], 'intent_data.csv')
     intent_datas_org = pd.read_csv(intents_data_path_org, dtype=str)
 
-    synonym_data = None
     # Synonym data
     with open(os.path.join(os.path.splitext(datafile)[0], 'synonyms.json'), encoding='utf-8') as synonym_file:
         synonym_data = json.load(synonym_file)
@@ -401,9 +399,17 @@ def train_context_intent_recognizer(datafile, output):
     hcm_data = [text_prepare(text) for text in hcm_data]
     context_question_arr = [text_prepare(text) for text in context_question_arr]
     context_question_arr = [text for text in context_question_arr if text]
+
+    # Load context word data
+    context_words = load_text_data(os.path.join(ROOT, 'data/context_words.txt'))
+    context_question_arr.extend(context_words * 50)
     context_question_len = len(context_question_arr)
-    hcm_data = random.sample(hcm_data, context_question_len*3)
+    print('Context words data len: {}'.format(len(context_words)))
+
+    # Reduce HCM data
+    hcm_data = random.sample(hcm_data, context_question_len*2)
     hcm_data_len = len(hcm_data)
+
     print('Context question length: ' + str(context_question_len))
     print('HCM question length: ' + str(hcm_data_len))
     print('Total data len: {}'.format(context_question_len + hcm_data_len))
