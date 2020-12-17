@@ -83,33 +83,34 @@ def generate_similaries(request):
         for data in sentences:
             all_synonym_ids.extend(data['synonyms'])
         all_synonym_ids = list(Counter(all_synonym_ids))
-        synonyms = synonym_model.Synonym.objects.filter(synonym_id__in=all_synonym_ids)
-        check_ids = [s.synonym_id for s in synonyms]
-        error_ids = []
-        for sid in all_synonym_ids:
-            if sid not in check_ids:
-                error_ids.append(str(sid))
-        if error_ids:
-            raise ValueError(COMMA.join(error_ids))
+        synonyms = synonym_model.Synonym.objects.filter(synonym_id__in=all_synonym_ids).filter(ne_synonym=False)
+        ne_synonyms = synonym_model.Synonym.objects.filter(synonym_id__in=all_synonym_ids).filter(ne_synonym=True)
 
-        synonym_set_dicts = {}
+        synonym_dicts = {}
         for synonym in synonyms:
-            synonym_set_dicts[synonym.synonym_id] = SynonymSet(synonym)
+            synonym_dicts[synonym.synonym_id] = SynonymSet(synonym)
+
+        ne_synonym_dicts = {}
+        for synonym in ne_synonyms:
+            ne_synonym_dicts[synonym.synonym_id] = SynonymSet(synonym)
 
         for data in sentences:
             sentence = data['sentence']
             synonym_ids = data['synonyms']
-
-            result_data['similaries'].append(
-                language_processor.generate_similary_sentences(
-                                    (sentence.split(SPACE), {k: synonym_set_dicts[k] for k in synonym_ids}),
-                                    word_segemented=True
+            ne_similaries = language_processor.generate_similary_sentences(
+                (sentence.split(SPACE), {k: ne_synonym_dicts.get(k) for k in synonym_ids if ne_synonym_dicts.get(k)}),
+                word_segemented=True
+            )
+            similaries = []
+            for sim in ne_similaries:
+                similaries.extend(language_processor.generate_similary_sentences(
+                    (sim.split(SPACE), {k: synonym_dicts.get(k) for k in synonym_ids if synonym_dicts.get(k)}),
+                    word_segemented=True
                 ))
+            result_data['similaries'].append(similaries)
 
     except KeyError:
         raise APIException('Data structure error.')
-    except ValueError as ex:
-        raise APIException('Invalid synonym ID. ' + str(ex))
 
     result.set_status(True)
     result.set_result_data(result_data)

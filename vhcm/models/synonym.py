@@ -6,6 +6,7 @@ from vhcm.common.constants import COMMA
 ID = 'synonym_id'
 MEANING = 'meaning'
 WORDS = 'words'
+NAMED_ENTITY = 'ne_synonym'
 
 
 class Synonym(models.Model):
@@ -17,6 +18,9 @@ class Synonym(models.Model):
     )
     words = models.TextField(
         verbose_name='words in synonym group'
+    )
+    ne_synonym = models.BooleanField(
+        verbose_name='is named-entity synonym set', default=False
     )
 
     def get_words(self):

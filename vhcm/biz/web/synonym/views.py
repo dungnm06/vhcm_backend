@@ -67,6 +67,7 @@ def add(request):
     synonym = synonym_model.Synonym()
     synonym.meaning = request.data.get('meaning').strip()
     synonym.words = COMMA.join([w.strip() for w in request.data.get('words')])
+    synonym.ne_synonym = request.data.get('ne_synonym', False)
     synonym.save()
 
     serilized_synonym = SynonymSerializer(synonym).data
@@ -104,6 +105,7 @@ def edit(request):
 
     synonym.meaning = request.data.get('meaning').strip()
     synonym.words = COMMA.join([w.strip() for w in request.data.get('words')])
+    synonym.ne_synonym = request.data.get('ne_synonym', False)
     synonym.save()
 
     serilized_synonym = SynonymSerializer(synonym).data

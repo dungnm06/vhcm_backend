@@ -56,7 +56,7 @@ class Intent:
     def __init__(self, intent_id=0, intent=None, fullname=None,
                  raw_data=None, base_response=None,
                  corresponding_datas=None, subjects=None,
-                 sentence_components=None, synonym_sets=None, references=None):
+                 sentence_components=None, synonyms=None, ne_synonyms=None, references=None):
         # Default argument value is mutable
         # https://florimond.dev/blog/articles/2018/08/python-mutable-defaults-are-the-source-of-all-evil
         # if intent_types is None:
@@ -69,8 +69,10 @@ class Intent:
             corresponding_datas = {}
         # if questions is None:
         #     questions = []
-        if synonym_sets is None:
-            synonym_sets = {}
+        if synonyms is None:
+            synonyms = {}
+        if ne_synonyms is None:
+            ne_synonyms = {}
         if references is None:
             references = {}
         # Assign attributes
@@ -83,7 +85,8 @@ class Intent:
         # self.intent_types = intent_types
         self.corresponding_datas = corresponding_datas
         self.subjects = subjects
-        self.synonym_sets = synonym_sets
+        self.synonyms = synonyms
+        self.ne_synonyms = ne_synonyms
         self.references = references
 
 
@@ -156,7 +159,7 @@ def load_from_data_file(intents_data_path, references_path, synonyms_path):
                     synonym_set.id = int(s)
                     synonym_set.meaning = synonyms[s][SYNONYM_MEANING]
                     synonym_set.words = synonyms[s][SYNONYM_WORDS]
-                    intent.synonym_sets[s] = synonym_set
+                    intent.synonyms[s] = synonym_set
             # Push to intents map
             intent_maps[intent.intent] = intent
 

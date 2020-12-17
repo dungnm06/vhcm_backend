@@ -237,7 +237,7 @@ class LanguageProcessor(object, metaclass=Singleton):
     def get_synonym_dicts(self, word, synonym_dicts):
         return [synonym_dicts[sid] for sid in synonym_dicts if word in synonym_dicts[sid].words]
 
-    def find_phrase_in_sentence(self, content, sentence, raw_sentence, synonyms, raw_start=None, raw_end=None):
+    def find_phrase_in_sentence(self, content, sentence, raw_sentence, synonyms, ne_synonyms, raw_start=None, raw_end=None):
         content = [c.lower() for c in content]
         if not raw_start:
             raw_start = 0
@@ -263,11 +263,19 @@ class LanguageProcessor(object, metaclass=Singleton):
         raw_sentence_lower = [w.lower() for w in raw_sentence]
         split_sentence = sentence_lower[start:(end + 1)]
         raw_split_sentence = raw_sentence_lower[raw_start:(raw_end + 1)]
-        similaries = self.generate_similary_sentences(
-            (content, synonyms),
+        similaries = []
+        ne_similaries = self.generate_similary_sentences(
+            (content, ne_synonyms),
             word_segemented=True,
             segemented_output=True,
             lower=True)
+        for sim in ne_similaries:
+            similaries.extend(self.generate_similary_sentences(
+                (sim, synonyms),
+                word_segemented=True,
+                segemented_output=True,
+                lower=True)
+            )
         # print(similaries)
         possibilities = []
         word_ranges = []
@@ -410,7 +418,7 @@ class LanguageProcessor(object, metaclass=Singleton):
                 content = [c.lower() for c in content if c.lower() not in self.exclude_words]
                 # print(content)
                 corresponse_part = self.find_phrase_in_sentence(content, tokenized_sentence, raw_tokenized_sentence,
-                                                                intent.synonym_sets)
+                                                                intent.synonym_sets, intent.ne_synonyms)
                 # Critical part still not found -> not same intent
                 if not corresponse_part:
                     check_flag = False
@@ -434,7 +442,7 @@ class LanguageProcessor(object, metaclass=Singleton):
                     check_arr.append(True)
                     continue
                 startpos = s[2] + 1
-                verb_found_in_sentence = self.find_phrase_in_sentence(verb, tokenized_sentence, raw_tokenized_sentence, intent.synonym_sets, raw_start=startpos)
+                verb_found_in_sentence = self.find_phrase_in_sentence(verb, tokenized_sentence, raw_tokenized_sentence, intent.synonyms, intent.ne_synonyms, raw_start=startpos)
                 check_arr.append(True if verb_found_in_sentence else False)
             if not any(check_arr):
                 return False

@@ -847,7 +847,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"uid\": \"FfhhzFOHMbunaWEJnibLRGquHaJffy\",\r\n    \"new_password\": \"123\"\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1982,12 +1982,12 @@
 					{
 						"key": "X-CSRFTOKEN",
 						"type": "text",
-						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"sentences\": [\r\n        {\r\n            \"sentence\": \"Bác_Hồ sinh năm nào ?\",\r\n            \"synonyms\": [1,2]\r\n        },\r\n        {\r\n            \"sentence\": \"Bác_Hồ sinh ở đâu ?\",\r\n            \"synonyms\": [1,2]\r\n        },\r\n        {\r\n            \"sentence\": \"Hồ_Chí_Minh ra_đời ở đâu vào năm nào ?\",\r\n            \"synonyms\": [1,2]\r\n        },\r\n        {\r\n            \"sentence\": \"Khi nào Hồ_Chí_Minh ra_đời và ở đâu ?\",\r\n            \"synonyms\": [1,2]\r\n        },\r\n        {\r\n            \"sentence\": \"What is coconut ?\",\r\n            \"synonyms\": [14]\r\n        }\r\n    ]\r\n}",
+					"raw": "{\r\n    \"sentences\": [\r\n        {\r\n            \"sentence\": \"Nguyễn_Sinh_Sắc ra_đời vào năm 1862\",\r\n            \"synonyms\": [36, 37, 48]\r\n        }\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2114,12 +2114,12 @@
 					{
 						"key": "X-CSRFTOKEN",
 						"type": "text",
-						"value": "Z9VLImuxn9aMAK2AYIIIOaA8vBqYyYvBKy5zKx5Tv3a0JscszRoUmLhZSgHQ6Mts"
+						"value": "4OEU13ExwV29WCCZRrvWyM1aAsDoJ7anxMwCPxX0w40azszL3szFEhqrs7E2Qiet"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"meaning\": \"Test_123\",\r\n    \"words\": [\"coconut\", \"kokonut\", \"Da_Coconut\"]\r\n}",
+					"raw": "{\r\n    \"meaning\": \"Nguyễn_Sinh_Sắc\",\r\n    \"words\": [\"Nguyễn_Sinh_Sắc\", \"bố Bác_Hồ\", \"chồng Hoàng_Thị_Loan\"],\r\n    \"ne_synonym\": true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
