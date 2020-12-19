@@ -71,6 +71,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'vhcm.biz.authentication.jwt_auth.JWTAuthentication',
     ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
     'EXCEPTION_HANDLER': 'vhcm.biz.exception.exception_handler.raise_exception'
 }
 
