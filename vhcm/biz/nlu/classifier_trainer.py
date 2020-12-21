@@ -1,5 +1,6 @@
 import subprocess
 import multiprocessing
+import threading
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from vhcm.common.constants import *
@@ -11,7 +12,7 @@ def send_stdout_to_client(stdout):
     async_to_sync(channel_layer.group_send)(
         TRAIN_CLASSIFIER_ROOM_GROUP,
         {
-            'type': 'send_message',
+            'type': 'send.message',
             'message': stdout
         }
     )
@@ -22,7 +23,7 @@ class ClassifierTrainer(object):
         self.script = script_path
         self.communicate_queue = None
         self.process = None
-        self.listening_process = None
+        self.listening_thread = None
 
     def start(self, train_type, data, sentence_length, batch, epoch, learning_rate, epsilon, activation, bot_version):
         self.communicate_queue = multiprocessing.Queue()
@@ -31,28 +32,25 @@ class ClassifierTrainer(object):
             args=(self.script, self.communicate_queue, train_type, data, sentence_length,
                   batch, epoch, learning_rate, epsilon, activation, bot_version,),
             daemon=True)
-        self.listening_process = multiprocessing.Process(
-            target=self.wait_for_stdout,
-            args=(self.communicate_queue,),
-            daemon=True)
         self.process.start()
-        self.listening_process.start()
+        self.listening_thread = threading.Thread(target=self.wait_for_stdout, args=[self.communicate_queue], daemon=True)
+        self.listening_thread.start()
 
     def stop(self):
-        status = False
         try:
-            self.listening_process.terminate()
+            if self.listening_thread.is_alive():
+                self.communicate_queue.put('terminate')
             # Kill the child training process
             kill_child_proc(self.process.pid)
             self.process.terminate()
             status = True
-        except Exception:
-            # TODO: Implement force close processes
+        except Exception as e:
+            print('[classifier trainer] Error: {}'.format(e))
             status = False
         finally:
             self.communicate_queue = None
             self.process = None
-            self.listening_process = None
+            self.listening_thread = None
 
         return status
 
@@ -64,6 +62,8 @@ class ClassifierTrainer(object):
         while True:
             out = communicate_queue.get()
             send_stdout_to_client(out)
+            if out == 'Training process done' or out == 'Training process error' or out == 'terminate':
+                break
 
     @staticmethod
     def train(script_path, communicate_queue, train_type, data, sentence_length,

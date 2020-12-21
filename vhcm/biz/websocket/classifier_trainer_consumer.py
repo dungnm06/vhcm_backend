@@ -31,10 +31,10 @@ class ClassifierConsumer(WebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        self.accept()
         script_path = config.config_loader.get_setting_value(config.CLASSIFIER_TRAINER_SCRIPT)
         script_path = os.path.join(PROJECT_ROOT, script_path)
         self.trainer = ClassifierTrainer(script_path)
+        self.accept()
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
@@ -64,6 +64,9 @@ class ClassifierConsumer(WebsocketConsumer):
                                    'Or use the separate training script provided.',
                                    'TRAINING PROCESS NOT STARTED.'])
                 )
+            elif self.is_process_running():
+                self.send_response(SEND_MESSAGE, 'Wait for current training process done first')
+                return
             else:
                 data_id = text_data_json['data']
                 train_data = train_data_model.TrainData.objects.filter(id=data_id).first()
@@ -111,7 +114,8 @@ class ClassifierConsumer(WebsocketConsumer):
         if message == 'Training process done' or message == 'Training process error':
             self.trainer.stop()
         # Send message to WebSocket
-        self.send_response(SEND_MESSAGE, message)
+        if message != 'terminate':
+            self.send_response(SEND_MESSAGE, message)
 
     def send_response(self, datatype, data=None):
         # Send message to WebSocket
