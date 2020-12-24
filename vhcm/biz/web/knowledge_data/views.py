@@ -539,7 +539,10 @@ def edit(request):
     if not (kd_id and isInt(kd_id)):
         raise APIException('Invalid intent id: ID({})'.format(kd_id))
 
-    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=kd_id).select_related('edit_user').first()
+    knowledge_data = knowledge_data_model.KnowledgeData.objects\
+        .filter(knowledge_data_id=kd_id)\
+        .select_related('edit_user')\
+        .first()
     if knowledge_data is None:
         raise APIException('Intent id not found: ID({})'.format(kd_id))
 
@@ -773,6 +776,15 @@ def change_status(request):
     if status not in knowledge_data_model.CHANGEABLE_PROCESS_STATUS or not isInt(status):
         raise APIException('Invalid knowledge data status')
 
+    if status == knowledge_data_model.DONE:
+        raise APIException('You have no right to complelte review process by yourself')
+
+    if knowledge_data.status == knowledge_data_model.DONE and status == knowledge_data_model.PROCESSING:
+        # DONE -> PROCESSING: reset reviews status
+        reviews = review_model.Review.objects.filter(knowledge_data=knowledge_data)
+        if reviews.exists():
+            reviews.update(status=review_model.DRAFT)
+
     knowledge_data.status = status
     knowledge_data.save()
 
@@ -798,7 +810,7 @@ def all_comment(request):
     knowledge_data_id = request.data.get(comment_model.KNOWLEDGE_DATA) if request.method == 'POST' \
         else request.GET.get(comment_model.KNOWLEDGE_DATA)
 
-    comments = comments = execute_native_query(GET_ALL_COMMENTS.format(knowledge_data_id=knowledge_data_id))
+    comments = execute_native_query(GET_ALL_COMMENTS.format(knowledge_data_id=knowledge_data_id))
     display_comments = []
     relative_users = {}
     for comment in comments:
@@ -1031,7 +1043,10 @@ def review_data(request):
     user = get_current_user(request)
 
     knowledge_data_id = request.data.get(review_model.KNOWLEDGE_DATA)
-    knowledge_data = knowledge_data_model.KnowledgeData.objects.filter(knowledge_data_id=knowledge_data_id).select_related('edit_user').first()
+    knowledge_data = knowledge_data_model.KnowledgeData.objects\
+        .filter(knowledge_data_id=knowledge_data_id)\
+        .select_related('edit_user')\
+        .first()
     if not knowledge_data:
         raise APIException('Invalid knowledge data id, knowledge data not exists')
     if knowledge_data.status != knowledge_data_model.PROCESSING:
@@ -1158,7 +1173,8 @@ def validate(request, mode):
     if not ('documentReference' in request.data and request.data.get('documentReference')):
         errors.append('Knowledge data must belong to atleast one reference document')
     for reference in request.data.get('documentReference'):
-        if not (reference.get('page') and reference.get('page').strip()) and not (reference.get('extra_info') and reference.get('extra_info').strip()):
+        if not (reference.get('page') and reference.get('page').strip()) \
+                and not (reference.get('extra_info') and reference.get('extra_info').strip()):
             errors.append('Reference infomation must has atleast 1 of extra info or page infomation')
             break
 
