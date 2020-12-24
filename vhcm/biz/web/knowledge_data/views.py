@@ -621,6 +621,10 @@ def edit(request):
             status=comment_model.VIEWABLE
         )
         comment.save()
+        # Remove new edit user's old review on this knowledge data
+        user_review = review_model.Review.objects.filter(knowledge_data=knowledge_data, review_user=user).first()
+        if user_review:
+            user_review.delete()
 
     # Reference document
     kd_document_model.KnowledgeDataRefercenceDocumentLink.objects.filter(knowledge_data=knowledge_data).delete()
