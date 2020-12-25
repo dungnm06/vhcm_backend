@@ -214,10 +214,18 @@ class LanguageProcessor(object, metaclass=Singleton):
                         end_idx = start_idx + len(sw_splited) - 1
                         # Recheck if adding synonym is subset of added synonym (eg: 'thư' is subset of 'bức thư')
                         for srp in synonyms_replaceable_pos:
-                            if sw in srp['word'] and sw != srp['word'] and dictionary_id == srp['sid']:
+                            if sw in srp['word'] and sw != srp['word'] and (
+                                        dictionary_id == srp['sid']
+                                        or (srp['start_idx'] <= start_idx <= srp['end_idx'])
+                                        or (srp['start_idx'] <= end_idx <= srp['end_idx'])
+                            ):
                                 ok_flag = False
                                 break
-                            if srp['word'] in sw and sw != srp['word'] and dictionary_id == srp['sid']:
+                            if srp['word'] in sw and sw != srp['word'] and (
+                                    dictionary_id == srp['sid']
+                                    or (start_idx <= srp['start_idx'] <= end_idx)
+                                    or (start_idx <= srp['end_idx'] <= end_idx)
+                            ):
                                 synonyms_replaceable_pos.remove(srp)
                                 break
                         if ok_flag:
