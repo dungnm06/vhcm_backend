@@ -269,7 +269,7 @@ class VirtualHCMChatbot(object):
             last_state = self.get_last_state()
             if last_state.action != chat_state.AWAIT_CONFIRMATION:
                 # Input preprocesing
-                segmented_input = language_processor.text_prepare(user_input)
+                segmented_input = language_processor.text_prepare(user_input, lower=True)
                 # Predict
                 hcm_question = oos_intent_recognizer.predict(segmented_input) == HCM_QUESTION
                 context_question = context_question_recognizer.predict(segmented_input) == CONTEXT_QUESTION

@@ -495,11 +495,11 @@ class LanguageProcessor(object, metaclass=Singleton):
         """Performs tokenization and simple preprocessing."""
         replace_by_space_re = re.compile(r'[/(){}\[\]|@,;!?]')
 
-        if lower:
-            text = text.lower()
         text = replace_by_space_re.sub(' ', text)
         text = re.sub(r'\s+', ' ', text).strip()
         text = self.word_segmentation(text).strip()
+        if lower:
+            text = text.lower()
         text = ' '.join([x for x in text.split() if x and x not in self.stopwords])
 
         return text

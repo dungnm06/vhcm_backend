@@ -16,7 +16,10 @@ DRAFT_COUNT = '''
 SELECT
 	COUNT(kdr.id) as draft_count
 FROM vhcm.knowledge_data_review kdr
+INNER JOIN vhcm.knowledge_data kd
+ON kdr.knowledge_data_id = kd.knowledge_data_id
 WHERE kdr.status = 3
+AND kd.status = 1
 AND kdr.review_user_id = {user_id}
 '''
 

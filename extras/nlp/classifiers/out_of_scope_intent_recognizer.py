@@ -21,7 +21,7 @@ def train_oos_intent_recognizer(datafile, output):
 
     # Load context question data
     context_questions = load_text_data(os.path.join(ROOT, 'data/context_questions.txt'))
-    hcm_data.extend(context_questions*5)
+    hcm_data.extend(context_questions*10)
     print('Context question data len: {}'.format(len(context_questions)))
 
     # Load context word data
