@@ -31,6 +31,10 @@ COMMAND_END_SESSION = 'endsession'
 COMMAND_HELP = 'help'
 COMMAND_VIEW_REFERENCE = 'reference'
 
+# Confirm types
+CONFIRM_TRUE_FALSE = 'confirm_true_false'
+CONFIRM_YES_NO = 'confirm_yes_no'
+
 # Report processing
 REPORT = 1
 # All report choices
@@ -50,7 +54,7 @@ REGIST_BOT_STATE_TYPES = [
 ]
 YESNO_REPONSES = [
     CHOOSE_TO_CONTRIBUTE,
-    CHOOSE_TO_INPUT_NOTE
+    CHOOSE_TO_INPUT_NOTE,
 ]
 # Message mapping
 ACTION_RESPONSES = {
@@ -419,10 +423,20 @@ class ChatbotConsumer(WebsocketConsumer):
 
     # Receive message from room group
     def send_response(self, datatype, data=None):
+        confirm_type = None
+        confirm_state = False
+        if self.last_state in YESNO_REPONSES:
+            confirm_type = CONFIRM_YES_NO
+            confirm_state = True
+        if self.chatbot.state_tracker[len(self.chatbot.state_tracker)-1].action == chat_state.AWAIT_CONFIRMATION:
+            confirm_type = CONFIRM_TRUE_FALSE
+            confirm_state = True
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'type': datatype,
-            'data': data
+            'data': data,
+            'confirm_state': confirm_state,
+            'confirm_type': confirm_type
         }))
 
     def send_force_new_session(self):

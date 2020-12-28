@@ -251,10 +251,15 @@ class VirtualHCMChatbot(object):
         """Combines intent and question type recognition to decide bot action"""
         # print(last_state)
         if intent.intent_id == last_state.intent.intent_id and last_state.action == chat_state.AWAIT_CONFIRMATION:
-            if chat_input.lower() == 'đúng':
-                return chat_state.CONFIRMATION_OK
-            else:
+            if chat_input.lower() == 'sai' \
+                    or chat_input.lower() == 'sai rồi' \
+                    or chat_input.lower() == 'khong'\
+                    or chat_input.lower() == 'không'\
+                    or chat_input.lower() == 'không phải':
                 return chat_state.CONFIRMATION_NG
+            else:
+                return chat_state.CONFIRMATION_OK
+
         else:
             if (intent.intent_id and language_processor.analyze_sentence_components(intent, chat_input)) \
                     or chat_type == OUT_OF_SCOPE_DIALOGUE\
