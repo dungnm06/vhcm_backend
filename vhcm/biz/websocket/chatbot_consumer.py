@@ -368,6 +368,8 @@ class ChatbotConsumer(WebsocketConsumer):
                     self.processing_report_type = m.system_processing_report_type
                     if self.state_idx and self.processing_report_type:
                         self.last_state = ACTION_TYPES_MAP[self.processing_report_type][self.state_idx]
+                    else:
+                        self.last_state = None
                     self.input_data_type = m.system_input_data_type
                     self.report_data = m.system_tmp_report_data
                     self.report_note = m.system_tmp_report_note
