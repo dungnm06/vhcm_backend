@@ -2,6 +2,7 @@ import os
 import json
 import random
 import shutil
+import traceback
 import tensorflow as tf
 from vhcm.biz.nlu.language_processing import language_processor
 from vhcm.biz.nlu.classifiers.intent_classifier import IntentClassifier
@@ -52,6 +53,7 @@ MESSAGE_REFERENCE_INFO = '''{idx}{reference_name}\n{reference_author}{reference_
 MESSAGE_BOT_DIDNOT_ANSWER_ANYTHING_YET = 'Bot đã trả lời bạn thông tin gì đâu !?'
 MESSAGE_NOTHING_TO_ANSWER = 'Bạn đang hỏi về vấn đề gì ?'
 MESSAGE_USER_INPUT_UNKNOW_COMMAND = 'Sai cú pháp, đã hủy thao tác trước đó.\nBạn có thể chat tiếp.'
+MESSAGE_SERVER_ERROR = 'Đã xảy ra lỗi hệ thống.\nBạn hãy kiểm tra lại bộ gõ tiếng Việt của mình và thử lại.'
 MESSAGE_OOS_ANSWER = 'Xin lỗi hình như vấn đề này bot không có thông tin nên không thể trả lời bạn được, mời bạn hỏi câu khác.'
 MESSAGE_CONFIRMATION = 'Có phải bạn đang hỏi về: {intent}? (đúng, sai)'
 MESSAGE_CANCER_LAST_COMMAND = 'Đã huỷ thao tác trước đó.'
@@ -276,39 +278,46 @@ class VirtualHCMChatbot(object):
                 return chat_state.AWAIT_CONFIRMATION
 
     def chat(self, user_input=None, init=False):
-        if not init:
-            last_state = self.get_last_state()
-            if last_state.action != chat_state.AWAIT_CONFIRMATION:
-                # Input preprocesing
-                segmented_input = language_processor.text_prepare(user_input, lower=True)
-                # Predict
-                hcm_question = oos_intent_recognizer.predict(segmented_input) == HCM_QUESTION
-                context_question = context_question_recognizer.predict(segmented_input) == CONTEXT_QUESTION
-                if hcm_question:
-                    if context_question:
-                        intent = last_state.intent
+        try:
+            if not init:
+                last_state = self.get_last_state()
+                if last_state.action != chat_state.AWAIT_CONFIRMATION:
+                    # Input preprocesing
+                    segmented_input = language_processor.text_prepare(user_input, lower=True)
+                    # Predict
+                    hcm_question = oos_intent_recognizer.predict(segmented_input) == HCM_QUESTION
+                    context_question = context_question_recognizer.predict(segmented_input) == CONTEXT_QUESTION
+                    if hcm_question:
+                        if context_question:
+                            intent = last_state.intent
+                        else:
+                            intent_name = intent_classifier.predict(segmented_input)
+                            intent = intent_datas[intent_name]
+                        types = question_type_classifier.predict(segmented_input)
+                        types = [int(t) for t in types]
                     else:
-                        intent_name = intent_classifier.predict(segmented_input)
-                        intent = intent_datas[intent_name]
-                    types = question_type_classifier.predict(segmented_input)
-                    types = [int(t) for t in types]
+                        # User asking out of scope question
+                        intent = Intent()
+                        types = []
                 else:
-                    # User asking out of scope question
-                    intent = Intent()
-                    types = []
+                    # If bot awaiting user confirmation so no need to predict
+                    hcm_question = True
+                    context_question = last_state.context_question
+                    intent = last_state.intent
+                    types = last_state.question_types
+                # Decide what to do base on predicted data
+                action = self.__decide_action(user_input, hcm_question, intent, types, context_question, last_state)
+                bot_response = self.answer_generator.get_response(hcm_question, intent, types, action, last_state)
+                self.__regis_history(intent, user_input, bot_response, types, hcm_question, context_question, action)
             else:
-                # If bot awaiting user confirmation so no need to predict
-                hcm_question = True
-                context_question = last_state.context_question
-                intent = last_state.intent
-                types = last_state.question_types
-            # Decide what to do base on predicted data
-            action = self.__decide_action(user_input, hcm_question, intent, types, context_question, last_state)
-            bot_response = self.answer_generator.get_response(hcm_question, intent, types, action, last_state)
-            self.__regis_history(intent, user_input, bot_response, types, hcm_question, context_question, action)
-        else:
-            bot_response = MESSAGE_BOT_GREATING
-            self.__regis_history(Intent(), None, bot_response, [], False, False, chat_state.INITIAL)
+                bot_response = MESSAGE_BOT_GREATING
+                self.__regis_history(Intent(), None, bot_response, [], False, False, chat_state.INITIAL)
+        except Exception as e:
+            print(e)
+            print(traceback.format_exc())
+            bot_response = MESSAGE_SERVER_ERROR
+            self.__regis_history(Intent(), None, bot_response, [], False, False, chat_state.ERROR_SERVER)
+
         return bot_response
 
 

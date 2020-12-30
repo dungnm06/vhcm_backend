@@ -29,13 +29,15 @@ AWAIT_CONFIRMATION = 2
 CONFIRMATION_OK = 3
 CONFIRMATION_NG = 4
 ERROR_COMMAND = 5
+ERROR_SERVER = 6
 ACTION_TYPES = [
     (INITIAL, 'initial'),
     (ANSWER, 'answer'),
     (AWAIT_CONFIRMATION, 'await'),
     (CONFIRMATION_OK, 'ok'),
     (CONFIRMATION_NG, 'ng'),
-    (ERROR_COMMAND, 'error'),
+    (ERROR_COMMAND, 'error_command'),
+    (ERROR_SERVER, 'error_server'),
 ]
 
 
