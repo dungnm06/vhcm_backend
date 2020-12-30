@@ -51,7 +51,9 @@ CSRF_TRUSTED_ORIGINS = [
     'localhost',
     '127.0.0.1:3000',
     'localhost:3000',
+    'www.vhcm.org',
     'vhcm.org',
+    'www.vhcm.org:3000',
     'vhcm.org:3000'
 ]
 CSRF_COOKIE_SECURE = True

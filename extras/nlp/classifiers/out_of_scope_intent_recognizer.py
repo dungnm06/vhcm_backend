@@ -21,12 +21,12 @@ def train_oos_intent_recognizer(datafile, output):
 
     # Load context question data
     context_questions = load_text_data(os.path.join(ROOT, 'data/context_questions.txt'))
-    hcm_data.extend(context_questions*10)
+    hcm_data.extend(context_questions*2)
     print('Context question data len: {}'.format(len(context_questions)))
 
     # Load context word data
     context_words = load_text_data(os.path.join(ROOT, 'data/context_words.txt'))
-    hcm_data.extend(context_words*50)
+    hcm_data.extend(context_words*10)
     print('Context words data len: {}'.format(len(context_words)))
 
     sample_size = len(hcm_data)

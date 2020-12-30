@@ -428,7 +428,7 @@ class ChatbotConsumer(WebsocketConsumer):
         if self.last_state in YESNO_REPONSES:
             confirm_type = CONFIRM_YES_NO
             confirm_state = True
-        if self.chatbot.state_tracker[len(self.chatbot.state_tracker)-1].action == chat_state.AWAIT_CONFIRMATION:
+        if self.chatbot.state_tracker and self.chatbot.state_tracker[len(self.chatbot.state_tracker)-1].action == chat_state.AWAIT_CONFIRMATION:
             confirm_type = CONFIRM_TRUE_FALSE
             confirm_state = True
         # Send message to WebSocket

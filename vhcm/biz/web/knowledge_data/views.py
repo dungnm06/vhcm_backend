@@ -215,7 +215,8 @@ def get(request):
         tmp_dict[synonym.word].append({
             'id': synonym.synonym.synonym_id,
             'meaning': synonym.synonym.meaning,
-            'words': synonym.synonym.words.split(COMMA)
+            'words': synonym.synonym.words.split(COMMA),
+            'ne_synonym': synonym.synonym.ne_synonym
         })
     for word in tmp_dict:
         synonyms_display.append({
