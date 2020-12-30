@@ -835,6 +835,7 @@ def all_comment(request):
             report_model.ID: comment.report_id,
             report_comment_model.REPORT_TO: comment.report_to,
             report_comment_model.REPORT_TO + '_username': comment.report_to_username,
+            report_model.STATUS: comment.report_status
         }
         display_comment['report'] = report_comment
         display_comments.append(display_comment)
