@@ -51,6 +51,7 @@ Nguồn:
 MESSAGE_REFERENCE_INFO = '''{idx}{reference_name}\n{reference_author}{reference_info}'''
 MESSAGE_BOT_DIDNOT_ANSWER_ANYTHING_YET = 'Bot đã trả lời bạn thông tin gì đâu !?'
 MESSAGE_NOTHING_TO_ANSWER = 'Bạn đang hỏi về vấn đề gì ?'
+MESSAGE_USER_INPUT_UNKNOW_COMMAND = 'Sai cú pháp, đã hủy thao tác trước đó.\nBạn có thể chat tiếp.'
 MESSAGE_OOS_ANSWER = 'Xin lỗi hình như vấn đề này bot không có thông tin nên không thể trả lời bạn được, mời bạn hỏi câu khác.'
 MESSAGE_CONFIRMATION = 'Có phải bạn đang hỏi về: {intent}? (đúng, sai)'
 MESSAGE_CANCER_LAST_COMMAND = 'Đã huỷ thao tác trước đó.'
@@ -257,9 +258,14 @@ class VirtualHCMChatbot(object):
                     or chat_input.lower() == 'không'\
                     or chat_input.lower() == 'không phải':
                 return chat_state.CONFIRMATION_NG
-            else:
+            elif chat_input.lower() == 'đúng'\
+                    or chat_input.lower() == 'dung'\
+                    or chat_input.lower() == 'đúng rồi'\
+                    or chat_input.lower() == 'ừ'\
+                    or chat_input.lower() == 'phải':
                 return chat_state.CONFIRMATION_OK
-
+            else:
+                return chat_state.ERROR_COMMAND
         else:
             if (intent.intent_id and language_processor.analyze_sentence_components(intent, chat_input)) \
                     or chat_type == OUT_OF_SCOPE_DIALOGUE\
@@ -321,6 +327,8 @@ class AnswerGenerator:
                 return self.__answer(last_state.intent, last_state.question_types)
             elif action == chat_state.CONFIRMATION_NG:
                 return self.__confirmation_ng()
+            elif action == chat_state.ERROR_COMMAND:
+                return self.__user_input_unknow_command()
         else:
             return self.__out_of_scope_response()
 
@@ -353,6 +361,10 @@ class AnswerGenerator:
     @staticmethod
     def __nothing_to_response():
         return MESSAGE_NOTHING_TO_ANSWER
+
+    @staticmethod
+    def __user_input_unknow_command():
+        return MESSAGE_USER_INPUT_UNKNOW_COMMAND
 
 
 # For clearing GPU memory in case of load models failed
