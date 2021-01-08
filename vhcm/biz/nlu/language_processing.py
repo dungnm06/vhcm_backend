@@ -276,13 +276,13 @@ class LanguageProcessor(object, metaclass=Singleton):
             (content, ne_synonyms),
             word_segemented=True,
             segemented_output=True,
-            lower=True)
+            lower=False)
         for sim in ne_similaries:
             similaries.extend(self.generate_similary_sentences(
                 (sim, synonyms),
                 word_segemented=True,
                 segemented_output=True,
-                lower=True)
+                lower=False)
             )
         # Clean exclude things from generated similaries
         tmp = []
@@ -290,7 +290,7 @@ class LanguageProcessor(object, metaclass=Singleton):
             tmp_pos = self.pos_tagging(self.words_unsegmentation(SPACE.join(sim)))
             cleaned_tmp_pos = []
             for arr in tmp_pos:
-                cleaned_tmp_pos.extend([word[0] for word in arr if (
+                cleaned_tmp_pos.extend([word[0].lower() for word in arr if (
                             word[0].lower() not in self.exclude_words and word[1] not in self.exclude_pos_tag)])
                 tmp.append(cleaned_tmp_pos)
         similaries = tmp

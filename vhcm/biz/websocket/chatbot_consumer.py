@@ -220,6 +220,7 @@ class ChatbotConsumer(WebsocketConsumer):
                         elif user_input == REPORT_CONTRIBUTE_DATA:
                             # Contribute data
                             self.processing_report_type = REPORT_CONTRIBUTE_DATA
+                            self.input_data_type = CHOOSE_REPORT_TYPE
                             self.state_idx = 1
                             self.last_state = PROCESSING_CONTRIBUTE_DATA[self.state_idx]
                             self.regist_message(chat_state.SYSTEM_SENT, ACTION_RESPONSES[self.last_state])
@@ -260,7 +261,20 @@ class ChatbotConsumer(WebsocketConsumer):
                         elif self.processing_report_type == REPORT_CONTRIBUTE_DATA:
                             self.state_idx += 1
                             if self.last_state == INPUT_DATA:
-                                self.report_data = user_input
+                                if self.input_data_type == CHOOSE_TO_INPUT_NOTE:
+                                    self.report_note = user_input
+                                elif self.input_data_type == CHOOSE_REPORT_TYPE:
+                                    self.report_data = user_input
+                            elif self.last_state in YESNO_REPONSES:
+                                if user_input == 'có' or user_input == 'co':
+                                    pass
+                                elif user_input == 'không' or user_input == 'khong':
+                                    # End report
+                                    self.state_idx = len(PROCESSING_CONTRIBUTE_DATA)
+                                else:
+                                    self.error_cancel_report()
+                                    return
+                                self.input_data_type = self.last_state
                             if self.state_idx == len(PROCESSING_CONTRIBUTE_DATA):
                                 self.regist_report()
                                 self.reset_system_communicate_state()
@@ -269,7 +283,7 @@ class ChatbotConsumer(WebsocketConsumer):
                                     bot.MESSAGE_THANK_FOR_CONTRIBUTE)
                                 self.send_response(CHAT_RESPONSE, bot.MESSAGE_THANK_FOR_CONTRIBUTE)
                                 return
-                            self.last_state = PROCESSING_REPORT_WRONG_ANSWER[self.state_idx]
+                            self.last_state = PROCESSING_CONTRIBUTE_DATA[self.state_idx]
                             self.regist_message(chat_state.SYSTEM_SENT, ACTION_RESPONSES[self.last_state])
                             self.send_response(CHAT_RESPONSE, ACTION_RESPONSES[self.last_state])
                         elif self.processing_report_type == ANSWER_CONFIRMATION_NG:
